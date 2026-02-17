@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advertising Flags - Square Foot Printing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Estructura para mantener el menú fijo y el contenido con scroll independiente */
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow: hidden; }
+        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        
+        .sidebar-fixed { 
+            width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; 
+            background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto;
+        }
+
+        .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
+        .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
+        .sidebar-item.active { border-right: 3px solid #000; }
+
+        .main-content-scroll { 
+            height: calc(100vh - 73px); overflow-y: auto; flex-grow: 1;
+            background-color: white; display: flex; flex-direction: column;
+        }
+
+        .product-card { 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border: 1px solid #f3f4f6; 
+            border-radius: 2.5rem; 
+        }
+        .product-card:hover { 
+            transform: scale(1.02) translateY(-5px); 
+            box-shadow: 0 25px 30px -10px rgb(0 0 0 / 0.1);
+            border-color: #000;
+        }
+
+        .filter-btn { transition: all 0.3s ease; border: 1px solid #f3f4f6; }
+        .filter-btn.active { background-color: #000; color: #fff; border-color: #000; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
+        <div class="flex items-center gap-8">
+            <a href="index.html" class="flex items-center group">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
+                </div>
+            </a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                <a href="index.html" class="text-black border-b-2 border-black pb-1">Wall Art</a>
+                <a href="banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
+            </div>
+        </div>
+        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg">Register</button>
+    </nav>
+
+    <div class="flex flex-row flex-grow w-full">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
+            <ul class="space-y-6">
+                <li class="sidebar-item cursor-pointer active"><a href="advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer">Displays</li>
+                <li class="sidebar-item cursor-pointer">Large Format Printing</li>
+                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+                <li class="sidebar-item cursor-pointer"><a href="stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer">Rigid Signs</li>
+            </ul>
+        </aside>
+
+        <main class="main-content-scroll">
+            <div class="p-12 flex-grow">
+                <header class="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
+                    <div>
+                        <h1 class="text-5xl heavy-italic text-gray-900 mb-4">Advertising Flags</h1>
+                        <div class="h-2 w-24 bg-black rounded-full"></div>
+                    </div>
+                    
+                    <div class="flex gap-2 bg-white p-1.5 rounded-full border shadow-sm">
+                        <button onclick="applySort('random', this)" class="filter-btn active px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">Featured</button>
+                        <button onclick="applySort('low', this)" class="filter-btn px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">Price ↓</button>
+                        <button onclick="applySort('high', this)" class="filter-btn px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">Price ↑</button>
+                    </div>
+                </header>
+
+                <div id="flag-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+                    </div>
+            </div>
+
+            <footer class="bg-white border-t py-12 px-10 text-center w-full">
+                <div class="bg-black p-2 rounded-lg inline-block mb-4 shadow-lg">
+                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto">
+                </div>
+                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        const flags = [
+            { name: 'Custom Pole Flag', priceVal: 10.00, priceStr: '$10.00 - $18.5', img: 'images/Advertising Flags/Custom-Pole-Flag-02-1.png', desc: 'Durable outdoor fabric flags.' },
+            { name: 'Tear Drop Flag - Small', priceVal: 19.17, priceStr: '$19.17 - $212.63', img: 'images/Advertising Flags/TearDropFlags-SMALL-1.png', desc: 'Unique aerodynamic shape.' },
+            { name: 'Tear Drop Flag - Medium', priceVal: 20.13, priceStr: '$20.13 - $223.26', img: 'images/Advertising Flags/TearDropFlags-MEDIUM-1.png', desc: 'Aerodynamic shape for Las Vegas wind.' },
+            { name: 'Tear Drop Flag - Large', priceVal: 24.14, priceStr: '$24.14 - $247.58', img: 'images/Advertising Flags/TearDropFlags-LARGE-1.png', desc: 'Unique aerodynamic shape.' },
+            { name: 'Tear Drop Flag - X-Large', priceVal: 49.49, priceStr: '$49.49 - $507.54', img: 'images/Advertising Flags/TearDropFlags-XLARGE-1.png', desc: 'Maximum visibility impact.' },
+            { name: 'Feather Angled - Small', priceVal: 19.17, priceStr: '$19.17 - $212.63', img: 'images/Advertising Flags/FeatherAngledFlags-SMALL-1.png', desc: 'Classic vertical advertising flag.' },
+            { name: 'Feather Angled - Medium', priceVal: 20.13, priceStr: '$20.13 - $223.26', img: 'images/Advertising Flags/FeatherAngledFlags-MEDIUM-1.png', desc: 'Classic vertical advertising flag.' },
+            { name: 'Feather Angled - Large', priceVal: 24.14, priceStr: '$24.14 - $247.58', img: 'images/Advertising Flags/FeatherAngledFlags-LARGE-1.png', desc: 'Classic vertical advertising flag.' },
+            { name: 'Feather Angled - X-Large', priceVal: 49.49, priceStr: '$49.49 - $507.54', img: 'images/Advertising Flags/FeatherAngledFlags-XLARGE-1.png', desc: 'Classic vertical advertising flag.' },
+            { name: 'Econo Feather Flag', priceVal: 33.32, priceStr: '$33.32 – $156.60', img: 'images/Advertising Flags/Econo-Feather-Flag-Main-1.png', desc: 'Budget-friendly vertical flag.' }
+        ];
+
+        function renderFlags(data) {
+            const grid = document.getElementById('flag-grid');
+            grid.innerHTML = data.map(f => `
+                <div onclick="navigateToProduct('${f.name}')" class="product-card bg-white overflow-hidden cursor-pointer group shadow-sm border border-gray-100">
+                    <div class="h-80 p-10 flex items-center justify-center group-hover:bg-gray-50 transition-colors">
+                        <img src="${f.img}" alt="${f.name}" class="object-contain h-full drop-shadow-xl transition-transform group-hover:scale-110">
+                    </div>
+                    <div class="p-8 border-t">
+                        <h3 class="font-black text-xl text-gray-800 uppercase italic leading-tight">${f.name}</h3>
+                        <p class="text-[11px] text-gray-400 font-bold mt-2 uppercase">${f.desc}</p>
+                        <div class="flex justify-between items-end mt-8">
+                            <div>
+                                <p class="text-[9px] text-gray-400 font-black uppercase">Starting at</p>
+                                <p class="text-3xl font-black text-gray-900 italic leading-none">${f.priceStr}</p>
+                            </div>
+                            <div class="bg-black text-white px-6 py-2 rounded-full group-hover:bg-red-600 transition-colors italic text-[10px] uppercase font-bold tracking-widest shadow-lg">Select</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Función para redirigir específicamente a custom pole flag
+        function navigateToProduct(name) {
+            if (name === 'Custom Pole Flag') {
+                window.location.href = 'pole-flag.html';
+            } else {
+                console.log("Navegación pendiente para: " + name);
+            }
+        }
+
+        function applySort(type, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            let sorted;
+            if (type === 'low') sorted = [...flags].sort((a, b) => a.priceVal - b.priceVal);
+            else if (type === 'high') sorted = [...flags].sort((a, b) => b.priceVal - a.priceVal);
+            else sorted = [...flags].sort(() => 0.5 - Math.random());
+            renderFlags(sorted);
+        }
+
+        window.onload = () => applySort('random', document.querySelector('.filter-btn'));
+    </script>
+</body>
+</html>
