@@ -16,10 +16,15 @@
         .sidebar-item.active { border-right: 3px solid #000; }
         .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
         .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
+        .custom-dropdown:disabled { background-color: #f9fafb; color: #9ca3af; cursor: not-allowed; }
         .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
         .custom-input:focus { border-color: #000; }
         .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
-        /* Estilos para el menú móvil */
+        .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
+        .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
+        .progress-bar { width: 0%; height: 8px; background: #83D644; transition: width 0.6s ease; border-radius: 4px; }
+        
+        /* Estilos exclusivos para el menú móvil */
         #mobile-menu { transition: transform 0.3s ease-in-out; transform: translateX(-100%); }
         #mobile-menu.active { transform: translateX(0); }
     </style>
@@ -31,53 +36,67 @@
             <button onclick="toggleMobileMenu()" class="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
                 <i data-lucide="menu" class="w-6 h-6"></i>
             </button>
-            
+
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
-                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 md:h-10 w-auto object-contain">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-            
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                <a href="../index.html" class="hover:text-black">Wall Art</a>
-                <a href="../Banners/banners.html" class="hover:text-black">Banners</a>
-                <a href="#" class="hover:text-black">Trade Show</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black">Stickers</a>
+                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
         <button class="bg-red-600 text-white px-4 md:px-6 py-2 rounded-full font-black uppercase text-[9px] md:text-[10px] tracking-widest shadow-lg">Register</button>
     </nav>
 
     <div id="mobile-menu" class="fixed inset-0 bg-white z-[60] lg:hidden flex flex-col p-8 overflow-y-auto">
-        <div class="flex justify-between items-center mb-12">
-            <span class="font-black text-[12px] uppercase tracking-widest">Menu</span>
+        <div class="flex justify-between items-center mb-8">
+            <span class="font-black text-[12px] uppercase tracking-widest text-gray-400">Menu</span>
             <button onclick="toggleMobileMenu()" class="p-2"><i data-lucide="x" class="w-8 h-8"></i></button>
         </div>
         
-        <h3 class="text-[10px] font-black text-gray-300 uppercase mb-6 tracking-widest border-b pb-2">Navigation</h3>
-        <ul class="space-y-6 mb-12">
-            <li><a href="../index.html" class="text-2xl font-black italic uppercase">Wall Art</a></li>
-            <li><a href="../Banners/banners.html" class="text-2xl font-black italic uppercase">Banners</a></li>
-            <li><a href="#" class="text-2xl font-black italic uppercase">Trade Show</a></li>
-            <li><a href="../Stickers/stickers.html" class="text-2xl font-black italic uppercase">Stickers</a></li>
-        </ul>
+        <div class="space-y-10">
+            <nav class="flex flex-col gap-4">
+                <h3 class="text-[10px] font-black text-gray-300 uppercase tracking-widest border-b pb-2">Main Navigation</h3>
+                <a href="../index.html" class="text-xl font-black uppercase italic hover:text-red-600">Wall Art</a>
+                <a href="../Banners/banners.html" class="text-xl font-black uppercase italic hover:text-red-600">Banners</a>
+                <a href="#" class="text-xl font-black uppercase italic hover:text-red-600">Trade Show</a>
+                <a href="#" class="text-xl font-black uppercase italic hover:text-red-600">Decals</a>
+                <a href="../Stickers/stickers.html" class="text-xl font-black uppercase italic hover:text-red-600">Stickers</a>
+                <a href="#" class="text-xl font-black uppercase italic hover:text-red-600">Apparel</a>
+                <a href="#" class="text-xl font-black uppercase italic hover:text-red-600">Marketing Materials</a>
+            </nav>
 
-        <h3 class="text-[10px] font-black text-gray-300 uppercase mb-6 tracking-widest border-b pb-2">Categories</h3>
-        <ul class="space-y-4">
-            <li><a href="../AdvertisingFlags/advertising-flags.html" class="text-sm font-bold uppercase text-gray-500">Advertising Flags</a></li>
-            <li><a href="../Banners/banners.html" class="text-sm font-bold uppercase text-gray-500">Banners</a></li>
-            <li><a href="../LargePrinting/largeprinting.html" class="text-sm font-bold uppercase text-gray-500">Large Format</a></li>
-            <li><a href="#" class="text-sm font-black uppercase text-black">Rigid Signs</a></li>
-        </ul>
+            <nav class="flex flex-col gap-4">
+                <h3 class="text-[10px] font-black text-gray-300 uppercase tracking-widest border-b pb-2">Categories</h3>
+                <a href="../AdvertisingFlags/advertising-flags.html" class="text-sm font-bold uppercase text-gray-500">Advertising Flags</a>
+                <a href="../Banners/banners.html" class="text-sm font-bold uppercase text-gray-500">Banners</a>
+                <a href="#" class="text-sm font-bold uppercase text-gray-500">Displays</a>
+                <a href="../LargePrinting/largeprinting.html" class="text-sm font-bold uppercase text-gray-500">Large Format Printing</a>
+                <a href="#" class="text-sm font-bold uppercase text-gray-500">Printed Fabric</a>
+                <a href="../Stickers/stickers.html" class="text-sm font-bold uppercase text-gray-500">Stickers</a>
+                <a href="#" class="text-sm font-black uppercase text-black">Rigid Signs</a>
+            </nav>
+        </div>
     </div>
 
     <div class="flex flex-row flex-grow w-full">
         <aside class="sidebar-fixed p-10 hidden lg:block">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html">Banners</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html">Large Format</a></li>
-                <li class="sidebar-item active font-black text-black">Rigid Signs</li>
+                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer">Displays</li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer active"><a href="rigidsigns.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
 
@@ -86,72 +105,216 @@
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-20">
                     
                     <div class="space-y-8">
-                        <div class="bg-gray-50 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[300px] md:min-h-[450px]">
-                            <img id="main-prod-img" src="../images/Rigid Signs/Aluminum-01.png" alt="Sign" class="max-h-[250px] md:max-h-[380px] drop-shadow-2xl">
+                        <div class="bg-gray-50 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] md:min-h-[450px] relative">
+                            <img id="main-prod-img" src="../images/Rigid Signs/Die-Bond-01.png" alt="Sign" class="max-h-[280px] md:max-h-[380px] drop-shadow-2xl">
                         </div>
                         <div class="pt-8 border-t border-gray-100 italic font-medium text-gray-600 space-y-6">
-                            <h2 id="desc-title" class="text-2xl md:text-3xl font-black text-black uppercase tracking-tighter">White Aluminum</h2>
-                            <p id="desc-body" class="text-sm md:text-[15px] leading-relaxed">Solid aluminum sheets designed for durability. Perfect for real estate and industrial use.</p>
+                            <div>
+                                <h2 id="desc-title" class="text-2xl md:text-3xl font-black text-black uppercase tracking-tighter mb-4">White Aluminum</h2>
+                                <p id="desc-body" class="text-sm md:text-[15px] leading-relaxed">Solid aluminum sheets designed for high durability and a sleek finish. Perfect for long-term outdoor use, real estate, and industrial signage.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-gray-900 mb-4 tracking-wider text-xs uppercase underline">Specifications:</h4>
+                                <ul id="desc-features" class="list-disc pl-5 space-y-3 text-[13px]"></ul>
+                            </div>
                         </div>
                     </div>
 
                     <div class="space-y-10">
                         <header>
                             <h1 id="prod-title" class="text-4xl md:text-5xl heavy-italic text-gray-900 italic">Aluminum Signs</h1>
-                            <p class="text-lg md:text-xl font-black text-gray-400 italic mt-4" id="prod-range">$4.50 – $14.00 sq/ft</p>
+                            <p class="text-xl font-black text-gray-400 italic mt-6" id="prod-range">$4.50 – $14.00 sq/ft</p>
                         </header>
 
                         <div class="space-y-6">
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-2 block">Material</label>
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Substrate Selection</label>
                                 <select id="mat-select" onchange="handleMaterialChange()" class="custom-dropdown">
-                                    <option value="white_alum">White Aluminum</option>
-                                    <option value="die_bond">Die Bond</option>
+                                    <option value="white_alum" selected>White Aluminum (Solid Sheet)</option>
+                                    <option value="die_bond">Die Bond (Aluminum Composite)</option>
                                 </select>
                             </div>
 
-                            <div class="bg-gray-50/50 p-6 md:p-10 rounded-[2rem] border border-gray-100">
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm">
-                                    <span>Width (in)</span>
-                                    <input type="number" id="w-input" value="24" oninput="calculatePrice()" class="custom-input w-24 md:w-36">
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Thickness Options</label>
+                                <select id="thick-select" onchange="calculatePrice()" class="custom-dropdown"></select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Lamination</label>
+                                <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="none">No Lamination</option>
+                                    <option value="uv" selected>UV Lamination (Gloss/Matte)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1"># Of Sides</label>
+                                <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="1">Single Sided</option>
+                                    <option value="2">Double Sided</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-4">
+                                <label class="text-[10px] font-black uppercase text-red-500 italic ml-1">Validation Status</label>
+                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-8 md:p-12 rounded-[2rem] md:rounded-[2.5rem]">
+                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Upload Artwork File</span>
+                                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
                                 </div>
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm">
-                                    <span>Height (in)</span>
-                                    <input type="number" id="h-input" value="24" oninput="calculatePrice()" class="custom-input w-24 md:w-36">
-                                </div>
-                                <div class="pt-8 text-center">
-                                    <span id="final-price" class="text-5xl md:text-6xl heavy-italic italic">$33.00</span>
+                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-10 shadow-2xl space-y-8">
+                                    <div class="flex flex-col md:flex-row gap-6 md:gap-10 items-center">
+                                        <div class="w-24 h-24 md:w-32 md:h-32 bg-gray-50 rounded-3xl border p-2 flex items-center justify-center overflow-hidden"><img id="preview-thumb" class="max-h-full max-w-full object-contain"></div>
+                                        <div class="flex-grow text-center md:text-left">
+                                            <h4 id="status-title" class="text-2xl md:text-3xl font-black uppercase text-blue-600 italic tracking-tighter mb-4">Analysis Complete</h4>
+                                            <div id="validation-text" class="text-base md:text-lg text-gray-400 font-medium italic leading-tight"></div>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar h-full"></div></div>
+                                    <div class="flex gap-4">
+                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[13px] font-black uppercase py-5 rounded-3xl hover:bg-black transition-all shadow-lg italic">Approve</button>
+                                        <button onclick="resetUpload()" class="px-6 md:px-10 bg-gray-50 text-gray-300 text-[11px] font-black uppercase rounded-3xl italic">Discard</button>
+                                    </div>
                                 </div>
                             </div>
 
-                            <button class="w-full bg-black text-white font-black py-5 md:py-6 rounded-2xl text-[11px] md:text-[12px] uppercase tracking-[0.3em] italic shadow-lg">Add to cart</button>
+                            <div class="bg-gray-50/50 p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 relative">
+                                <div id="limit-msg" class="hidden absolute -top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit reached</div>
+                                <div class="price-row italic font-black uppercase text-gray-700 text-sm">
+                                    <span>Width (in)</span>
+                                    <input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36">
+                                </div>
+                                <div class="price-row italic font-black uppercase text-gray-700 text-sm">
+                                    <span>Height (in)</span>
+                                    <input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36">
+                                </div>
+                                <div class="price-row border-none pt-10">
+                                    <span class="text-[12px] font-black uppercase text-gray-900 italic">Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.000 sq ft</span></span>
+                                    <span id="final-price" class="text-5xl md:text-6xl heavy-italic italic text-black tracking-tighter">$33.00</span>
+                                </div>
+                            </div>
+
+                            <button id="add-to-cart-btn" disabled class="w-full bg-gray-200 text-white font-black py-5 md:py-6 rounded-2xl text-[11px] md:text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
         </main>
     </div>
 
     <script>
         lucide.createIcons();
 
+        // Control del menú móvil
         function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('active');
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('active');
         }
 
-        // Lógica de materiales y precios simplificada para el ejemplo
+        const thickOptions = {
+            white_alum: ['0.040" Solid', '0.063" Solid', '0.080" Solid'],
+            die_bond: ['1/8" (3mm) Composite', '1/4" (6mm) Composite']
+        };
+
         function handleMaterialChange() {
             const mat = document.getElementById('mat-select').value;
+            const thickSelect = document.getElementById('thick-select');
             const title = document.getElementById('desc-title');
-            title.innerText = mat === "white_alum" ? "White Aluminum" : "Die Bond / E-Panel";
+            const body = document.getElementById('desc-body');
+            const features = document.getElementById('desc-features');
+            
+            thickSelect.innerHTML = '';
+            thickOptions[mat].forEach(opt => {
+                const o = document.createElement('option');
+                o.value = opt; o.text = opt; thickSelect.add(o);
+            });
+
+            if (mat === "white_alum") {
+                title.innerText = "White Aluminum Signs";
+                body.innerText = "Solid aluminum sheets designed for high durability. Perfect for parking signs, real estate, and long-term industrial use.";
+                features.innerHTML = `<li>Maximum size 48" x 96"</li><li>Weatherproof and UV safe</li><li>High res digital print 720x720</li>`;
+            } else {
+                title.innerText = "Die Bond / E-Panel";
+                body.innerText = "Two aluminum sheets bonded to a polyethylene core. Best for Real Estate and Trade Shows.";
+                features.innerHTML = `<li>FREE ROUTER CUTTING</li><li>Maximum size 46" x 94"</li><li>Outdoor and indoor durability</li>`;
+            }
+            calculatePrice();
+        }
+
+        function validateSize() {
+            const mat = document.getElementById('mat-select').value;
+            const w = document.getElementById('w-input');
+            const h = document.getElementById('h-input');
+            const msg = document.getElementById('limit-msg');
+            const maxW = (mat === 'die_bond') ? 46 : 48;
+            const maxH = (mat === 'die_bond') ? 94 : 96;
+            
+            if (parseFloat(w.value) > maxW) { w.value = maxW; msg.classList.remove('hidden'); }
+            if (parseFloat(h.value) > maxH) { h.value = maxH; msg.classList.remove('hidden'); }
+            setTimeout(() => msg.classList.add('hidden'), 2000);
             calculatePrice();
         }
 
         function calculatePrice() {
+            const mat = document.getElementById('mat-select').value;
+            const lam = document.getElementById('lam-select').value;
+            const sides = document.getElementById('side-select').value;
+            const thick = document.getElementById('thick-select').value;
             const w = parseFloat(document.getElementById('w-input').value) || 0;
             const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const price = (w * h / 144) * 8.25;
-            document.getElementById('final-price').innerText = `$${price.toFixed(2)}`;
+            const area = (w * h) / 144;
+            let pSqFt = 0;
+
+            if (mat === "white_alum") {
+                if (lam === "none") pSqFt = 7.50;
+                else pSqFt = (sides === "1") ? 8.25 : 9.00;
+            } else {
+                if (thick.includes("1/8")) {
+                    pSqFt = (lam === "none") ? ((sides === "1") ? 4.50 : 6.25) : ((sides === "1") ? 5.25 : 14.00);
+                } else {
+                    pSqFt = (lam === "none") ? 9.00 : 10.50;
+                    if (sides === "2") pSqFt = 14.00;
+                }
+            }
+            document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
+            document.getElementById('final-price').innerText = `$${(pSqFt * area).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        }
+
+        function processFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                document.getElementById('drop-zone').classList.add('hidden');
+                document.getElementById('validation-panel').classList.remove('hidden');
+                reader.onload = (e) => {
+                    document.getElementById('preview-thumb').src = e.target.result;
+                    setTimeout(() => { 
+                        document.getElementById('upload-progress').style.width = '100%'; 
+                        document.getElementById('validation-text').innerHTML = `Verifying substrate compatibility... confirmed.`;
+                    }, 1000);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function approveArt() {
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
+            btn.classList.remove('cursor-not-allowed');
+            document.getElementById('status-title').innerText = "Artwork Approved";
+            document.getElementById('status-title').classList.replace('text-blue-600', 'text-[#83D644]');
+        }
+
+        function resetUpload() {
+            document.getElementById('drop-zone').classList.remove('hidden');
+            document.getElementById('validation-panel').classList.add('hidden');
+            document.getElementById('file-input').value = "";
+            document.getElementById('add-to-cart-btn').disabled = true;
+            document.getElementById('upload-progress').style.width = '0%';
         }
 
         window.onload = handleMaterialChange;
