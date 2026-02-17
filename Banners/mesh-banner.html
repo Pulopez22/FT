@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesh Banner - Square Foot Printing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow: hidden; }
+        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
+        .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
+        .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
+        .sidebar-item.active { border-right: 3px solid #000; }
+        .main-content-scroll { height: calc(100vh - 73px); overflow-y: auto; flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
+        .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
+        .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
+        .custom-input:focus { border-color: #000; }
+        .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
+        .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
+        .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
+        .progress-bar { width: 0%; height: 4px; background: #83D644; transition: width 0.6s ease; border-radius: 2px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
+        <div class="flex items-center gap-8">
+            <a href="../index.html" class="flex items-center group">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
+                </div>
+            </a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                <a href="../index.html" class="hover:text-black">Wall Art</a>
+                <a href="banners.html" class="text-black border-b-2 border-black pb-1">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
+            </div>
+        </div>
+        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-red-700 transition-all">Register</button>
+    </nav>
+
+    <div class="flex flex-row flex-grow w-full">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
+            <ul class="space-y-6">
+                <li class="sidebar-item"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item active font-black text-black"><a href="banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer">Displays</li>
+                <li class="sidebar-item cursor-pointer">Large Format Printing</li>
+                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer">Rigid Signs</li>
+            </ul>
+        </aside>
+
+        <main class="main-content-scroll">
+            <div class="p-12 flex-grow">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
+                    
+                    <div class="space-y-8">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] relative">
+                            <img id="main-prod-img" src="../images/Banners/AMS-Mesh-Banner-01.png" alt="Mesh Banner" class="max-h-[300px] drop-shadow-2xl transition-all duration-300">
+                        </div>
+                        <div class="flex gap-3 justify-center flex-wrap">
+                            <img src="../images/Banners/AMS-Mesh-Banner-01.png" class="thumb-img w-16 h-16 rounded-xl border-2 border-black cursor-pointer object-cover hover:scale-105 transition-transform" onclick="changeImage(this)">
+                            <img src="../images/Banners/AMS-Mesh-Banner-02.png" class="thumb-img w-16 h-16 rounded-xl border border-gray-100 cursor-pointer object-cover hover:scale-105 transition-transform" onclick="changeImage(this)">
+                        </div>
+                        <div class="pt-8 border-t border-gray-100">
+                            <h3 class="text-3xl font-normal text-gray-800 mb-6 italic">Mesh Banners</h3>
+                            <div class="text-[14px] text-gray-600 leading-[1.7] space-y-5 font-medium">
+                                <p>Mesh banners are printed on 10 oz. heavy-duty banner material. They are suitable for large outdoor advertisements where wind load is an issue.</p>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li>Single piece maximum size 10’ x 145’</li>
+                                    <li>High resolution digitally printed at 720 x 720</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-10">
+                        <header>
+                            <h1 class="text-4xl heavy-italic text-gray-900 leading-none italic">10oz Mesh Banner</h1>
+                            <p class="text-1xl font-black text-gray-400 italic mt-6">$2.00 sq/ft</p>
+                        </header>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Finish</label>
+                                <select class="custom-dropdown"><option>Matte</option></select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Finishing Options</label>
+                                <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="2.00">Hems & Grommets 2ft</option>
+                                    <option value="2.00">No finishing</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Pole Pockets</label>
+                                <select id="pocket-select" class="custom-dropdown">
+                                    <option value="0">No Pole Pockets</option>
+                                    <option value="0">2" Top & Bottom</option>
+                                    <option value="0">3" Top & Bottom</option>
+                                    <option value="0">4" Top & Bottom</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] ml-1">Turnaround</label>
+                                    <button onclick="resetDropdown('turn-select')" class="text-[10px] font-bold text-gray-900 flex items-center gap-1.5 hover:text-red-600 transition-colors">
+                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Clear
+                                    </button>
+                                </div>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="0" selected>Next Day +1</option>
+                                    <option value="50">Same Day Rush + $50</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-4">
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block ml-1">Upload & Validate Art</label>
+                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">
+                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest">Select Image File</span>
+                                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
+                                </div>
+
+                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 shadow-2xl space-y-5">
+                                    <div class="flex gap-5 items-center">
+                                        <div class="w-24 h-24 bg-gray-50 rounded-2xl overflow-hidden border p-2">
+                                            <img id="preview-thumb" class="w-full h-full object-contain">
+                                        </div>
+                                        <div class="flex-grow">
+                                            <h4 id="status-title" class="text-[14px] font-black uppercase text-red-600 tracking-tighter italic">ARTWORK SCALING REQUIRED</h4>
+                                            <div id="validation-text" class="text-[12px] text-gray-500 font-medium leading-relaxed mt-1">
+                                                <span class="text-red-500 font-bold">Dimensions Mismatch:</span><br>
+                                                <span id="file-dims" class="text-gray-400">Your file: 0.32" x 0.16" (at 1000 DPI).</span><br>
+                                                <span id="requested-dims" class="text-gray-400">Requested: <span class="text-black font-bold">24" x 24"</span>.</span><br>
+                                                <span class="text-black italic underline font-bold mt-1 block italic">We will scale your artwork.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
+                                        <div id="upload-progress" class="progress-bar"></div>
+                                    </div>
+                                    <div class="flex gap-3" id="action-buttons">
+                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[10px] font-black uppercase py-4 rounded-2xl hover:bg-black transition-all shadow-lg">Approve & Continue</button>
+                                        <button onclick="resetUpload()" class="px-6 bg-gray-100 text-gray-400 text-[10px] font-black uppercase rounded-2xl">Discard</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50/50 p-10 rounded-[2.5rem] border border-gray-100 shadow-inner">
+                                <div class="price-row">
+                                    <span class="text-[13px] font-black uppercase text-gray-700">Width (in)</span>
+                                    <input type="number" id="w-input" value="24" oninput="calculatePrice()" class="custom-input w-32">
+                                </div>
+                                <div class="price-row">
+                                    <span class="text-[13px] font-black uppercase text-gray-700">Height (in)</span>
+                                    <input type="number" id="h-input" value="24" oninput="calculatePrice()" class="custom-input w-32">
+                                </div>
+                                <div class="price-row border-none pt-8">
+                                    <span class="text-[11px] font-black uppercase text-gray-900 tracking-widest">Total Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.00 sq ft</span></span>
+                                    <span id="final-price" class="text-5xl heavy-italic italic text-black">$8.00</span>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-5">
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-5 border-2 border-gray-100 rounded-2xl font-black text-center outline-none">
+                                <button id="add-to-cart-btn" disabled class="flex-grow bg-gray-200 text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed">Add to cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="bg-white border-t py-12 px-10 text-center w-full">
+                <div class="bg-black p-2 rounded-lg inline-block mb-4 shadow-lg">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto">
+                </div>
+                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function changeImage(el) {
+            document.getElementById('main-prod-img').src = el.src;
+            document.querySelectorAll('.thumb-img').forEach(i => { i.classList.remove('border-black'); i.classList.add('border-gray-100'); });
+            el.classList.add('border-black');
+        }
+
+        function processFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                document.getElementById('drop-zone').classList.add('hidden');
+                document.getElementById('validation-panel').classList.remove('hidden');
+                setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        document.getElementById('preview-thumb').src = e.target.result;
+                        const w_selected = parseFloat(document.getElementById('w-input').value);
+                        const h_selected = parseFloat(document.getElementById('h-input').value);
+                        
+                        // CÁLCULO DE DIMS PARA EL MENSAJE
+                        const realW = (this.width / 1000).toFixed(2);
+                        const realH = (this.height / 1000).toFixed(2);
+                        
+                        document.getElementById('file-dims').innerText = `Your file: ${realW}" x ${realH}" (at 1000 DPI).`;
+                        document.getElementById('requested-dims').innerHTML = `Requested: <span class="text-black font-bold">${w_selected}" x ${h_selected}"</span>.`;
+                        
+                        const isMatch = (Math.abs(realW - w_selected) < 0.1) && (Math.abs(realH - h_selected) < 0.1);
+                        
+                        if (isMatch) {
+                            document.getElementById('status-title').innerText = "PERFECT SIZE MATCH";
+                            document.getElementById('status-title').className = "text-[14px] font-black uppercase text-green-600 tracking-tighter italic";
+                        } else {
+                            document.getElementById('status-title').innerText = "ARTWORK SCALING REQUIRED";
+                            document.getElementById('status-title').className = "text-[14px] font-black uppercase text-red-600 tracking-tighter italic";
+                        }
+                    };
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function approveArt() {
+            const btn = document.getElementById('add-to-cart-btn'); 
+            btn.disabled = false;
+            btn.classList.replace('bg-gray-200', 'bg-[#83D644]'); 
+            btn.classList.add('shadow-xl'); 
+            btn.classList.remove('cursor-not-allowed');
+            document.getElementById('status-title').innerText = "Artwork Approved";
+            document.getElementById('status-title').className = "text-[14px] font-black uppercase text-green-600 tracking-tighter italic";
+            document.getElementById('action-buttons').classList.add('hidden');
+        }
+
+        function resetUpload() {
+            document.getElementById('drop-zone').classList.remove('hidden'); 
+            document.getElementById('validation-panel').classList.add('hidden');
+            document.getElementById('upload-progress').style.width = '0%'; 
+            document.getElementById('file-input').value = "";
+        }
+
+        function resetDropdown(id) { document.getElementById(id).selectedIndex = 0; calculatePrice(); }
+
+        function calculatePrice() {
+            const w = parseFloat(document.getElementById('w-input').value) || 0;
+            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const pricePerSqFt = 2.00;
+            const area = (w * h) / 144;
+            const finalTotal = (area * pricePerSqFt * qty);
+            document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
+            document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+        window.onload = calculatePrice;
+    </script>
+</body>
+</html>

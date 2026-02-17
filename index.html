@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Foot Printing - Premium Custom Prints</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fff; }
+        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        .product-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f3f4f6; }
+        .product-card:hover { 
+            transform: scale(1.02) translateY(-5px); 
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            border-color: #000;
+        }
+        .sidebar-item:hover { color: #000; padding-left: 6px; transition: all 0.2s ease; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50">
+        <div class="flex items-center gap-8">
+            <a href="index.html" class="flex items-center group">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" 
+                         alt="Square Foot Printing" class="h-8 md:h-10 w-auto object-contain">
+                </div>
+            </a>
+            
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                <a href="index.html" class="text-black border-b-2 border-black pb-1">Wall Art</a>
+                <a href="banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
+            </div>
+        </div>
+
+        <div class="flex gap-4">
+            <button class="text-[10px] font-black uppercase text-gray-400 hover:text-black transition-colors">Sign In</button>
+            <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-red-700 transition-all">Register</button>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <aside class="w-72 border-r h-[calc(100vh-70px)] sticky top-[70px] p-8 hidden lg:block bg-white overflow-y-auto">
+            <h3 class="text-[10px] font-black uppercase mb-8 text-gray-400 tracking-widest border-b pb-2 active">Product Categories</h3>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+                <li class="sidebar-item cursor-pointer"><a href="AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer">Displays</li>
+                <li class="sidebar-item cursor-pointer"><a href="LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+                <li class="sidebar-item cursor-pointer"><a href="Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer">Rigid Signs</li>
+            </ul>
+        </aside>
+
+        <main class="flex-grow p-12">
+            <header class="mb-12">
+                <h1 class="text-5xl heavy-italic text-gray-900 mb-4">Featured Products</h1>
+                <div class="h-2 w-24 bg-black rounded-full"></div>
+            </header>
+
+            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Listado completo de productos restaurado
+        const products = [
+            { name: 'Advertising Flags', w: 24, h: 36, img: 'images/AdvertisingFlags..png', desc: 'Custom outdoor promotional flags.' },
+            { name: 'Banners', w: 24, h: 48, img: 'images/Banners.png', desc: 'High-quality vinyl banners.' },
+            { name: 'Displays', w: 36, h: 48, img: 'images/Displays.png', desc: 'Trade show and event booth displays.' },
+            { name: 'Large Format Printing', w: 48, h: 96, img: 'images/Large-Format-Printing.png', desc: 'Oversized high-definition prints.' },
+            { name: 'Printed Fabric', w: 24, h: 24, img: 'images/Printed-Fabric.png', desc: 'Seamless silicone edge fabric graphics.' },
+            { name: 'Stickers', w: 3, h: 3, img: 'images/AMS_Stickers6..png', desc: 'Custom die-cut vinyl stickers.' },
+            { name: 'Rigid Signs', w: 18, h: 24, img: 'images/Rigid-Signs.png', desc: 'Durable foam core and plastic boards.' }
+        ];
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = products.map(p => `
+                <div onclick="handleSelection('${p.name}', ${p.w}, ${p.h})" class="product-card bg-white rounded-[2rem] overflow-hidden cursor-pointer group shadow-sm border border-gray-100">
+                    <div class="h-80 p-10 flex items-center justify-center group-hover:bg-gray-50 transition-colors">
+                        <img src="${p.img}" alt="${p.name}" class="object-contain h-full drop-shadow-2xl transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                    <div class="p-8 border-t">
+                        <h3 class="font-black text-xl text-gray-800 uppercase italic leading-none">${p.name}</h3>
+                        <p class="text-[11px] text-gray-400 font-bold mt-2 uppercase tracking-tighter">${p.desc}</p>
+                        <div class="flex justify-end mt-8">
+                            <div class="bg-black text-white px-6 py-3 rounded-full group-hover:bg-red-600 transition-all italic text-[10px] uppercase font-black tracking-widest shadow-lg">
+                                ${p.name === 'Stickers' ? 'Customize Now' : 'See Details'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleSelection(name, w, h) {
+            localStorage.setItem('selectedProduct', name);
+            localStorage.setItem('initialW', w);
+            localStorage.setItem('initialH', h);
+
+            if (name === 'Stickers') {
+                window.location.href = 'Stickers/stickers.html';
+            } else if (name === 'Advertising Flags') {
+                window.location.href = 'AdvertisingFlags/advertising-flags.html';
+            } else if (name === 'Banners') {
+                window.location.href = 'Banners/banners.html';
+            } else if (name === 'Large Format Printing') {
+                window.location.href = 'LargePrinting/largeprinting.html';
+            }else if (name === 'Rigid Signs') {
+                window.location.href = 'Rigid Signs/rigidsigns.html';
+            }else {
+                alert('Redirigiendo a la configuración de ' + name);
+            }
+        }
+
+        window.onload = renderProducts;
+    </script>
+</body>
+</html>

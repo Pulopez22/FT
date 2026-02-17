@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adhesive Vinyl - Square Foot Printing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow: hidden; }
+        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
+        .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
+        .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
+        .sidebar-item.active { border-right: 3px solid #000; }
+        .main-content-scroll { height: calc(100vh - 73px); overflow-y: auto; flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
+        .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
+        .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
+        .custom-input:focus { border-color: #000; }
+        .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
+        .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
+        .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
+        .progress-bar { width: 0%; height: 4px; background: #83D644; transition: width 0.6s ease; border-radius: 2px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
+        <div class="flex items-center gap-8">
+            <a href="../index.html" class="flex items-center group">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
+                </div>
+            </a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
+            </div>
+        </div>
+        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg">Register</button>
+    </nav>
+
+    <div class="flex flex-row flex-grow w-full">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
+             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer">Displays</li>
+                <li class="sidebar-item cursor-pointer active"><a href="largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer">Rigid Signs</li>
+            </ul>
+        </aside>
+
+        <main class="main-content-scroll">
+            <div class="p-12 flex-grow">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
+                    
+                    <div class="space-y-8">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] relative">
+                            <img id="main-prod-img" src="../images/Large Printing/AB-Vinyl-01.png" alt="Vinyl" class="max-h-[300px] drop-shadow-2xl transition-all duration-300">
+                        </div>
+                        
+                        <div class="flex gap-3 justify-center flex-wrap" id="thumb-container">
+                            <img src="../images/Large Printing/AB-Vinyl-01.png" class="thumb-img w-16 h-16 rounded-xl border-2 border-black cursor-pointer object-cover hover:scale-105" onclick="changeImage(this)">
+                            <img src="../images/Large Printing/AB-Vinyl-02.png" class="thumb-img w-16 h-16 rounded-xl border border-gray-100 cursor-pointer object-cover hover:scale-105" onclick="changeImage(this)">
+                            <img src="../images/Large Printing/AB-Vinyl-BF-01.png" id="thumb-bf-1" style="display:none;" class="thumb-img w-16 h-16 rounded-xl border border-gray-100 cursor-pointer object-cover hover:scale-105" onclick="changeImage(this)">
+                            <img src="../images/Large Printing/AB-Vinyl-BF-02.png" id="thumb-bf-2" style="display:none;" class="thumb-img w-16 h-16 rounded-xl border border-gray-100 cursor-pointer object-cover hover:scale-105" onclick="changeImage(this)">
+                        </div>
+
+                        <div class="pt-8 border-t border-gray-100">
+                            <h2 class="text-2xl font-light text-gray-500 mb-6 tracking-tight">Description</h2>
+                            <h3 class="text-3xl font-normal text-gray-800 mb-6 italic" id="desc-title">Calendar Adhesive Vinyl</h3>
+                            <div class="text-[14px] text-gray-600 leading-[1.7] space-y-5 font-medium">
+                                <p id="desc-text">Our Adhesive Vinyl uses a premium **3.5 mil PVC film** with a permanent adhesive backing.</p>
+                                <div>
+                                    <h4 class="font-black text-gray-900 mb-3 tracking-wider text-xs uppercase">Features:</h4>
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li>High resolution digitally printed at 720 x 720.</li>
+                                        <li>Indoor or Outdoor; Waterproof and UV safe.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-10">
+                        <header>
+                            <h1 class="text-4xl heavy-italic text-gray-900 leading-none italic" id="prod-title">Calendar Adhesive Vinyl</h1>
+                            <p class="text-1xl font-black text-gray-400 italic mt-6" id="prod-range">$1.25 – $4.50 sq/ft</p>
+                        </header>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Vinyl Type</label>
+                                <select id="vinyl-type" onchange="updateType()" class="custom-dropdown">
+                                    <option value="standard" selected>Standard (White/Opaque)</option>
+                                    <option value="clear">Clear (Transparent)</option>
+                                    <option value="bubblefree">Bubble Free (Air Release)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Finish</label>
+                                <select class="custom-dropdown"><option>Gloss (Standard)</option><option>Matte</option></select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Finishing Options</label>
+                                <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="0">Trim to Size</option>
+                                    <option value="1.00">Flex Cut (+$1.00 sq/ft)</option>
+                                    <option value="1.50">Contour Cut (+$1.50 sq/ft)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Lamination</label>
+                                <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="0">No Lamination</option>
+                                    <option value="1.00">Gloss UV Lamination (+$1.00 sq/ft)</option>
+                                    <option value="1.00">Matte UV Lamination (+$1.00 sq/ft)</option>
+                                    <option value="2.00" id="opt-white-lam" style="display:none;">Reverse Printed + White Backed (+$2.00 sq/ft)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] ml-1">Turnaround</label>
+                                    <button onclick="resetDropdown('turn-select')" class="text-[10px] font-bold text-gray-900 flex items-center gap-1.5 hover:text-red-600 transition-colors">
+                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Clear
+                                    </button>
+                                </div>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="0" selected>2-3 Days</option>
+                                    <option value="50">Next Day +$50.00</option>
+                                    <option value="100">Same Day Rush +$100.00</option>
+                                </select>
+                            </div>
+
+                            <div class="bg-gray-50/50 p-10 rounded-[2.5rem] border border-gray-100 shadow-inner">
+                                <div class="price-row italic"><span class="text-[13px] font-black uppercase text-gray-700">Width (in)</span><input type="number" id="w-input" value="24" oninput="calculatePrice()" class="custom-input w-32"></div>
+                                <div class="price-row italic"><span class="text-[13px] font-black uppercase text-gray-700">Height (in)</span><input type="number" id="h-input" value="24" oninput="calculatePrice()" class="custom-input w-32"></div>
+                                <div class="price-row border-none pt-8">
+                                    <span class="text-[11px] font-black uppercase text-gray-900 tracking-widest italic">Total Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.00 sq ft</span></span>
+                                    <span id="final-price" class="text-5xl heavy-italic italic text-black">$5.00</span>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-5">
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-5 border-2 border-gray-100 rounded-2xl font-black text-center outline-none">
+                                <button id="add-to-cart-btn" class="flex-grow bg-black text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all">Add to cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="bg-white border-t py-12 px-10 text-center w-full">
+                <div class="bg-black p-2 rounded-lg inline-block mb-4 shadow-lg"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto"></div>
+                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function updateType() {
+            const type = document.getElementById('vinyl-type').value;
+            const title = document.getElementById('prod-title');
+            const range = document.getElementById('prod-range');
+            const descText = document.getElementById('desc-text');
+            const optWhiteLam = document.getElementById('opt-white-lam');
+            const mainImg = document.getElementById('main-prod-img');
+            const bf1 = document.getElementById('thumb-bf-1');
+            const bf2 = document.getElementById('thumb-bf-2');
+
+            if(type === 'bubblefree') {
+                title.innerText = "Bubble Free Adhesive Vinyl";
+                range.innerText = "$2.00 – $6.75 sq/ft";
+                descText.innerHTML = "Gray back vinyl with **air release patterns**. Extremely durable for extended outdoor use.";
+                optWhiteLam.style.display = "none";
+                mainImg.src = "../images/Large Printing/AB-Vinyl-01.png";
+                bf1.style.display = "block"; bf2.style.display = "block";
+            } else if(type === 'clear') {
+                title.innerText = "Clear Calendar Adhesive Vinyl";
+                range.innerText = "$1.25 – $3.75 sq/ft";
+                descText.innerHTML = "Uses a premium **3.5 mil Clear PVC film** for glass surfaces and window decals.";
+                optWhiteLam.style.display = "block";
+                mainImg.src = "../images/Large Printing/AB-Vinyl-01.png";
+                bf1.style.display = "none"; bf2.style.display = "none";
+            } else {
+                title.innerText = "Calendar Adhesive Vinyl";
+                range.innerText = "$1.25 – $4.50 sq/ft";
+                descText.innerHTML = "Our Adhesive Vinyl uses a premium **3.5 mil PVC film** with permanent backing.";
+                optWhiteLam.style.display = "none";
+                mainImg.src = "../images/Large Printing/AB-Vinyl-Bf-01.png";
+                bf1.style.display = "none"; bf2.style.display = "none";
+            }
+            calculatePrice();
+        }
+
+        function calculatePrice() {
+            const type = document.getElementById('vinyl-type').value;
+            const w = parseFloat(document.getElementById('w-input').value) || 0;
+            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const finishAdd = parseFloat(document.getElementById('finish-select').value) || 0;
+            const lamAdd = parseFloat(document.getElementById('lam-select').value) || 0;
+            const rushFee = parseFloat(document.getElementById('turn-select').value) || 0;
+            
+            let basePrice = (type === 'bubblefree') ? 2.00 : 1.25;
+            
+            const area = (w * h) / 144;
+            const finalTotal = (area * (basePrice + finishAdd + lamAdd) * qty) + rushFee;
+            document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
+            document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        function changeImage(el) {
+            document.getElementById('main-prod-img').src = el.src;
+            document.querySelectorAll('.thumb-img').forEach(i => i.classList.remove('border-black', 'border-2'));
+            el.classList.add('border-black', 'border-2');
+        }
+
+        function resetDropdown(id) { document.getElementById(id).selectedIndex = 0; calculatePrice(); }
+
+        window.onload = () => { calculatePrice(); updateType(); };
+    </script>
+</body>
+</html>

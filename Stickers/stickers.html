@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Foot Printing - Sticker Configurator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fff; color: #1a1a1a; }
+        .options-container { border-radius: 20px; overflow: hidden; border: 1px solid #f3f4f6; background-color: white; }
+        .selectable-item { padding: 16px; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; width: 100%; text-align: left; font-size: 13px; font-weight: 600; }
+        .selectable-item:last-child { border-bottom: none; }
+        .item-active { background-color: #f9fafb !important; font-weight: 900 !important; color: #000 !important; border-left: 4px solid #000; }
+        .icon-box { width: 32px; height: 32px; margin-right: 12px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background-color: #f3f4f6; font-size: 14px; }
+        
+        #custom-size-panel { transition: all 0.3s ease; max-height: 0; overflow: hidden; opacity: 0; }
+        #custom-size-panel.open { max-height: 400px; opacity: 1; border-top: 1px solid #f3f4f6; padding: 20px; }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50">
+        <div class="flex items-center gap-8">
+            <a href="../index.html" class="flex items-center group">
+                <div class="bg-black p-2 rounded-lg transition-transform group-hover:scale-105 shadow-xl">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" 
+                         alt="Square Foot Printing" class="h-8 md:h-10 w-auto object-contain">
+                </div>
+            </a>
+            <div class="hidden md:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                <span class="text-black border-b-2 border-black pb-1 italic">Sticker Configurator</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 flex-grow">
+        <header class="mb-12">
+            <h1 class="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Configure your Stickers</h1>
+            <div class="h-1.5 w-20 bg-black rounded-full mt-2"></div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
+            
+            <div class="space-y-6">
+                <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em]">1. Shape & Finish</h3>
+                <div id="shape-options" class="options-container shadow-sm">
+                    <button onclick="selectItem(this, 'shape')" class="selectable-item item-active">
+                        <div class="icon-box">🐱</div> <span>Contour Cut</span>
+                    </button>
+                    <button onclick="selectItem(this, 'shape')" class="selectable-item">
+                        <div class="icon-box">⬜</div> <span>Square</span>
+                    </button>
+                    <button onclick="selectItem(this, 'shape')" class="selectable-item">
+                        <div class="icon-box">◯</div> <span>Circle</span>
+                    </button>
+                    <button onclick="selectItem(this, 'shape')" class="selectable-item">
+                        <div class="icon-box">⬜</div> <span>Orillas redondas</span>
+                    </button>
+                </div>
+
+                <div id="shape-tip" class="bg-blue-50 border border-blue-100 p-4 rounded-2xl">
+                    <p class="text-[10px] font-black text-blue-600 uppercase tracking-tight flex items-center italic">
+                        <span class="mr-2">✨</span> Pro tip: Use PNG for exact contour.
+                    </p>
+                </div>
+
+                <select id="finish-select" onchange="updateSummary()" class="w-full p-4 border border-gray-100 rounded-2xl bg-white font-black text-xs uppercase outline-none focus:border-black transition-all">
+                    <option>Glossy Finish</option>
+                    <option>Matte Finish</option>
+                </select>
+            </div>
+
+            <div class="space-y-6">
+                <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em]">2. Size</h3>
+                <div id="size-options" class="options-container shadow-sm">
+                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item item-active">2 x 2 in</button>
+                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">4 x 4 in</button>
+                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">6 x 6 in</button>
+                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">8 x 8 in</button>
+                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">10 x 10 in</button>
+                    <button onclick="toggleCustomControls(true); selectItem(this, 'size')" class="selectable-item text-red-600">Custom Size</button>
+                    
+                    <div id="custom-size-panel" class="bg-gray-50">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="text-[9px] uppercase font-black text-gray-400 block mb-1">Width (in)</label>
+                                <input type="number" id="custom-w" value="3.0" step="0.1" oninput="validateLimits(this); updateSummary();" class="w-full p-3 border rounded-xl font-black outline-none focus:border-black">
+                            </div>
+                            <div>
+                                <label class="text-[9px] uppercase font-black text-gray-400 block mb-1">Height (in)</label>
+                                <input type="number" id="custom-h" value="3.0" step="0.1" oninput="validateLimits(this); updateSummary();" class="w-full p-3 border rounded-xl font-black outline-none focus:border-black">
+                            </div>
+                        </div>
+                        <p class="text-[9px] text-gray-400 font-bold uppercase italic">* Max size: 12 inches</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em]">3. Quantity</h3>
+                <div id="qty-options" class="options-container shadow-sm">
+                    <button onclick="selectItem(this, 'qty')" class="selectable-item item-active justify-between">
+                        <span>50 pcs</span> <span class="font-black">$36</span>
+                    </button>
+                    <button onclick="selectItem(this, 'qty')" class="selectable-item justify-between text-gray-400">
+                        <span>100 pcs</span> <span class="font-black text-gray-900">$52</span>
+                    </button>
+                    <button onclick="selectItem(this, 'qty')" class="selectable-item justify-between text-gray-400">
+                        <span>Custom pcs</span> <span class="font-black text-gray-900"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:sticky lg:top-24 h-fit">
+                <div class="bg-white p-8 border border-gray-100 rounded-[2.5rem] shadow-2xl">
+                    <h3 class="text-xl font-black mb-6 uppercase italic tracking-tighter">Your Order</h3>
+                    <div id="order-summary" class="bg-gray-50 p-5 rounded-2xl mb-8 border border-gray-100 text-[10px] font-black text-gray-500 uppercase leading-relaxed tracking-widest">
+                        Sticker / Contour Cut / Glossy / 2x2 in / 50 pcs
+                    </div>
+                    <div class="flex justify-between items-end mb-10 px-2">
+                        <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest">Total</span>
+                        <span id="final-price" class="text-4xl font-black italic tracking-tighter">$36.00</span>
+                    </div>
+
+                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileAndRedirect(this)">
+                    <button onclick="document.getElementById('file-input').click()" class="w-full bg-black hover:bg-red-600 text-white font-black py-5 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95">
+                        Upload & Edit ↓
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t py-12 px-10 text-center">
+        <div class="bg-black p-2 rounded-lg inline-block mb-4">
+            <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto">
+        </div>
+        <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">© 2026 Square Foot Printing - Las Vegas</p>
+    </footer>
+
+    <script>
+        function toggleCustomControls(show) {
+            const panel = document.getElementById('custom-size-panel');
+            show ? panel.classList.add('open') : panel.classList.remove('open');
+            updateSummary();
+        }
+
+        function validateLimits(input) {
+            if (parseFloat(input.value) > 12) input.value = 12;
+        }
+
+        function selectItem(element, category) {
+            const items = document.querySelectorAll(`#${category}-options .selectable-item`);
+            items.forEach(item => item.classList.remove('item-active'));
+            element.classList.add('item-active');
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const shape = document.querySelector('#shape-options .item-active span').innerText;
+            const finish = document.getElementById('finish-select').value;
+            const activeSize = document.querySelector('#size-options .item-active');
+            const qtyItem = document.querySelector('#qty-options .item-active');
+            
+            let sizeText = activeSize.innerText.includes('Custom') 
+                ? `${document.getElementById('custom-w').value}x${document.getElementById('custom-h').value} in`
+                : activeSize.innerText;
+
+            document.getElementById('order-summary').innerText = `Sticker / ${shape} / ${finish} / ${sizeText} / ${qtyItem.querySelector('span').innerText}`;
+            document.getElementById('final-price').innerText = qtyItem.querySelector('.font-black').innerText + ".00";
+        }
+
+        function handleFileAndRedirect(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const activeSize = document.querySelector('#size-options .item-active');
+                let w, h;
+
+                if (activeSize.innerText.includes('Custom')) {
+                    w = document.getElementById('custom-w').value;
+                    h = document.getElementById('custom-h').value;
+                } else {
+                    const dims = activeSize.innerText.split('x').map(n => n.replace('in','').trim());
+                    w = dims[0]; h = dims[1] || dims[0];
+                }
+
+                localStorage.setItem('tempStickerImage', e.target.result);
+                localStorage.setItem('selectedShape', document.querySelector('#shape-options .item-active span').innerText);
+                localStorage.setItem('initialW', w);
+                localStorage.setItem('initialH', h);
+                
+                window.open('editor.html', '_blank');
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
