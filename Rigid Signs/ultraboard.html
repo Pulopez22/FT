@@ -23,6 +23,12 @@
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 8px; background: #83D644; transition: width 0.6s ease; border-radius: 4px; }
+
+        /* Estilos Carrito Lateral */
+        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -44,7 +50,13 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg">Register</button>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
+        </div>
     </nav>
 
     <div class="flex flex-row flex-grow w-full">
@@ -67,8 +79,9 @@
                     
                     <div class="space-y-8">
                         <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative">
-                            <img id="main-prod-img" src="../images/Rigid Signs/UltraBoard-01.png" alt="Sign" class="max-h-[380px] drop-shadow-2xl">
+                            <img id="main-prod-img" src="../images/Rigid Signs/UltraBoard-01.png" alt="Sign" class="max-h-[380px] drop-shadow-2xl transition-all duration-300">
                         </div>
+
                         <div class="pt-8 border-t border-gray-100 italic font-medium text-gray-600 space-y-6">
                             <div>
                                 <h2 id="desc-title" class="text-3xl font-black text-black uppercase tracking-tighter mb-4">Gatorfoam</h2>
@@ -174,13 +187,31 @@
                                 </div>
                             </div>
 
-                            <button id="add-to-cart-btn" disabled class="w-full bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
+                            <button id="add-to-cart-btn" onclick="addToCart()" disabled class="w-full bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
         </main>
     </div>
+
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Tu Carrito</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Artículos</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Finalizar Pedido</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
 
     <script>
         lucide.createIcons();
@@ -236,41 +267,6 @@
             calculatePrice();
         }
 
-        function processFile(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                document.getElementById('drop-zone').classList.add('hidden');
-                document.getElementById('validation-panel').classList.remove('hidden');
-                reader.onload = (e) => {
-                    document.getElementById('preview-thumb').src = e.target.result;
-                    const w = document.getElementById('w-input').value;
-                    const h = document.getElementById('h-input').value;
-                    setTimeout(() => { 
-                        document.getElementById('upload-progress').style.width = '100%'; 
-                        document.getElementById('validation-text').innerHTML = `Verifying artwork for ${w}" x ${h}"... confirmed.<br>Substrate material compatible.`;
-                    }, 1000);
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function approveArt() {
-            const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
-            btn.classList.remove('cursor-not-allowed');
-            document.getElementById('status-title').innerText = "Artwork Approved";
-            document.getElementById('status-title').classList.replace('text-blue-600', 'text-[#83D644]');
-        }
-
-        function resetUpload() {
-            document.getElementById('drop-zone').classList.remove('hidden');
-            document.getElementById('validation-panel').classList.add('hidden');
-            document.getElementById('file-input').value = "";
-            const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = true; btn.classList.replace('bg-black', 'bg-gray-200');
-            document.getElementById('upload-progress').style.width = '0%';
-        }
-
         function validateSize() {
             const w = document.getElementById('w-input');
             const h = document.getElementById('h-input');
@@ -291,32 +287,104 @@
             const sides = document.getElementById('side-select').value;
             const w = parseFloat(document.getElementById('w-input').value) || 0;
             const h = parseFloat(document.getElementById('h-input').value) || 0;
-            
             const area = (w * h) / 144;
             let pSqFt = 0;
 
             if (mat === "ultra") {
-                if (thick === "3/16") {
-                    pSqFt = (lam === "none") ? 5.00 : ((sides === "1") ? 5.75 : 7.00);
-                } else {
-                    pSqFt = (lam === "none") ? 7.50 : ((sides === "1") ? 8.25 : 9.50);
-                }
+                pSqFt = (thick === "3/16") ? ((lam === "none") ? 5.00 : ((sides === "1") ? 5.75 : 7.00)) : ((lam === "none") ? 7.50 : ((sides === "1") ? 8.25 : 9.50));
             } else {
-                if (thick === "3/16") {
-                    pSqFt = (lam === "none") ? 6.50 : ((sides === "1") ? 7.25 : 8.50);
-                } else {
-                    pSqFt = (lam === "none") ? 9.00 : ((sides === "1") ? 9.75 : 11.00);
-                }
+                pSqFt = (thick === "3/16") ? ((lam === "none") ? 6.50 : ((sides === "1") ? 7.25 : 8.50)) : ((lam === "none") ? 9.00 : ((sides === "1") ? 9.75 : 11.00));
             }
 
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
             document.getElementById('final-price').innerText = `$${(pSqFt * area).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
-        window.onload = () => {
-            handleMaterialChange();
-            handleSideChange();
-        };
+        function processFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                document.getElementById('drop-zone').classList.add('hidden');
+                document.getElementById('validation-panel').classList.remove('hidden');
+                reader.onload = (e) => {
+                    document.getElementById('preview-thumb').src = e.target.result;
+                    setTimeout(() => { 
+                        document.getElementById('upload-progress').style.width = '100%'; 
+                        document.getElementById('validation-text').innerHTML = `Verifying artwork... confirmed.<br>Substrate material compatible.`;
+                    }, 1000);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function approveArt() {
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
+            btn.classList.remove('cursor-not-allowed');
+            document.getElementById('status-title').innerText = "Artwork Approved";
+            document.getElementById('status-title').classList.replace('text-blue-600', 'text-[#83D644]');
+        }
+
+        function resetUpload() {
+            document.getElementById('drop-zone').classList.remove('hidden');
+            document.getElementById('validation-panel').classList.add('hidden');
+            document.getElementById('add-to-cart-btn').disabled = true;
+            document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+        }
+
+        // LÓGICA CARRITO
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open'); overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
+                renderCart();
+            }
+        }
+
+        function addToCart() {
+            const priceStr = document.getElementById('final-price').innerText.replace('$', '').replace(',', '');
+            const newItem = {
+                name: document.getElementById('prod-title').innerText,
+                specs: document.getElementById('mat-select').value + " - " + document.getElementById('thick-select').value,
+                size: `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
+                qty: 1,
+                price: parseFloat(priceStr),
+                image: document.getElementById('preview-thumb').src
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem); localStorage.setItem('sqft_cart', JSON.stringify(cart)); toggleCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-300 italic py-20 uppercase font-black text-[11px]">Carrito Vacío</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    container.innerHTML += `<div class="flex gap-6 border-b border-gray-50 pb-6"><div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div><div class="flex flex-col justify-between flex-grow"><div class="flex justify-between"><h4 class="text-sm font-black uppercase italic">${item.name}</h4><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.specs}</p><div class="flex justify-between items-end mt-4"><span class="text-[10px] font-bold text-gray-400">Qty: 1</span><span class="text-xl font-black italic">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div></div></div>`;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
+        }
+
+        window.onload = () => { handleMaterialChange(); handleSideChange(); renderCart(); };
     </script>
 </body>
 </html>

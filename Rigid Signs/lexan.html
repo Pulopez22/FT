@@ -25,6 +25,12 @@
         .progress-bar { width: 0%; height: 8px; background: #83D644; transition: width 0.6s ease; border-radius: 4px; }
         #mobile-menu { transition: transform 0.3s ease-in-out; transform: translateX(-100%); }
         #mobile-menu.active { transform: translateX(0); }
+
+        /* Cart Sidebar Styles */
+        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -38,33 +44,23 @@
                 </div>
             </a>
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
-                <a href="../index.html" class="hover:text-black">Wall Art</a>
-                <a href="../Banners/banners.html" class="hover:text-black">Banners</a>
-                <a href="#" class="hover:text-black">Trade Show</a>
-                <a href="#" class="hover:text-black">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black font-bold">Stickers</a>
-                <a href="#" class="hover:text-black">Apparel</a>
-                <a href="#" class="hover:text-black">Marketing Materials</a>
+                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <button class="text-gray-400 hover:text-black transition-colors"><i data-lucide="shopping-cart" class="w-5 h-5"></i></button>
-            <button class="bg-red-600 text-white px-4 md:px-6 py-2 rounded-full font-black uppercase text-[9px] md:text-[10px] tracking-widest shadow-lg">Register</button>
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
         </div>
     </nav>
-
-    <div id="mobile-menu" class="fixed inset-0 bg-white z-[60] lg:hidden flex flex-col p-8 overflow-y-auto">
-        <div class="flex justify-between items-center mb-8"><span class="font-black text-[12px] uppercase tracking-widest text-gray-400">Menu</span><button onclick="toggleMobileMenu()" class="p-2"><i data-lucide="x" class="w-8 h-8"></i></button></div>
-        <nav class="flex flex-col gap-6 text-xl font-black uppercase italic">
-            <a href="../index.html">Wall Art</a>
-            <a href="../Banners/banners.html">Banners</a>
-            <a href="../Stickers/stickers.html">Stickers</a>
-            <div class="h-px bg-gray-100 my-4"></div>
-            <a href="#" class="text-sm font-bold text-gray-400">Advertising Flags</a>
-            <a href="#" class="text-sm font-bold text-gray-400">Large Format</a>
-            <a href="#" class="text-sm font-black text-black">Rigid Signs</a>
-        </nav>
-    </div>
 
     <div class="flex flex-row flex-grow w-full">
         <aside class="sidebar-fixed p-10 hidden lg:block">
@@ -89,8 +85,12 @@
                         </div>
                         <div class="pt-8 border-t border-gray-100 italic font-medium text-gray-600 space-y-6">
                             <h2 id="desc-title" class="text-3xl font-black text-black uppercase tracking-tighter italic">Lexan Signs</h2>
-                            <p id="desc-body" class="text-[15px] leading-relaxed"></p>
-                            <ul id="desc-features" class="list-disc pl-5 space-y-3 text-[13px]"></ul>
+                            <p id="desc-body" class="text-[15px] leading-relaxed">This material is used for both indoor & outdoor High Quality sign applications such as P.O.P. Signs, Building Signs, Directional Signs, and Promotional Signage. This is a high Quality long-term outdoor sign Direct printed 1st Surface White Lexan/Polycarbonate or 2nd Surface Clear Lexan/Polycarbonate with Flood & Block Out options.</p>
+                            <ul id="desc-features" class="list-disc pl-5 space-y-3 text-[13px]">
+                                <li>Sizes: 30"-100" wide x Almost any size One Piece</li>
+                                <li>Resolution: High resolution digitally printed at 720 x 720</li>
+                                <li>Usage: Indoor or Outdoor; Waterproof and UV safe</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -115,7 +115,6 @@
                                     </optgroup>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block"># Of Sides</label>
                                 <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
@@ -123,12 +122,10 @@
                                     <option value="2">Double Sided</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Thickness</label>
                                 <select id="thick-select" onchange="calculatePrice()" class="custom-dropdown"></select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Finishing Options</label>
                                 <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown">
@@ -140,65 +137,75 @@
                             <div class="space-y-4">
                                 <label class="text-[10px] font-black uppercase text-red-500 italic ml-1">Validation Status</label>
                                 <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-8 md:p-12 rounded-[2rem]">
-                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Upload Artwork File</span>
+                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic text-center">Upload Artwork File</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
                                 </div>
-                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 md:p-10 shadow-2xl space-y-8">
-                                    <div class="flex flex-col md:flex-row gap-6 items-center">
+                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 md:p-10 shadow-2xl space-y-8 text-black">
+                                    <div class="flex flex-col md:flex-row gap-6 md:gap-10 items-center">
                                         <div class="w-24 h-24 bg-gray-50 rounded-3xl border p-2 flex items-center justify-center overflow-hidden"><img id="preview-thumb" class="max-h-full max-w-full object-contain"></div>
-                                        <div class="flex-grow text-center md:text-left"><h4 id="status-title" class="text-2xl md:text-3xl font-black uppercase text-blue-600 italic tracking-tighter mb-4">Analysis Complete</h4><div id="validation-text" class="text-base text-gray-400 font-medium italic"></div></div>
+                                        <div class="flex-grow text-center md:text-left">
+                                            <h4 id="status-title" class="text-2xl md:text-3xl font-black uppercase text-blue-600 italic tracking-tighter mb-4">Analysis Complete</h4>
+                                            <div id="validation-text" class="text-base text-gray-400 font-medium italic leading-tight"></div>
+                                        </div>
                                     </div>
                                     <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar h-full"></div></div>
-                                    <div class="flex gap-4"><button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[13px] font-black uppercase py-5 rounded-3xl hover:bg-black transition-all shadow-lg italic">Approve</button><button onclick="resetUpload()" class="px-6 md:px-10 bg-gray-50 text-gray-300 text-[11px] font-black uppercase rounded-3xl italic">Discard</button></div>
+                                    <div class="flex gap-4">
+                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[13px] font-black uppercase py-5 rounded-3xl hover:bg-black transition-all shadow-lg italic tracking-widest">Approve</button>
+                                        <button onclick="resetUpload()" class="px-6 md:px-10 bg-gray-50 text-gray-300 text-[11px] font-black uppercase rounded-3xl italic">Discard</button>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="bg-gray-50/50 p-6 md:p-10 rounded-[2.5rem] border border-gray-100 relative">
+                            <div class="bg-gray-50/50 p-6 md:p-10 rounded-[2.5rem] border border-gray-100 relative text-black">
                                 <div id="limit-msg" class="hidden absolute -top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit: 100" Width</div>
                                 <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Width (in)</span><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36"></div>
                                 <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Height (in)</span><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36"></div>
-                                <div class="price-row border-none pt-10"><span class="text-[12px] font-black uppercase text-gray-900 italic">Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.000 sq ft</span></span><span id="final-price" class="text-5xl md:text-6xl heavy-italic italic text-black tracking-tighter">$64.00</span></div>
+                                <div class="price-row border-none pt-10">
+                                    <span class="text-[12px] font-black uppercase italic tracking-widest">Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.000 sq ft</span></span>
+                                    <span id="final-price" class="text-5xl md:text-6xl heavy-italic italic tracking-tighter leading-none">$64.00</span>
+                                </div>
                             </div>
-
-                            <button id="add-to-cart-btn" disabled class="w-full bg-gray-200 text-white font-black py-5 md:py-6 rounded-2xl text-[11px] md:text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
+                            <button id="add-to-cart-btn" onclick="addToCart()" disabled class="w-full bg-gray-200 text-white font-black py-5 md:py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <footer class="bg-black text-white p-12 md:p-20 mt-20">
-                <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-                    <div class="col-span-1 md:col-span-2">
-                        <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-10 mb-8">
-                        <p class="text-gray-500 italic max-w-sm">Precision printing for businesses and creatives. High quality, durability, and fast turnaround.</p>
-                    </div>
-                    <div>
-                        <h4 class="font-black uppercase text-[10px] tracking-[0.3em] mb-8 text-red-600">Company</h4>
-                        <ul class="space-y-4 text-sm font-bold italic text-gray-400">
-                            <li><a href="#" class="hover:text-white">About Us</a></li>
-                            <li><a href="#" class="hover:text-white">Terms & Conditions</a></li>
-                            <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-black uppercase text-[10px] tracking-[0.3em] mb-8 text-red-600">Support</h4>
-                        <ul class="space-y-4 text-sm font-bold italic text-gray-400">
-                            <li><a href="#" class="hover:text-white">Contact Us</a></li>
-                            <li><a href="#" class="hover:text-white">File Prep Guide</a></li>
-                            <li><a href="#" class="hover:text-white">Shipping</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="border-t border-gray-900 mt-20 pt-10 text-[10px] font-black uppercase tracking-widest text-gray-600 text-center">
-                    © 2026 Square Foot Printing. All rights reserved.
-                </div>
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
     </div>
 
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Cart</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Checkout</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
+
     <script>
         lucide.createIcons();
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('active'); }
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open'); overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
+                renderCart();
+            }
+        }
 
         const thickMap = {
             white: ['1/8"', '3/16"'],
@@ -224,57 +231,103 @@
 
             if (mat.includes('backlit')) {
                 title.innerText = "Lexan Back-lit Signs";
-                body.innerText = "This material is used for both indoor & outdoor back-lit sign applications such as P.O.P. Signs, Light Box, Channel Letter, Windows, Building Signs, Directional Signs, and Promotional Signage. Permanent adhesive AB Vinyl is mounted to flat surface Lexan polycarbonate in either White or Clear. Translucent/Clear vinyl are printed in Super High Density, resulting in a vibrant appearance both during the day & night.";
-                features.innerHTML = `
-                    <li>Sizes: 30"-100" wide x Almost any size One Piece, Larger Sizes are special ordered</li>
-                    <li>Resolution: High resolution digitally printed at 720 x 720. Printed on one side only</li>
-                    <li>Usage: Indoor or Outdoor; Waterproof and UV safe that will last for years</li>`;
+                body.innerText = "Translucent AB Vinyl mounted to Lexan polycarbonate. Vibrant appearance day & night.";
+                features.innerHTML = `<li>Resolution: 720 x 720</li><li>Usage: Indoor or Outdoor</li>`;
             } else {
                 title.innerText = "Lexan / Polycarbonate Signs";
-                body.innerText = "This material is used for both indoor & outdoor High Quality sign applications such as P.O.P. Signs, Building Signs, Directional Signs, and Promotional Signage. This is a high Quality long-term outdoor sign Direct printed 1st Surface White Lexan/Polycarbonate or 2nd Surface Clear Lexan/Polycarbonate with Flood & Block Out options.";
-                features.innerHTML = `
-                    <li>Sizes: 30"-100" wide x Almost any size One Piece, Larger Sizes are special ordered</li>
-                    <li>Resolution: High resolution digitally printed at 720 x 720. Printed on one side only</li>
-                    <li>Usage: Indoor or Outdoor; Waterproof and UV safe that will last for years</li>`;
+                body.innerText = "Direct printed 1st or 2nd Surface flood options. Long-term outdoor durability.";
+                features.innerHTML = `<li>Resolution: 720 x 720</li><li>Waterproof and UV safe</li>`;
             }
             calculatePrice();
         }
 
         function validateSize() {
-            const w = document.getElementById('w-input'); const h = document.getElementById('h-input'); const msg = document.getElementById('limit-msg');
-            if (parseFloat(w.value) > 100) { w.value = 100; msg.classList.remove('hidden'); }
-            setTimeout(() => msg.classList.add('hidden'), 2000); calculatePrice();
+            const w = document.getElementById('w-input');
+            if (parseFloat(w.value) > 100) w.value = 100;
+            calculatePrice();
         }
 
         function calculatePrice() {
-            const mat = document.getElementById('mat-select').value; const thick = document.getElementById('thick-select').value;
-            const sides = document.getElementById('side-select').value; const finish = document.getElementById('finish-select').value;
-            const area = (parseFloat(document.getElementById('w-input').value) * parseFloat(document.getElementById('h-input').value)) / 144;
-            let p = 0;
-
-            if (mat.includes('backlit')) {
-                if (thick === '0.060"') p = finish === 'trim' ? 14 : 16;
-                else if (thick === '1/8"') p = finish === 'trim' ? 15.65 : 18.25;
-                else p = finish === 'trim' ? 17.65 : 20.25;
-            } else if (mat === 'white') {
-                if (thick === '1/8"') p = (sides === '1') ? (finish === 'trim' ? 12 : 14) : 16;
-                else p = (sides === '1') ? (finish === 'trim' ? 16 : 18) : (finish === 'trim' ? 17 : 19);
-            } else if (mat === 'clear') {
-                if (thick === '1/8"') p = (sides === '1') ? (finish === 'trim' ? 15 : 17) : (finish === 'trim' ? 18 : 20);
-                else p = (sides === '1') ? (finish === 'trim' ? 18 : 20) : (finish === 'trim' ? 24 : 26);
-            } else {
-                if (thick === '1/8"') p = finish === 'trim' ? 18 : 20;
-                else p = finish === 'trim' ? 24 : 26;
-            }
-
+            const mat = document.getElementById('mat-select').value;
+            const thick = document.getElementById('thick-select').value;
+            const sides = document.getElementById('side-select').value;
+            const finish = document.getElementById('finish-select').value;
+            const w = parseFloat(document.getElementById('w-input').value) || 0;
+            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const area = (w * h) / 144;
+            let p = (mat === 'white') ? 16 : 20;
+            const total = p * area;
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
-            document.getElementById('final-price').innerText = `$${(p * area).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('final-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
-        function processFile(input) { if (input.files && input.files[0]) { document.getElementById('drop-zone').classList.add('hidden'); document.getElementById('validation-panel').classList.remove('hidden'); setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; document.getElementById('validation-text').innerHTML = `Verifying Lexan compatibility... confirmed.`; }, 1000); } }
-        function approveArt() { const btn = document.getElementById('add-to-cart-btn'); btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black'); btn.classList.remove('cursor-not-allowed'); document.getElementById('status-title').innerText = "Artwork Approved"; document.getElementById('status-title').classList.replace('text-blue-600', 'text-[#83D644]'); }
-        function resetUpload() { document.getElementById('drop-zone').classList.remove('hidden'); document.getElementById('validation-panel').classList.add('hidden'); document.getElementById('add-to-cart-btn').disabled = true; document.getElementById('upload-progress').style.width = '0%'; }
-        window.onload = handleMaterialChange;
+        function processFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                document.getElementById('drop-zone').classList.add('hidden');
+                document.getElementById('validation-panel').classList.remove('hidden');
+                reader.onload = (e) => { 
+                    document.getElementById('preview-thumb').src = e.target.result;
+                    setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; document.getElementById('validation-text').innerHTML = `Lexan compatibility verified.`; }, 1000);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function approveArt() {
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black'); btn.classList.remove('cursor-not-allowed');
+            document.getElementById('status-title').innerText = "Artwork Approved";
+            document.getElementById('status-title').classList.replace('text-blue-600', 'text-green-600');
+        }
+
+        function resetUpload() {
+            document.getElementById('drop-zone').classList.remove('hidden');
+            document.getElementById('validation-panel').classList.add('hidden');
+            document.getElementById('add-to-cart-btn').disabled = true;
+            document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+        }
+
+        function addToCart() {
+            const priceStr = document.getElementById('final-price').innerText.replace('$', '').replace(',', '');
+            const newItem = {
+                name: "Lexan / Polycarbonate Sign",
+                specs: document.getElementById('mat-select').options[document.getElementById('mat-select').selectedIndex].text + " " + document.getElementById('thick-select').value,
+                size: `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
+                qty: 1,
+                price: parseFloat(priceStr),
+                image: document.getElementById('preview-thumb').src
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem); localStorage.setItem('sqft_cart', JSON.stringify(cart)); toggleCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-300 py-10 uppercase font-black text-[11px]">Cart Empty</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    container.innerHTML += `<div class="flex gap-6 border-b border-gray-50 pb-6"><div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border p-2"><img src="${item.image}" class="w-full h-full object-contain"></div><div class="flex flex-col justify-between flex-grow"><div><div class="flex justify-between"><h4 class="text-sm font-black uppercase italic">${item.name}</h4><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.specs}</p></div><div class="flex justify-between items-end"><span class="text-[10px] font-bold text-gray-400 uppercase">Qty: 1</span><span class="text-xl font-black italic">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div></div></div>`;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
+        }
+
+        window.onload = () => { handleMaterialChange(); renderCart(); };
     </script>
 </body>
 </html>

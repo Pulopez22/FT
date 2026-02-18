@@ -23,6 +23,12 @@
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 8px; background: #83D644; transition: width 0.6s ease; border-radius: 4px; }
+
+        /* Estilos Carrito Lateral */
+        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -44,7 +50,13 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg">Register</button>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
+        </div>
     </nav>
 
     <div class="flex flex-row flex-grow w-full">
@@ -64,12 +76,10 @@
         <main class="main-content-scroll">
             <div class="p-12 flex-grow">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
-                    
                     <div class="space-y-8">
                         <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative">
                             <img id="main-prod-img" src="../images/Rigid Signs/Styrene-01.png" alt="Styrene Sign" class="max-h-[380px] drop-shadow-2xl transition-all duration-300">
                         </div>
-
                         <div class="pt-8 border-t border-gray-100 italic font-medium text-gray-600 space-y-4">
                             <h2 class="text-2xl font-light text-black">Description</h2>
                             <p>Styrene is a durable plastic flexible board suitable for long term POP signage. Suitable for short-term outdoor events, restaurants, malls, and more.</p>
@@ -84,7 +94,7 @@
 
                     <div class="space-y-10">
                         <header>
-                            <h1 class="text-5xl heavy-italic text-gray-900 italic">Styrene</h1>
+                            <h1 id="prod-title" class="text-5xl heavy-italic text-gray-900 italic">Styrene</h1>
                             <p class="text-xl font-black text-gray-400 italic mt-6" id="prod-range">$3.50 – $6.00 sq/ft</p>
                         </header>
 
@@ -97,7 +107,6 @@
                                     <option value="0.060">0.060 White Polystyrene</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Lamination</label>
                                 <select id="lam-select" onchange="handleLaminationChange()" class="custom-dropdown">
@@ -106,7 +115,6 @@
                                     <option value="matte">Matte UV Lamination</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1"># Of Sides</label>
                                 <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
@@ -114,7 +122,6 @@
                                     <option value="2">Double Sided</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Finishing Options</label>
                                 <select id="finish-select" class="custom-dropdown">
@@ -123,7 +130,6 @@
                                     <option value="0">Router Cut to Shape</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Grommets</label>
                                 <select id="grommet-select" class="custom-dropdown">
@@ -132,7 +138,6 @@
                                     <option value="slot">Slot Punched</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] ml-1">Turnaround</label>
                                 <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
@@ -181,14 +186,31 @@
 
                             <div class="flex gap-6">
                                 <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-xl">
-                                <button id="add-to-cart-btn" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
         </main>
     </div>
+
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Tu Carrito</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Artículos</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Finalizar Pedido</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
 
     <script>
         lucide.createIcons();
@@ -197,28 +219,18 @@
             const lam = document.getElementById('lam-select').value;
             const sideSelect = document.getElementById('side-select');
             if (lam === "gloss" || lam === "matte") {
-                sideSelect.value = "2";
-                sideSelect.disabled = true;
-            } else {
-                sideSelect.disabled = false;
-            }
+                sideSelect.value = "2"; sideSelect.disabled = true;
+            } else { sideSelect.disabled = false; }
             calculatePrice();
         }
 
-        // FUNCIÓN DE VALIDACIÓN DE TAMAÑO AGREGADA
         function validateSize() {
             const wInput = document.getElementById('w-input');
             const hInput = document.getElementById('h-input');
             const msg = document.getElementById('limit-msg');
-            const maxW = 48;
-            const maxH = 96;
-            let hit = false;
-            if (parseFloat(wInput.value) > maxW) { wInput.value = maxW; hit = true; }
-            if (parseFloat(hInput.value) > maxH) { hInput.value = maxH; hit = true; }
-            if (hit) {
-                msg.classList.remove('hidden');
-                setTimeout(() => msg.classList.add('hidden'), 2500);
-            }
+            const maxW = 48; const maxH = 96;
+            if (parseFloat(wInput.value) > maxW) wInput.value = maxW;
+            if (parseFloat(hInput.value) > maxH) hInput.value = maxH;
             calculatePrice();
         }
 
@@ -230,14 +242,7 @@
             const lamination = document.getElementById('lam-select').value;
             const rushAdd = parseFloat(document.getElementById('turn-select').value) || 0;
             const area = (w * h) / 144;
-            let pSqFt = 0;
-
-            if (lamination === "gloss" || lamination === "matte") {
-                pSqFt = 6.00;
-            } else {
-                pSqFt = (sides === "1") ? 3.50 : 4.75;
-            }
-
+            let pSqFt = (lamination === "gloss" || lamination === "matte") ? 6.00 : ((sides === "1") ? 3.50 : 4.75);
             const total = (pSqFt * area * qty) + rushAdd;
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
             document.getElementById('final-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
@@ -250,16 +255,9 @@
                 document.getElementById('validation-panel').classList.remove('hidden');
                 reader.onload = (e) => {
                     document.getElementById('preview-thumb').src = e.target.result;
-                    const w = document.getElementById('w-input').value;
-                    const h = document.getElementById('h-input').value;
                     setTimeout(() => { 
                         document.getElementById('upload-progress').style.width = '100%'; 
-                        // Verificación de tamaño en el mensaje
-                        if (w > 48 || h > 96) {
-                            document.getElementById('validation-text').innerHTML = `Error: Artwork exceeds 48" x 96" limit.<br><span class='text-red-600'>Please resize artwork.</span>`;
-                        } else {
-                            document.getElementById('validation-text').innerHTML = `Verifying artwork for ${w}" x ${h}"... confirmed.<br>Styrene material compatible.`;
-                        }
+                        document.getElementById('validation-text').innerHTML = `Verified for Styrene printing compatible.`;
                     }, 1000);
                 };
                 reader.readAsDataURL(input.files[0]);
@@ -268,19 +266,68 @@
 
         function approveArt() {
             const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
-            btn.classList.remove('cursor-not-allowed');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black'); btn.classList.remove('cursor-not-allowed');
             document.getElementById('status-title').innerText = "Artwork Approved";
-            document.getElementById('status-title').classList.replace('text-blue-600', 'text-[#83D644]');
+            document.getElementById('status-title').classList.replace('text-blue-600', 'text-green-600');
         }
 
         function resetUpload() {
             document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
-            document.getElementById('file-input').value = "";
-            const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = true; btn.classList.replace('bg-black', 'bg-gray-200');
-            document.getElementById('upload-progress').style.width = '0%';
+            document.getElementById('add-to-cart-btn').disabled = true;
+            document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open'); overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
+                renderCart();
+            }
+        }
+
+        function addToCart() {
+            const priceStr = document.getElementById('final-price').innerText.replace('$', '').replace(',', '');
+            const newItem = {
+                name: document.getElementById('prod-title').innerText,
+                specs: document.getElementById('thick-select').options[document.getElementById('thick-select').selectedIndex].text,
+                size: `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
+                qty: document.getElementById('qty-input').value,
+                price: parseFloat(priceStr),
+                image: document.getElementById('preview-thumb').src
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem); localStorage.setItem('sqft_cart', JSON.stringify(cart)); toggleCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-300 italic py-20 uppercase font-black text-[11px]">Carrito Vacío</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    container.innerHTML += `<div class="flex gap-6 border-b border-gray-50 pb-6"><div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div><div class="flex flex-col justify-between flex-grow"><div class="flex justify-between"><h4 class="text-sm font-black uppercase italic">${item.name}</h4><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.specs}</p><div class="flex justify-between items-end mt-4"><span class="text-[10px] font-bold text-gray-400 uppercase">Cant: ${item.qty}</span><span class="text-xl font-black italic">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div></div></div>`;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Artículos`;
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
         }
 
         window.onload = calculatePrice;

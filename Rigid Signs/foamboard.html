@@ -16,12 +16,19 @@
         .sidebar-item.active { border-right: 3px solid #000; }
         .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
         .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
+        .custom-dropdown:disabled { background-color: #f9fafb; color: #9ca3af; cursor: not-allowed; }
         .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
         .custom-input:focus { border-color: #000; }
         .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
-        .progress-bar { width: 0%; height: 6px; background: #83D644; transition: width 0.6s ease; border-radius: 3px; }
+        .progress-bar { width: 0%; height: 8px; background: #83D644; transition: width 0.6s ease; border-radius: 4px; }
+
+        /* Cart Sidebar Styles */
+        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -43,13 +50,19 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg">Register</button>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
+        </div>
     </nav>
 
     <div class="flex flex-row flex-grow w-full">
         <aside class="sidebar-fixed p-10 hidden lg:block">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
-             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer">Displays</li>
@@ -89,7 +102,7 @@
 
                     <div class="space-y-10">
                         <header>
-                            <h1 class="text-5xl heavy-italic text-gray-900 leading-none italic">Foamboard</h1>
+                            <h1 id="prod-title" class="text-5xl heavy-italic text-gray-900 leading-none italic">Foamboard</h1>
                             <p class="text-xl font-black text-gray-400 italic mt-6" id="prod-range">$3.50 – $8.50 sq/ft</p>
                         </header>
 
@@ -128,7 +141,7 @@
                             </div>
 
                             <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block ml-1 text-red-500 italic">Validation Status</label>
+                                <label class="text-[10px] font-black uppercase text-red-500 italic ml-1">Validation Status</label>
                                 <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-12 rounded-[2.5rem]">
                                     <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic text-center">Click to Select Image File</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
@@ -167,7 +180,7 @@
 
                             <div class="flex gap-6">
                                 <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-xl shadow-sm">
-                                <button id="add-to-cart-btn" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
                             </div>
                         </div>
                     </div>
@@ -180,6 +193,19 @@
             </footer>
         </main>
     </div>
+
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Checkout</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
 
     <script>
         lucide.createIcons();
@@ -198,18 +224,11 @@
         }
 
         function validateSize() {
-            const wInput = document.getElementById('w-input');
-            const hInput = document.getElementById('h-input');
+            const w = document.getElementById('w-input');
+            const h = document.getElementById('h-input');
             const msg = document.getElementById('limit-msg');
-            const maxW = 46;
-            const maxH = 94;
-            let hit = false;
-            if (parseFloat(wInput.value) > maxW) { wInput.value = maxW; hit = true; }
-            if (parseFloat(hInput.value) > maxH) { hInput.value = maxH; hit = true; }
-            if (hit) {
-                msg.classList.remove('hidden');
-                setTimeout(() => msg.classList.add('hidden'), 2500);
-            }
+            if (parseFloat(w.value) > 46) w.value = 46;
+            if (parseFloat(h.value) > 94) h.value = 94;
             calculatePrice();
         }
 
@@ -225,23 +244,21 @@
             if (thickness === "3/16") {
                 if (sides === "1") {
                     if (lamination === "none") pSqFt = 3.50;
-                    if (lamination === "uv") pSqFt = 4.25;
-                    if (lamination === "dry-erase") pSqFt = 6.50;
+                    else if (lamination === "uv") pSqFt = 4.25;
+                    else pSqFt = 6.50;
                 } else {
                     if (lamination === "none") pSqFt = 4.75;
-                    if (lamination === "uv") pSqFt = 5.50;
-                    if (lamination === "dry-erase") pSqFt = 8.50;
+                    else if (lamination === "uv") pSqFt = 5.50;
+                    else pSqFt = 8.50;
                 }
             } else {
                 if (sides === "1") {
-                    if (lamination === "none") pSqFt = 6.00;
-                    if (lamination === "uv") pSqFt = 6.75;
+                    pSqFt = (lamination === "none") ? 6.00 : 6.75;
                 } else {
-                    if (lamination === "none") pSqFt = 7.25;
-                    if (lamination === "uv") pSqFt = 8.00;
+                    pSqFt = (lamination === "none") ? 7.25 : 8.00;
                 }
             }
-            const total = (pSqFt * area * qty);
+            const total = pSqFt * area * qty;
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
             document.getElementById('final-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
@@ -253,18 +270,10 @@
                 document.getElementById('validation-panel').classList.remove('hidden');
                 reader.onload = (e) => {
                     document.getElementById('preview-thumb').src = e.target.result;
-                    const w = document.getElementById('w-input').value;
-                    const h = document.getElementById('h-input').value;
                     setTimeout(() => { 
                         document.getElementById('upload-progress').style.width = '100%'; 
-                        let msg = `Verifying for ${w}" x ${h}"... `;
-                        if (w > 46 || h > 94) {
-                            msg += "<br><span class='text-red-600 font-bold'>Error: Exceeds 46x94 limit. Please resize.</span>";
-                        } else {
-                            msg += "<br><span class='text-black font-bold'>Foamboard substrate verified.</span>";
-                        }
-                        document.getElementById('validation-text').innerHTML = msg;
-                    }, 1200);
+                        document.getElementById('validation-text').innerHTML = `Verified for Foamboard substrate.`;
+                    }, 1000);
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -274,16 +283,70 @@
             const btn = document.getElementById('add-to-cart-btn');
             btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
             btn.classList.remove('cursor-not-allowed');
-            document.getElementById('status-title').innerText = "Approved for Print";
-            document.getElementById('status-title').className = "text-[15px] font-black uppercase text-green-600 italic";
+            document.getElementById('status-title').innerText = "Artwork Approved";
+            document.getElementById('status-title').classList.replace('text-blue-600', 'text-green-600');
         }
 
         function resetUpload() {
             document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
-            document.getElementById('file-input').value = "";
-            const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = true; btn.classList.replace('bg-black', 'bg-gray-200');
+            document.getElementById('add-to-cart-btn').disabled = true;
+            document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+        }
+
+        // CART LOGIC
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open'); overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
+                renderCart();
+            }
+        }
+
+        function addToCart() {
+            const thick = document.getElementById('thick-select');
+            const qty = document.getElementById('qty-input').value;
+            const priceStr = document.getElementById('final-price').innerText.replace('$', '').replace(',', '');
+            const newItem = {
+                name: "Foamboard Sign",
+                specs: thick.options[thick.selectedIndex].text + " - " + document.getElementById('lam-select').value,
+                size: `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
+                qty: qty,
+                price: parseFloat(priceStr),
+                image: document.getElementById('preview-thumb').src
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem); localStorage.setItem('sqft_cart', JSON.stringify(cart)); toggleCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-300 italic py-20 uppercase font-black text-[11px]">Cart Empty</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    container.innerHTML += `<div class="flex gap-6 border-b border-gray-50 pb-6"><div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div><div class="flex flex-col justify-between flex-grow"><div class="flex justify-between"><h4 class="text-sm font-black uppercase italic">${item.name}</h4><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1">${item.specs}</p><div class="flex justify-between items-end mt-4"><span class="text-[10px] font-bold text-gray-400">Qty: ${item.qty}</span><span class="text-xl font-black italic">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div></div></div>`;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
         }
 
         window.onload = handleThicknessChange;

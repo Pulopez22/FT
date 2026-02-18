@@ -23,20 +23,21 @@
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 8px; background: #83D644; transition: width 0.6s ease; border-radius: 4px; }
-        
-        /* Estilos exclusivos para el menú móvil */
         #mobile-menu { transition: transform 0.3s ease-in-out; transform: translateX(-100%); }
         #mobile-menu.active { transform: translateX(0); }
+
+        /* Estilos Carrito Lateral */
+        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-4 md:gap-8">
-            <button onclick="toggleMobileMenu()" class="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
-                <i data-lucide="menu" class="w-6 h-6"></i>
-            </button>
-
+            <button onclick="toggleMobileMenu()" class="lg:hidden p-2 hover:bg-gray-100 rounded-lg"><i data-lucide="menu" class="w-6 h-6"></i></button>
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
@@ -52,27 +53,28 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <button class="bg-red-600 text-white px-4 md:px-6 py-2 rounded-full font-black uppercase text-[9px] md:text-[10px] tracking-widest shadow-lg">Register</button>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
+        </div>
     </nav>
 
     <div id="mobile-menu" class="fixed inset-0 bg-white z-[60] lg:hidden flex flex-col p-8 overflow-y-auto">
-        <div class="flex justify-between items-center mb-8">
-            <span class="font-black text-[12px] uppercase tracking-widest text-gray-400">Menu</span>
-            <button onclick="toggleMobileMenu()" class="p-2"><i data-lucide="x" class="w-8 h-8"></i></button>
-        </div>
-        
+        <div class="flex justify-between items-center mb-8"><span class="font-black text-[12px] uppercase tracking-widest text-gray-400">Menu</span><button onclick="toggleMobileMenu()" class="p-2"><i data-lucide="x" class="w-8 h-8"></i></button></div>
         <div class="space-y-10">
             <nav class="flex flex-col gap-4">
                 <h3 class="text-[10px] font-black text-gray-300 uppercase tracking-widest border-b pb-2">Main Navigation</h3>
-                <a href="../index.html" class="text-xl font-black uppercase italic hover:text-red-600">Wall Art</a>
-                <a href="../Banners/banners.html" class="text-xl font-black uppercase italic hover:text-red-600">Banners</a>
-                <a href="#" class="text-xl font-black uppercase italic hover:text-red-600">Trade Show</a>
-                <a href="#" class="text-xl font-black uppercase italic hover:text-red-600">Decals</a>
-                <a href="../Stickers/stickers.html" class="text-xl font-black uppercase italic hover:text-red-600">Stickers</a>
-                <a href="#" class="text-xl font-black uppercase italic hover:text-red-600">Apparel</a>
-                <a href="#" class="text-xl font-black uppercase italic hover:text-red-600">Marketing Materials</a>
+                <a href="../index.html" class="text-xl font-black uppercase italic">Wall Art</a>
+                <a href="../Banners/banners.html" class="text-xl font-black uppercase italic">Banners</a>
+                <a href="#" class="text-xl font-black uppercase italic">Trade Show</a>
+                <a href="#" class="text-xl font-black uppercase italic">Decals</a>
+                <a href="../Stickers/stickers.html" class="text-xl font-black uppercase italic">Stickers</a>
+                <a href="#" class="text-xl font-black uppercase italic">Apparel</a>
+                <a href="#" class="text-xl font-black uppercase italic">Marketing Materials</a>
             </nav>
-
             <nav class="flex flex-col gap-4">
                 <h3 class="text-[10px] font-black text-gray-300 uppercase tracking-widest border-b pb-2">Categories</h3>
                 <a href="../AdvertisingFlags/advertising-flags.html" class="text-sm font-bold uppercase text-gray-500">Advertising Flags</a>
@@ -103,7 +105,6 @@
         <main class="main-content-scroll">
             <div class="p-6 md:p-12 flex-grow">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-20">
-                    
                     <div class="space-y-8">
                         <div class="bg-gray-50 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] md:min-h-[450px] relative">
                             <img id="main-prod-img" src="../images/Rigid Signs/Die-Bond-01.png" alt="Sign" class="max-h-[280px] md:max-h-[380px] drop-shadow-2xl">
@@ -134,12 +135,10 @@
                                     <option value="die_bond">Die Bond (Aluminum Composite)</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Thickness Options</label>
                                 <select id="thick-select" onchange="calculatePrice()" class="custom-dropdown"></select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Lamination</label>
                                 <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown">
@@ -147,7 +146,6 @@
                                     <option value="uv" selected>UV Lamination (Gloss/Matte)</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1"># Of Sides</label>
                                 <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
@@ -180,21 +178,14 @@
 
                             <div class="bg-gray-50/50 p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 relative">
                                 <div id="limit-msg" class="hidden absolute -top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit reached</div>
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm">
-                                    <span>Width (in)</span>
-                                    <input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36">
-                                </div>
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm">
-                                    <span>Height (in)</span>
-                                    <input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36">
-                                </div>
+                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Width (in)</span><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36"></div>
+                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Height (in)</span><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36"></div>
                                 <div class="price-row border-none pt-10">
                                     <span class="text-[12px] font-black uppercase text-gray-900 italic">Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.000 sq ft</span></span>
                                     <span id="final-price" class="text-5xl md:text-6xl heavy-italic italic text-black tracking-tighter">$33.00</span>
                                 </div>
                             </div>
-
-                            <button id="add-to-cart-btn" disabled class="w-full bg-gray-200 text-white font-black py-5 md:py-6 rounded-2xl text-[11px] md:text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
+                            <button id="add-to-cart-btn" onclick="addToCart()" disabled class="w-full bg-gray-200 text-white font-black py-5 md:py-6 rounded-2xl text-[11px] md:text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
                         </div>
                     </div>
                 </div>
@@ -207,56 +198,59 @@
         </main>
     </div>
 
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Tu Carrito</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Artículos</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Finalizar Pedido</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
+
     <script>
         lucide.createIcons();
-
-        // Control del menú móvil
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('active');
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('active'); }
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open'); overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
+                renderCart();
+            }
         }
 
-        const thickOptions = {
-            white_alum: ['0.040" Solid', '0.063" Solid', '0.080" Solid'],
-            die_bond: ['1/8" (3mm) Composite', '1/4" (6mm) Composite']
-        };
+        const thickOptions = { white_alum: ['0.040" Solid', '0.063" Solid', '0.080" Solid'], die_bond: ['1/8" (3mm) Composite', '1/4" (6mm) Composite'] };
 
         function handleMaterialChange() {
             const mat = document.getElementById('mat-select').value;
             const thickSelect = document.getElementById('thick-select');
-            const title = document.getElementById('desc-title');
-            const body = document.getElementById('desc-body');
             const features = document.getElementById('desc-features');
-            
             thickSelect.innerHTML = '';
-            thickOptions[mat].forEach(opt => {
-                const o = document.createElement('option');
-                o.value = opt; o.text = opt; thickSelect.add(o);
-            });
-
+            thickOptions[mat].forEach(opt => { const o = document.createElement('option'); o.value = opt; o.text = opt; thickSelect.add(o); });
             if (mat === "white_alum") {
-                title.innerText = "White Aluminum Signs";
-                body.innerText = "Solid aluminum sheets designed for high durability. Perfect for parking signs, real estate, and long-term industrial use.";
-                features.innerHTML = `<li>Maximum size 48" x 96"</li><li>Weatherproof and UV safe</li><li>High res digital print 720x720</li>`;
+                document.getElementById('desc-title').innerText = "White Aluminum Signs";
+                features.innerHTML = `<li>Maximum size 48" x 96"</li><li>Weatherproof and UV safe</li>`;
             } else {
-                title.innerText = "Die Bond / E-Panel";
-                body.innerText = "Two aluminum sheets bonded to a polyethylene core. Best for Real Estate and Trade Shows.";
-                features.innerHTML = `<li>FREE ROUTER CUTTING</li><li>Maximum size 46" x 94"</li><li>Outdoor and indoor durability</li>`;
+                document.getElementById('desc-title').innerText = "Die Bond / E-Panel";
+                features.innerHTML = `<li>FREE ROUTER CUTTING</li><li>Maximum size 46" x 94"</li>`;
             }
             calculatePrice();
         }
 
         function validateSize() {
             const mat = document.getElementById('mat-select').value;
-            const w = document.getElementById('w-input');
-            const h = document.getElementById('h-input');
-            const msg = document.getElementById('limit-msg');
-            const maxW = (mat === 'die_bond') ? 46 : 48;
-            const maxH = (mat === 'die_bond') ? 94 : 96;
-            
-            if (parseFloat(w.value) > maxW) { w.value = maxW; msg.classList.remove('hidden'); }
-            if (parseFloat(h.value) > maxH) { h.value = maxH; msg.classList.remove('hidden'); }
-            setTimeout(() => msg.classList.add('hidden'), 2000);
+            const w = document.getElementById('w-input'); const h = document.getElementById('h-input');
+            const maxW = (mat === 'die_bond') ? 46 : 48; const maxH = (mat === 'die_bond') ? 94 : 96;
+            if (parseFloat(w.value) > maxW) w.value = maxW;
+            if (parseFloat(h.value) > maxH) h.value = maxH;
             calculatePrice();
         }
 
@@ -269,17 +263,11 @@
             const h = parseFloat(document.getElementById('h-input').value) || 0;
             const area = (w * h) / 144;
             let pSqFt = 0;
-
-            if (mat === "white_alum") {
-                if (lam === "none") pSqFt = 7.50;
-                else pSqFt = (sides === "1") ? 8.25 : 9.00;
-            } else {
-                if (thick.includes("1/8")) {
-                    pSqFt = (lam === "none") ? ((sides === "1") ? 4.50 : 6.25) : ((sides === "1") ? 5.25 : 14.00);
-                } else {
-                    pSqFt = (lam === "none") ? 9.00 : 10.50;
-                    if (sides === "2") pSqFt = 14.00;
-                }
+            if (mat === "white_alum") { pSqFt = (lam === "none") ? 7.50 : ((sides === "1") ? 8.25 : 9.00); }
+            else { 
+                if (thick.includes("1/8")) pSqFt = (lam === "none") ? ((sides === "1") ? 4.50 : 6.25) : ((sides === "1") ? 5.25 : 14.00);
+                else pSqFt = (lam === "none") ? 9.00 : 10.50;
+                if (sides === "2") pSqFt = 14.00;
             }
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
             document.getElementById('final-price').innerText = `$${(pSqFt * area).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
@@ -290,12 +278,9 @@
                 const reader = new FileReader();
                 document.getElementById('drop-zone').classList.add('hidden');
                 document.getElementById('validation-panel').classList.remove('hidden');
-                reader.onload = (e) => {
+                reader.onload = (e) => { 
                     document.getElementById('preview-thumb').src = e.target.result;
-                    setTimeout(() => { 
-                        document.getElementById('upload-progress').style.width = '100%'; 
-                        document.getElementById('validation-text').innerHTML = `Verifying substrate compatibility... confirmed.`;
-                    }, 1000);
+                    setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; document.getElementById('validation-text').innerHTML = `Verified substrate compatibility.`; }, 1000);
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -303,18 +288,57 @@
 
         function approveArt() {
             const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
-            btn.classList.remove('cursor-not-allowed');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black'); btn.classList.remove('cursor-not-allowed');
             document.getElementById('status-title').innerText = "Artwork Approved";
-            document.getElementById('status-title').classList.replace('text-blue-600', 'text-[#83D644]');
+            document.getElementById('status-title').classList.replace('text-blue-600', 'text-green-600');
         }
 
         function resetUpload() {
             document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
-            document.getElementById('file-input').value = "";
             document.getElementById('add-to-cart-btn').disabled = true;
-            document.getElementById('upload-progress').style.width = '0%';
+            document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+        }
+
+        function addToCart() {
+            const priceStr = document.getElementById('final-price').innerText.replace('$', '').replace(',', '');
+            const newItem = {
+                name: document.getElementById('prod-title').innerText,
+                specs: document.getElementById('mat-select').value + " - " + document.getElementById('thick-select').value,
+                size: `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
+                qty: 1,
+                price: parseFloat(priceStr),
+                image: document.getElementById('preview-thumb').src
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            toggleCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-300 italic py-20 uppercase font-black text-[11px]">Carrito Vacío</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    container.innerHTML += `<div class="flex gap-6 border-b border-gray-50 pb-6"><div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div><div class="flex flex-col justify-between flex-grow"><div class="flex justify-between"><h4 class="text-sm font-black uppercase italic">${item.name}</h4><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase">${item.specs}</p><div class="flex justify-between items-end mt-4"><span class="text-[10px] font-bold text-gray-400">Qty: 1</span><span class="text-xl font-black italic">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div></div></div>`;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Artículos`;
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
         }
 
         window.onload = handleMaterialChange;

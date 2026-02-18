@@ -24,6 +24,12 @@
         .progress-bar { width: 0%; height: 8px; background: #83D644; transition: width 0.6s ease; border-radius: 4px; }
         #mobile-menu { transition: transform 0.3s ease-in-out; transform: translateX(-100%); }
         #mobile-menu.active { transform: translateX(0); }
+
+        /* Estilos Carrito Lateral */
+        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -46,7 +52,13 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <button class="bg-red-600 text-white px-4 md:px-6 py-2 rounded-full font-black uppercase text-[9px] md:text-[10px] tracking-widest shadow-lg">Register</button>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
+        </div>
     </nav>
 
     <div id="mobile-menu" class="fixed inset-0 bg-white z-[60] lg:hidden flex flex-col p-8 overflow-y-auto">
@@ -100,23 +112,17 @@
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Substrate Selection</label>
                                 <select id="mat-select" onchange="handleMaterialChange()" class="custom-dropdown">
-                                    <optgroup label="Standard Acrylic">
-                                        <option value="white">Sign White (1st Surface Print)</option>
-                                        <option value="clear">Clear (2nd Surface White Flood)</option>
-                                        <option value="blackout">Clear (2nd Surface BlackOut)</option>
-                                    </optgroup>
-                                    <optgroup label="Back-lit Acrylic">
-                                        <option value="backlit_white">Acrylic Back-lit (Sign White)</option>
-                                        <option value="backlit_clear">Acrylic Back-lit (Day/Night Print)</option>
-                                    </optgroup>
+                                    <option value="white">Sign White (1st Surface Print)</option>
+                                    <option value="clear">Clear (2nd Surface White Flood)</option>
+                                    <option value="blackout">Clear (2nd Surface BlackOut)</option>
+                                    <option value="backlit_white">Acrylic Back-lit (Sign White)</option>
+                                    <option value="backlit_clear">Acrylic Back-lit (Day/Night Print)</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Thickness</label>
                                 <select id="thick-select" onchange="calculatePrice()" class="custom-dropdown"></select>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Finishing Options</label>
                                 <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown">
@@ -148,17 +154,47 @@
                                 <div class="price-row border-none pt-10"><span class="text-[12px] font-black uppercase text-gray-900 italic">Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.000 sq ft</span></span><span id="final-price" class="text-5xl md:text-6xl heavy-italic italic text-black tracking-tighter">$48.00</span></div>
                             </div>
 
-                            <button id="add-to-cart-btn" disabled class="w-full bg-gray-200 text-white font-black py-5 md:py-6 rounded-2xl text-[11px] md:text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
+                            <button id="add-to-cart-btn" onclick="addToCart()" disabled class="w-full bg-gray-200 text-white font-black py-5 md:py-6 rounded-2xl text-[11px] md:text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
         </main>
     </div>
+
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Tu Carrito</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Artículos</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Finalizar Pedido</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
 
     <script>
         lucide.createIcons();
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('active'); }
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open'); overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
+                renderCart();
+            }
+        }
 
         const thickMap = {
             white: ['1/8"', '3/16"'],
@@ -171,59 +207,112 @@
         function handleMaterialChange() {
             const mat = document.getElementById('mat-select').value;
             const thickSelect = document.getElementById('thick-select');
-            const title = document.getElementById('desc-title');
-            const body = document.getElementById('desc-body');
             const features = document.getElementById('desc-features');
-            
             thickSelect.innerHTML = '';
             thickMap[mat].forEach(t => { const o = document.createElement('option'); o.value = t; o.text = t; thickSelect.add(o); });
-
             if (mat.includes('backlit')) {
-                title.innerText = "Acrylic Back-lit Signs";
-                body.innerText = "Used for indoor & outdoor back-lit sign applications. Technology: 3 Layer Ink Sandwich for extreme vibrancy.";
-                features.innerHTML = `<li>Maximum Size: 72"x96"</li><li>Weatherproof and UV safe</li><li>High res digital print 720x720</li>`;
+                document.getElementById('desc-title').innerText = "Acrylic Back-lit Signs";
+                features.innerHTML = `<li>Maximum Size: 72"x96"</li><li>Weatherproof and UV safe</li>`;
             } else {
-                title.innerText = "Acrylic Signs";
-                body.innerText = "High-quality sign applications for P.O.P. and Building Signs. Long-term durability.";
-                features.innerHTML = `<li>Maximum Size: 72"x96"</li><li>Waterproof and UV safe</li><li>High res digital print 720x720</li>`;
+                document.getElementById('desc-title').innerText = "Acrylic Signs";
+                features.innerHTML = `<li>Maximum Size: 72"x96"</li><li>Long-term durability</li>`;
             }
             calculatePrice();
         }
 
         function validateSize() {
-            const w = document.getElementById('w-input'); const h = document.getElementById('h-input'); const msg = document.getElementById('limit-msg');
-            if (parseFloat(w.value) > 72) { w.value = 72; msg.classList.remove('hidden'); }
-            if (parseFloat(h.value) > 96) { h.value = 96; msg.classList.remove('hidden'); }
-            setTimeout(() => msg.classList.add('hidden'), 2000); calculatePrice();
+            const w = document.getElementById('w-input'); const h = document.getElementById('h-input');
+            if (parseFloat(w.value) > 72) w.value = 72;
+            if (parseFloat(h.value) > 96) h.value = 96;
+            calculatePrice();
         }
 
         function calculatePrice() {
             const mat = document.getElementById('mat-select').value; const thick = document.getElementById('thick-select').value;
             const finish = document.getElementById('finish-select').value;
-            const area = (parseFloat(document.getElementById('w-input').value) * parseFloat(document.getElementById('h-input').value)) / 144;
+            const w = parseFloat(document.getElementById('w-input').value) || 0;
+            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const area = (w * h) / 144;
             let p = 12;
-
-            if (mat === 'white') {
-                if (thick === '1/8"') p = finish === 'trim' ? 12 : 15;
-                else p = finish === 'trim' ? 14 : 17;
-            } else if (mat === 'clear') {
-                if (thick === '0.060"') p = finish === 'trim' ? 10 : 14;
-                else if (thick === '1/8"') p = finish === 'trim' ? 18 : 20;
-                else p = finish === 'trim' ? 20 : 22;
-            } else if (mat === 'backlit_white') {
-                if (thick === '0.060"') p = finish === 'trim' ? 14 : 17;
-                else if (thick === '1/8"') p = finish === 'trim' ? 15 : 18;
-                else p = finish === 'trim' ? 17 : 20;
-            } else if (mat === 'blackout') p = finish === 'trim' ? 26 : 28;
-            else p = 20;
-
+            if (mat === 'white') { p = (thick === '1/8"') ? (finish === 'trim' ? 12 : 15) : (finish === 'trim' ? 14 : 17); }
+            else if (mat === 'clear') { 
+                if (thick === '0.060"') p = (finish === 'trim' ? 10 : 14);
+                else if (thick === '1/8"') p = (finish === 'trim' ? 18 : 20);
+                else p = (finish === 'trim' ? 20 : 22);
+            }
+            const total = p * area;
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
-            document.getElementById('final-price').innerText = `$${(p * area).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('final-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
-        function processFile(input) { if (input.files && input.files[0]) { document.getElementById('drop-zone').classList.add('hidden'); document.getElementById('validation-panel').classList.remove('hidden'); setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; document.getElementById('validation-text').innerHTML = `Verifying compatibility... confirmed.`; }, 1000); } }
-        function approveArt() { const btn = document.getElementById('add-to-cart-btn'); btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black'); btn.classList.remove('cursor-not-allowed'); document.getElementById('status-title').innerText = "Artwork Approved"; document.getElementById('status-title').classList.replace('text-blue-600', 'text-[#83D644]'); }
-        function resetUpload() { document.getElementById('drop-zone').classList.remove('hidden'); document.getElementById('validation-panel').classList.add('hidden'); document.getElementById('add-to-cart-btn').disabled = true; }
+        function processFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                document.getElementById('drop-zone').classList.add('hidden');
+                document.getElementById('validation-panel').classList.remove('hidden');
+                reader.onload = (e) => { 
+                    document.getElementById('preview-thumb').src = e.target.result;
+                    setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; document.getElementById('validation-text').innerHTML = `Verified compatibility... confirmed.`; }, 1000);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function approveArt() {
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black'); btn.classList.remove('cursor-not-allowed');
+            document.getElementById('status-title').innerText = "Artwork Approved";
+            document.getElementById('status-title').classList.replace('text-blue-600', 'text-green-600');
+        }
+
+        function resetUpload() {
+            document.getElementById('drop-zone').classList.remove('hidden');
+            document.getElementById('validation-panel').classList.add('hidden');
+            document.getElementById('add-to-cart-btn').disabled = true;
+            document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+        }
+
+        function addToCart() {
+            const priceStr = document.getElementById('final-price').innerText.replace('$', '').replace(',', '');
+            const newItem = {
+                name: document.getElementById('prod-title').innerText,
+                specs: document.getElementById('mat-select').value + ' ' + document.getElementById('thick-select').value,
+                size: `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
+                qty: 1,
+                price: parseFloat(priceStr),
+                image: document.getElementById('preview-thumb').src
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            toggleCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-300 italic py-20 uppercase font-black text-[11px]">Carrito Vacío</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    container.innerHTML += `<div class="flex gap-6 border-b border-gray-50 pb-6"><div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div><div class="flex flex-col justify-between flex-grow"><div class="flex justify-between"><h4 class="text-sm font-black uppercase italic">${item.name}</h4><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase">${item.specs}</p><div class="flex justify-between items-end mt-4"><span class="text-[10px] font-bold text-gray-400">Qty: 1</span><span class="text-xl font-black italic">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div></div></div>`;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
+        }
+
         window.onload = handleMaterialChange;
     </script>
 </body>
