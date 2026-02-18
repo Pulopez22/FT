@@ -8,13 +8,13 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
         .sidebar-item.active { border-right: 3px solid #000; }
-        .main-content-scroll { height: calc(100vh - 73px); overflow-y: auto; flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
+        .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
         .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
         .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
         .custom-input:focus { border-color: #000; }
@@ -24,9 +24,15 @@
         .progress-bar { width: 0%; height: 4px; background: #83D644; transition: width 0.6s ease; border-radius: 2px; }
         .thumb-img { width: 64px; height: 64px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s; }
         .thumb-active { border: 2px solid black !important; }
+
+        /* Cart Sidebar Styles */
+        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
@@ -35,39 +41,44 @@
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
                 <a href="#" class="hover:text-black transition-colors">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
                 <a href="#" class="hover:text-black transition-colors">Apparel</a>
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg">Register</button>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
+        </div>
     </nav>
 
     <div class="flex flex-row flex-grow w-full">
-        <aside class="sidebar-fixed p-10 hidden lg:block">
+        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
-             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
-                <li class="sidebar-item cursor-pointer">Displays</li>
+                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
                 <li class="sidebar-item cursor-pointer active"><a href="largeprinting.html" class="block w-full">Large Format Printing</a></li>
-                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
-                <li class="sidebar-item cursor-pointer">Rigid Signs</li>
+                <li class="sidebar-item cursor-pointer"><a href="../RigidSigns/rigid-signs.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
 
         <main class="main-content-scroll">
             <div class="p-12 flex-grow">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
-                    
                     <div class="space-y-8">
-                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] relative">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] relative text-black">
                             <img id="main-prod-img" src="../images/Large Printing/AB-Vinyl-01.png" alt="Vinyl" class="max-h-[300px] drop-shadow-2xl transition-all duration-300">
                         </div>
                         <div class="flex gap-3 justify-center flex-wrap" id="thumb-container">
@@ -75,21 +86,21 @@
                             <img src="../images/Large Printing/AB-Vinyl-02.png" class="thumb-img" onclick="changeImage(this)">
                         </div>
 
-                        <div class="pt-8 border-t border-gray-100">
+                        <div class="pt-8 border-t border-gray-100 italic text-black">
                             <h2 class="text-2xl font-light text-gray-500 mb-6 tracking-tight">Description</h2>
-                            <h3 class="text-3xl font-normal text-gray-800 mb-6 italic">Rough Wall HT Adhesive Vinyl</h3>
+                            <h3 class="text-3xl font-normal text-gray-800 mb-6">Rough Wall HT Adhesive Vinyl</h3>
                             <div class="text-[14px] text-gray-600 leading-[1.7] space-y-5 font-medium">
                                 <p>Our Rough Wall HT Adhesive Vinyl uses a **3.5 mil Satin white PVC film** with an **Extremely Aggressive Clear permanent adhesive backing (White Back)**. It is ideal for indoor High Textured Walls or Low VOC Paint Surface applications.</p>
                                 <div>
-                                    <h4 class="font-black text-gray-900 mb-3 tracking-wider text-xs uppercase">Features:</h4>
+                                    <h4 class="font-black text-gray-900 mb-3 tracking-wider text-xs uppercase underline">Features:</h4>
                                     <ul class="list-disc pl-5 space-y-2 text-[12px]">
-                                        <li>Maximum Size: 53.5" Wide (60" Wide on request).</li>
-                                        <li>Resolution: High resolution digitally printed at 720 x 720. Printed on one side only.</li>
-                                        <li>Usage: Indoor or Outdoor; Waterproof and UV safe that will last for years.</li>
+                                        <li>Maximum Width: 53.5" Wide (Up to 60" Wide on request).</li>
+                                        <li>Resolution: High resolution digitally printed at 720 x 720.</li>
+                                        <li>Usage: Indoor or Outdoor; Waterproof and UV safe.</li>
                                     </ul>
                                 </div>
                                 <div>
-                                    <h4 class="font-black text-gray-900 mb-3 tracking-wider text-xs uppercase">Material Options:</h4>
+                                    <h4 class="font-black text-gray-900 mb-3 tracking-wider text-xs uppercase underline">Material Options:</h4>
                                     <ul class="list-disc pl-5 space-y-2 text-[12px]">
                                         <li>3.5 mil. Satin HT Permanent Adhesive.</li>
                                         <li>Can be Laminated Gloss or Matte (Not Necessary).</li>
@@ -101,14 +112,14 @@
 
                     <div class="space-y-10">
                         <header>
-                            <h1 class="text-4xl heavy-italic text-gray-900 leading-none italic">Rough Wall HT Adhesive Vinyl</h1>
+                            <h1 id="prod-title" class="text-4xl heavy-italic text-gray-900 leading-none italic">Rough Wall HT Adhesive Vinyl</h1>
                             <p class="text-1xl font-black text-gray-400 italic mt-6" id="prod-range">$2.50 – $7.75 sq/ft</p>
                         </header>
 
                         <div class="space-y-6">
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Finishing Options</label>
-                                <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown">
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Finishing Options</label>
+                                <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                     <option value="0">Trim to Size</option>
                                     <option value="0.75">Flex to Cut (+$.75 sq/ft)</option>
                                     <option value="0.75">Contour Cut (+$.75 sq/ft)</option>
@@ -116,19 +127,17 @@
                                     <option value="4.50">Contour Cut + Weed & Masking (+$4.50 sq/ft)</option>
                                 </select>
                             </div>
-
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Lamination</label>
-                                <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown">
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Lamination</label>
+                                <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                     <option value="0">No Lamination</option>
                                     <option value="0.75">Gloss UV Lamination (+$.75 sq/ft)</option>
                                     <option value="0.75">Matte UV Lamination (+$.75 sq/ft)</option>
                                 </select>
                             </div>
-
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Turnaround</label>
-                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Turnaround</label>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                     <option value="0" selected>2-3 Days</option>
                                     <option value="50">Next Day (+$50.00)</option>
                                     <option value="100">Same Day Rush +$100.00</option>
@@ -136,64 +145,90 @@
                             </div>
 
                             <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block ml-1 text-red-500">Validation Status</label>
+                                <label class="text-[10px] font-black uppercase text-red-500 tracking-[0.15em] block ml-1 italic">Validation Status</label>
                                 <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">
-                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Select Image File</span>
+                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic text-center">Select Image File</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
                                 </div>
-                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 shadow-2xl space-y-5">
+                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 shadow-2xl space-y-5 text-black">
                                     <div class="flex gap-5 items-center">
-                                        <div class="w-24 h-24 bg-gray-50 rounded-2xl border p-2"><img id="preview-thumb" class="w-full h-full object-contain"></div>
+                                        <div class="w-24 h-24 bg-gray-50 rounded-2xl border p-2 flex items-center justify-center overflow-hidden"><img id="preview-thumb" class="max-h-full max-w-full object-contain"></div>
                                         <div class="flex-grow">
-                                            <h4 id="status-title" class="text-[14px] font-black uppercase text-red-600 italic tracking-tighter">Validating...</h4>
-                                            <div id="validation-text" class="text-[12px] text-gray-500 font-medium leading-relaxed mt-1 italic text-xs">
-                                                <span class="text-black font-bold mt-1 block italic">We will scale your artwork.</span>
-                                            </div>
+                                            <h4 id="status-title" class="text-[14px] font-black uppercase text-red-600 italic tracking-tighter">ANALYZING ARTWORK...</h4>
+                                            <div id="validation-text" class="text-[12px] text-gray-500 font-medium leading-relaxed mt-1 italic"></div>
                                         </div>
                                     </div>
                                     <div class="w-full bg-gray-100 h-1 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
                                     <div class="flex gap-3" id="action-buttons">
-                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[10px] font-black uppercase py-4 rounded-2xl hover:bg-black transition-all shadow-lg italic">Approve & Continue</button>
+                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[10px] font-black uppercase py-4 rounded-2xl hover:bg-black transition-all shadow-lg italic tracking-widest">APPROVE & CONTINUE</button>
                                         <button onclick="resetUpload()" class="px-6 bg-gray-100 text-gray-400 text-[10px] font-black uppercase rounded-2xl italic">Discard</button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="bg-gray-50/50 p-10 rounded-[2.5rem] border border-gray-100 shadow-inner">
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Width (in)</span><input type="number" id="w-input" value="24" oninput="calculatePrice()" class="custom-input w-32"></div>
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Height (in)</span><input type="number" id="h-input" value="24" oninput="calculatePrice()" class="custom-input w-32"></div>
+                            <div class="bg-gray-50/50 p-10 rounded-[2.5rem] border border-gray-100 shadow-inner text-black relative">
+                                <div id="limit-msg" class="hidden absolute -top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit Width: 53.5"</div>
+                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Width (in)</span><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input w-32"></div>
+                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Height (in)</span><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input w-32"></div>
                                 <div class="price-row border-none pt-8">
-                                    <span class="text-[11px] font-black uppercase text-gray-900 tracking-widest italic">Total Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.000 sq ft</span></span>
-                                    <span id="final-price" class="text-5xl heavy-italic italic text-black">$10.00</span>
+                                    <span class="text-[11px] font-black uppercase tracking-widest italic">Total Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.000 sq ft</span></span>
+                                    <span id="final-price" class="text-5xl heavy-italic italic">$10.00</span>
                                 </div>
                             </div>
 
                             <div class="flex gap-5">
-                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-5 border-2 border-gray-100 rounded-2xl font-black text-center outline-none">
-                                <button id="add-to-cart-btn" disabled class="flex-grow bg-gray-200 text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic">Add to cart</button>
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-5 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-black">
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md">Add to cart</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
         </main>
     </div>
 
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Checkout</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
+
     <script>
         lucide.createIcons();
+
+        function validateSize() {
+            const w = document.getElementById('w-input');
+            const h = document.getElementById('h-input');
+            const msg = document.getElementById('limit-msg');
+            if (parseFloat(w.value) > 53.5) { 
+                w.value = 53.5; 
+                msg.classList.remove('hidden'); 
+                setTimeout(() => msg.classList.add('hidden'), 2000); 
+            }
+            if (parseFloat(h.value) > 200) h.value = 200;
+            calculatePrice();
+        }
 
         function calculatePrice() {
             const w = parseFloat(document.getElementById('w-input').value) || 0;
             const h = parseFloat(document.getElementById('h-input').value) || 0;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const rushFee = parseFloat(document.getElementById('turn-select').value) || 0;
+            const turnFee = parseFloat(document.getElementById('turn-select').value) || 0;
             const finishAdd = parseFloat(document.getElementById('finish-select').value) || 0;
             const lamAdd = parseFloat(document.getElementById('lam-select').value) || 0;
-            
-            const basePrice = 2.50;
             const area = (w * h) / 144;
-            const finalTotal = (area * (basePrice + finishAdd + lamAdd) * qty) + rushFee;
-            
+            const finalTotal = (area * (2.50 + finishAdd + lamAdd) * qty) + turnFee;
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
             document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
@@ -201,10 +236,22 @@
         function processFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
+                const w = document.getElementById('w-input').value;
+                const h = document.getElementById('h-input').value;
                 document.getElementById('drop-zone').classList.add('hidden');
                 document.getElementById('validation-panel').classList.remove('hidden');
-                setTimeout(() => document.getElementById('upload-progress').style.width = '100%', 100);
-                reader.onload = (e) => document.getElementById('preview-thumb').src = e.target.result;
+                reader.onload = (e) => {
+                    document.getElementById('preview-thumb').src = e.target.result;
+                    setTimeout(() => { 
+                        document.getElementById('upload-progress').style.width = '100%'; 
+                        document.getElementById('status-title').innerText = "Analysis Complete";
+                        document.getElementById('status-title').className = "text-[14px] font-black uppercase text-blue-600 italic tracking-tighter";
+                        document.getElementById('validation-text').innerHTML = `
+                            <span>Requested: ${w}" x ${h}"</span><br>
+                            <span class="text-black font-bold mt-1 block italic underline">We will scale your artwork.</span>
+                        `;
+                    }, 800);
+                };
                 reader.readAsDataURL(input.files[0]);
             }
         }
@@ -214,7 +261,7 @@
             btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
             btn.classList.remove('cursor-not-allowed');
             document.getElementById('action-buttons').classList.add('hidden');
-            document.getElementById('status-title').innerText = "Approved";
+            document.getElementById('status-title').innerText = "Artwork Approved";
             document.getElementById('status-title').className = "text-[14px] font-black uppercase text-green-600 italic";
         }
 
@@ -223,6 +270,67 @@
             document.getElementById('validation-panel').classList.add('hidden');
             document.getElementById('upload-progress').style.width = '0%';
             document.getElementById('file-input').value = "";
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = true; btn.classList.replace('bg-black', 'bg-gray-200');
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open'); overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
+                renderCart();
+            }
+        }
+
+        function addToCart() {
+            const newItem = {
+                name: "Rough Wall HT Adhesive Vinyl",
+                specs: document.getElementById('finish-select').options[document.getElementById('finish-select').selectedIndex].text,
+                size: `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
+                qty: document.getElementById('qty-input').value,
+                price: parseFloat(document.getElementById('final-price').innerText.replace('$', '').replace(',', '')),
+                image: document.getElementById('preview-thumb').src
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem); localStorage.setItem('sqft_cart', JSON.stringify(cart)); toggleCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-300 italic py-20 uppercase font-black text-[11px]">Cart Empty</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    container.innerHTML += `
+                        <div class="flex gap-6 border-b border-gray-50 pb-6 last:border-0 text-black">
+                            <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div>
+                            <div class="flex flex-col justify-between flex-grow">
+                                <div class="flex justify-between"><h4 class="text-sm font-black uppercase italic">${item.name}</h4><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button></div>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.specs}</p>
+                                <div class="flex justify-between items-end mt-4"><span class="text-[10px] font-bold text-gray-400 uppercase">Qty: ${item.qty}</span><span class="text-xl font-black italic">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div>
+                            </div>
+                        </div>`;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
         }
 
         function changeImage(el) {
@@ -231,7 +339,7 @@
             el.classList.add('thumb-active');
         }
 
-        window.onload = calculatePrice;
+        window.onload = () => { calculatePrice(); renderCart(); };
     </script>
 </body>
 </html>
