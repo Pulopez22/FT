@@ -36,14 +36,10 @@
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
-                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
-                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
-                <a href="#" class="hover:text-black transition-colors">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
-                <a href="#" class="hover:text-black transition-colors">Apparel</a>
-                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+                <a href="../index.html" class="hover:text-black">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black">Banners</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black">Stickers</a>
             </div>
         </div>
         <button class="bg-red-600 text-white px-4 md:px-6 py-2 rounded-full font-black uppercase text-[9px] md:text-[10px] tracking-widest shadow-lg">Register</button>
@@ -54,11 +50,7 @@
         <nav class="flex flex-col gap-6 text-xl font-black uppercase italic">
             <a href="../index.html">Wall Art</a>
             <a href="../Banners/banners.html">Banners</a>
-            <a href="../Stickers/stickers.html" class="text-red-600">Stickers</a>
-            <div class="h-px bg-gray-100 my-4"></div>
-            <a href="../AdvertisingFlags/advertising-flags.html" class="text-sm font-bold text-gray-400">Advertising Flags</a>
-            <a href="../LargePrinting/largeprinting.html" class="text-sm font-bold text-gray-400">Large Format</a>
-            <a href="#" class="text-sm font-black text-black">Rigid Signs</a>
+            <a href="../Stickers/stickers.html">Stickers</a>
         </nav>
     </div>
 
@@ -66,13 +58,9 @@
         <aside class="sidebar-fixed p-10 hidden lg:block">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
-                <li class="sidebar-item cursor-pointer">Displays</li>
-                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
-                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
-                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
-                <li class="sidebar-item cursor-pointer active"><a href="rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html">Banners</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html">Large Format</a></li>
+                <li class="sidebar-item active font-black text-black">Rigid Signs</li>
             </ul>
         </aside>
 
@@ -80,13 +68,14 @@
             <div class="p-6 md:p-12 flex-grow">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-20">
                     <div class="space-y-8">
-                        <div class="bg-gray-50 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] md:min-h-[450px] relative">
-                            <img id="main-prod-img" src="../images/Rigid Signs/AB-Vinyl-Backlit-01.png" alt="Acrylic Sign" class="max-h-[280px] md:max-h-[380px] drop-shadow-2xl">
+                        <div class="bg-gray-50 rounded-[2rem] p-4 md:p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] relative">
+                            <img id="main-prod-img" src="../images/Rigid Signs/AB-Vinyl-Backlit-01.png" alt="Lexan Sign" class="max-h-[280px] drop-shadow-2xl">
                         </div>
                         <div class="pt-8 border-t border-gray-100 italic font-medium text-gray-600 space-y-6">
-                            <h2 id="desc-title" class="text-3xl font-black text-black uppercase tracking-tighter mb-4">Lexan Signs</h2>
-                            <p id="desc-body" class="text-[15px] leading-relaxed">This material is used for both indoor & outdoor High Quality sign applications. Long-term durability.</p>
-                            <ul id="desc-features" class="list-disc pl-5 space-y-3 text-[13px]"></ul>
+                            <h2 id="desc-title" class="text-3xl font-black text-black uppercase tracking-tighter mb-4 italic">Lexan Signs</h2>
+                            <p id="desc-body" class="text-[15px] leading-relaxed">This material is used for both indoor & outdoor High Quality sign applications such as Building Signs and Promotional Signage. Direct printed on Lexan/Polycarbonate.</p>
+                            <ul id="desc-features" class="list-disc pl-5 space-y-3 text-[13px]">
+                                </ul>
                         </div>
                     </div>
 
@@ -103,26 +92,25 @@
                                     <optgroup label="Standard Lexan">
                                         <option value="white">Sign White (1st Surface Print)</option>
                                         <option value="clear">Clear (2nd Surface White Flood)</option>
-                                        <option value="blackout">Clear (2nd Surface BlackOut)</option>
                                     </optgroup>
                                     <optgroup label="Back-lit Lexan">
-                                        <option value="backlit_white">Lexan Back-lit (Sign White)</option>
-                                        <option value="backlit_clear">Lexan Back-lit (Day/Night Print)</option>
+                                        <option value="backlit_white">Lexan Back-lit (White Surface)</option>
+                                        <option value="backlit_clear">Lexan Back-lit (Clear Surface)</option>
                                     </optgroup>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block"># Of Slides</label>
-                                <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown">
-                                    <option value="trim">Single Slide</option>
-                                    <option value="router">Double Slide</option>
                                 </select>
                             </div>
 
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Thickness</label>
                                 <select id="thick-select" onchange="calculatePrice()" class="custom-dropdown"></select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block"># Of Sides</label>
+                                <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="1">Single Sided</option>
+                                    <option value="2">Double Sided</option>
+                                </select>
                             </div>
 
                             <div>
@@ -139,10 +127,10 @@
                                     <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Upload Artwork File</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
                                 </div>
-                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 md:p-10 shadow-2xl space-y-8">
+                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 shadow-2xl space-y-8">
                                     <div class="flex flex-col md:flex-row gap-6 items-center">
                                         <div class="w-24 h-24 bg-gray-50 rounded-3xl border p-2 flex items-center justify-center overflow-hidden"><img id="preview-thumb" class="max-h-full max-w-full object-contain"></div>
-                                        <div class="flex-grow text-center md:text-left"><h4 id="status-title" class="text-2xl md:text-3xl font-black uppercase text-blue-600 italic tracking-tighter mb-4">Analysis Complete</h4><div id="validation-text" class="text-base text-gray-400 font-medium italic"></div></div>
+                                        <div class="flex-grow text-center md:text-left"><h4 id="status-title" class="text-2xl font-black uppercase text-blue-600 italic tracking-tighter mb-4">Analysis Complete</h4><div id="validation-text" class="text-base text-gray-400 font-medium italic"></div></div>
                                     </div>
                                     <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar h-full"></div></div>
                                     <div class="flex gap-4"><button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[13px] font-black uppercase py-5 rounded-3xl hover:bg-black transition-all shadow-lg italic">Approve</button><button onclick="resetUpload()" class="px-6 md:px-10 bg-gray-50 text-gray-300 text-[11px] font-black uppercase rounded-3xl italic">Discard</button></div>
@@ -150,7 +138,7 @@
                             </div>
 
                             <div class="bg-gray-50/50 p-6 md:p-10 rounded-[2.5rem] border border-gray-100 relative">
-                                <div id="limit-msg" class="hidden absolute -top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit: 72" x 96"</div>
+                                <div id="limit-msg" class="hidden absolute -top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit: 100" Width</div>
                                 <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Width (in)</span><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36"></div>
                                 <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Height (in)</span><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input w-24 md:w-36"></div>
                                 <div class="price-row border-none pt-10"><span class="text-[12px] font-black uppercase text-gray-900 italic">Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.000 sq ft</span></span><span id="final-price" class="text-5xl md:text-6xl heavy-italic italic text-black tracking-tighter">$48.00</span></div>
@@ -169,11 +157,10 @@
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('active'); }
 
         const thickMap = {
-            white: ['1/8"', '3/16"'],
+            white: ['0.060"', '1/8"', '3/16"'],
             clear: ['0.060"', '1/8"', '3/16"'],
-            blackout: ['3/16"'],
             backlit_white: ['0.060"', '1/8"', '3/16"'],
-            backlit_clear: ['3/16"']
+            backlit_clear: ['0.060"', '1/8"', '3/16"']
         };
 
         function handleMaterialChange() {
@@ -182,55 +169,50 @@
             const title = document.getElementById('desc-title');
             const body = document.getElementById('desc-body');
             const features = document.getElementById('desc-features');
-            
             thickSelect.innerHTML = '';
             thickMap[mat].forEach(t => { const o = document.createElement('option'); o.value = t; o.text = t; thickSelect.add(o); });
 
             if (mat.includes('backlit')) {
-                title.innerText = "Acrylic Back-lit Signs";
-                body.innerText = "Used for indoor & outdoor back-lit sign applications. Technology: 3 Layer Ink Sandwich for extreme vibrancy.";
-                features.innerHTML = `<li>Maximum Size: 72"x96"</li><li>Weatherproof and UV safe</li><li>High res digital print 720x720</li>`;
+                title.innerText = "Lexan Back-lit Signs";
+                body.innerText = "This material is used for both indoor & outdoor back-lit sign applications. Permanent adhesive AB Vinyl is mounted to Lexan polycarbonate to create a durable, vibrant face.";
+                features.innerHTML = `<li>Super High Density printing for Day/Night vibrancy</li><li>Sizes: 30"-100" wide x Almost any size</li><li>Waterproof and UV safe</li>`;
             } else {
-                title.innerText = "Acrylic Signs";
-                body.innerText = "High-quality sign applications for P.O.P. and Building Signs. Long-term durability.";
-                features.innerHTML = `<li>Maximum Size: 72"x96"</li><li>Waterproof and UV safe</li><li>High res digital print 720x720</li>`;
+                title.innerText = "Lexan / Polycarbonate Signs";
+                body.innerText = "Used for indoor & outdoor sign applications such as Building Signs and Promotional Signage. Direct printed for long-term durability.";
+                features.innerHTML = `<li>Sizes: 30"-100" wide x Almost any size</li><li>High res digital print 720x720</li><li>Weatherproof and UV safe</li>`;
             }
             calculatePrice();
         }
 
         function validateSize() {
             const w = document.getElementById('w-input'); const h = document.getElementById('h-input'); const msg = document.getElementById('limit-msg');
-            if (parseFloat(w.value) > 72) { w.value = 72; msg.classList.remove('hidden'); }
-            if (parseFloat(h.value) > 96) { h.value = 96; msg.classList.remove('hidden'); }
+            if (parseFloat(w.value) > 100) { w.value = 100; msg.classList.remove('hidden'); }
             setTimeout(() => msg.classList.add('hidden'), 2000); calculatePrice();
         }
 
         function calculatePrice() {
             const mat = document.getElementById('mat-select').value; const thick = document.getElementById('thick-select').value;
-            const finish = document.getElementById('finish-select').value;
+            const sides = document.getElementById('side-select').value; const finish = document.getElementById('finish-select').value;
             const area = (parseFloat(document.getElementById('w-input').value) * parseFloat(document.getElementById('h-input').value)) / 144;
-            let p = 12;
+            let p = 0;
 
-            if (mat === 'white') {
-                if (thick === '1/8"') p = finish === 'trim' ? 12 : 15;
-                else p = finish === 'trim' ? 14 : 17;
-            } else if (mat === 'clear') {
-                if (thick === '0.060"') p = finish === 'trim' ? 10 : 14;
-                else if (thick === '1/8"') p = finish === 'trim' ? 18 : 20;
-                else p = finish === 'trim' ? 20 : 22;
-            } else if (mat === 'backlit_white') {
-                if (thick === '0.060"') p = finish === 'trim' ? 14 : 17;
-                else if (thick === '1/8"') p = finish === 'trim' ? 15 : 18;
-                else p = finish === 'trim' ? 17 : 20;
-            } else if (mat === 'blackout') p = finish === 'trim' ? 26 : 28;
-            else p = 20;
+            if (mat.includes('backlit')) {
+                if (thick === '0.060"') p = finish === 'trim' ? 14 : 16;
+                else if (thick === '1/8"') p = finish === 'trim' ? 15.65 : 18.25;
+                else p = finish === 'trim' ? 17.65 : 20.25;
+            } else {
+                // Precios Lexan Standard
+                if (thick === '3/16"') p = (sides === '1') ? (finish === 'trim' ? 16 : 18) : (finish === 'trim' ? 24 : 26);
+                else if (thick === '1/8"') p = (sides === '1') ? 14 : 18;
+                else p = 12;
+            }
 
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
             document.getElementById('final-price').innerText = `$${(p * area).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
-        function processFile(input) { if (input.files && input.files[0]) { document.getElementById('drop-zone').classList.add('hidden'); document.getElementById('validation-panel').classList.remove('hidden'); setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; document.getElementById('validation-text').innerHTML = `Verifying compatibility... confirmed.`; }, 1000); } }
-        function approveArt() { const btn = document.getElementById('add-to-cart-btn'); btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black'); btn.classList.remove('cursor-not-allowed'); document.getElementById('status-title').innerText = "Artwork Approved"; document.getElementById('status-title').classList.replace('text-blue-600', 'text-[#83D644]'); }
+        function processFile(input) { if (input.files && input.files[0]) { document.getElementById('drop-zone').classList.add('hidden'); document.getElementById('validation-panel').classList.remove('hidden'); setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; document.getElementById('validation-text').innerHTML = `Verifying Lexan compatibility... confirmed.`; }, 1000); } }
+        function approveArt() { const btn = document.getElementById('add-to-cart-btn'); btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black'); btn.classList.remove('cursor-not-allowed'); document.getElementById('status-title').innerText = "Artwork Approved"; }
         function resetUpload() { document.getElementById('drop-zone').classList.remove('hidden'); document.getElementById('validation-panel').classList.add('hidden'); document.getElementById('add-to-cart-btn').disabled = true; }
         window.onload = handleMaterialChange;
     </script>
