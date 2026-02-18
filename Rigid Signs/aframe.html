@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-Frame Signs - Square Foot Printing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
+        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
+        .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
+        .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
+        .sidebar-item.active { border-right: 3px solid #000; }
+        .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
+        .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
+        .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
+        .custom-input:focus { border-color: #000; }
+        .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
+        <div class="flex items-center gap-8">
+            <a href="../index.html" class="flex items-center group">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
+                </div>
+            </a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+                <a href="../index.html" class="hover:text-black">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black">Banners</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black font-bold">Stickers</a>
+            </div>
+        </div>
+        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg">Register</button>
+    </nav>
+
+    <div class="flex flex-row flex-grow w-full">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+                <li class="sidebar-item cursor-pointer">Large Format</li>
+                <li class="sidebar-item active">A-Frame Signs</li>
+                <li class="sidebar-item cursor-pointer italic">Rigid Signs</li>
+            </ul>
+        </aside>
+
+        <main class="main-content-scroll">
+            <div class="p-12 flex-grow">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
+                    
+                    <div class="space-y-8">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px]">
+                            <img id="main-prod-img" src="../images/Rigid Signs/Standard-A-Frame.png" alt="A-Frame" class="max-h-[380px] drop-shadow-2xl transition-all duration-300">
+                        </div>
+                        <div class="pt-8 border-t border-gray-100">
+                            <h2 class="text-2xl font-light text-gray-500 mb-6 tracking-tight italic text-black">Description</h2>
+                            <h3 id="desc-title" class="text-3xl font-normal text-gray-800 mb-6 italic">A-Frame Signs</h3>
+                            <div class="text-[14px] text-gray-600 leading-[1.8] space-y-6 font-medium italic">
+                                <p id="desc-body"></p>
+                                <div>
+                                    <h4 class="font-black text-gray-900 mb-4 tracking-wider text-xs uppercase underline">Product Details:</h4>
+                                    <ul id="desc-details" class="list-disc pl-5 space-y-3 text-[13px]"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-10">
+                        <header>
+                            <h1 id="prod-title" class="text-5xl heavy-italic text-gray-900 italic">A-Frame Signs</h1>
+                            <p class="text-xl font-black text-gray-400 italic mt-6" id="prod-range">$95.67 – $230.20</p>
+                        </header>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Select A-Frame Type</label>
+                                <select id="type-select" onchange="handleTypeChange()" class="custom-dropdown">
+                                    <option value="standard">White Standard Signicade</option>
+                                    <option value="deluxe">White/Black Deluxe Signicade</option>
+                                </select>
+                            </div>
+
+                            <div id="hardware-color-container" class="hidden">
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Hardware Color</label>
+                                <select id="color-select" class="custom-dropdown">
+                                    <option value="white">White Hardware</option>
+                                    <option value="black">Black Hardware</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Graphic Material</label>
+                                <select id="mat-select" onchange="calculatePrice()" class="custom-dropdown"></select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1"># Of Sides</label>
+                                <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="2">Double Sided</option>
+                                    <option value="1">Single Sided</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Finishing / Lamination</label>
+                                <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="none">No Lamination</option>
+                                    <option value="uv_gloss">UV Gloss Lamination</option>
+                                    <option value="uv_matte">UV Matte Lamination</option>
+                                    <option value="dry_erase">Dry Erase Lamination</option>
+                                </select>
+                            </div>
+
+                            <div class="bg-gray-50/50 p-10 rounded-[2.5rem] border border-gray-100">
+                                <div class="price-row border-none">
+                                    <span class="text-[12px] font-black uppercase text-gray-900 italic">Total Price:</span>
+                                    <span id="final-price" class="text-6xl heavy-italic italic text-black tracking-tighter">$95.67</span>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-6">
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-xl">
+                                <button class="flex-grow bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic shadow-lg">Add to cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto">
+                </div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function handleTypeChange() {
+            const type = document.getElementById('type-select').value;
+            const matSelect = document.getElementById('mat-select');
+            const hardwareContainer = document.getElementById('hardware-color-container');
+            const descTitle = document.getElementById('desc-title');
+            const descBody = document.getElementById('desc-body');
+            const descDetails = document.getElementById('desc-details');
+            
+            matSelect.innerHTML = '';
+
+            if (type === 'standard') {
+                hardwareContainer.classList.add('hidden');
+                descTitle.innerText = "White Standard Signicade";
+                descBody.innerText = "Heavy-duty plastic A-frame fillable with sand/water. Double sided with regressed sign area to protect faces.";
+                descDetails.innerHTML = `<li>Dimensions: 46"H X 25"W x 3"D</li><li>Graphic Area: 36"H x 24"W</li><li>Weight: 19 lbs</li>`;
+                
+                const opt1 = document.createElement('option'); opt1.value = 'vinyl'; opt1.text = 'AB Vinyl';
+                const opt2 = document.createElement('option'); opt2.value = 'reflective'; opt2.text = 'Reflective AB Vinyl';
+                matSelect.add(opt1); matSelect.add(opt2);
+            } else {
+                hardwareContainer.classList.remove('hidden');
+                descTitle.innerText = "Deluxe Signicade";
+                descBody.innerText = "Quick-change graphics solution. Heavy-duty sandwich board with recessed graphic areas for inserts.";
+                descDetails.innerHTML = `<li>Dimensions: 46"H X 25"W x 3"D</li><li>Graphic Area: 36"H x 24"W</li><li>Weight: 19 lbs</li>`;
+
+                const opt1 = document.createElement('option'); opt1.value = 'coro'; opt1.text = 'Printed Coroplast Insert';
+                const opt2 = document.createElement('option'); opt2.value = 'reflective_coro'; opt2.text = 'Printed Reflective Coroplast';
+                matSelect.add(opt1); matSelect.add(opt2);
+            }
+            calculatePrice();
+        }
+
+        function calculatePrice() {
+            const type = document.getElementById('type-select').value;
+            const mat = document.getElementById('mat-select').value;
+            const lam = document.getElementById('lam-select').value;
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            
+            let price = 0;
+            if (type === 'standard') {
+                price = (mat === 'reflective') ? 191.48 : 95.67;
+                if (lam !== 'none') price += 5.91;
+            } else {
+                price = (mat === 'reflective_coro') ? 193.89 : 120.89;
+                if (lam !== 'none') price += 4.50;
+            }
+            
+            document.getElementById('final-price').innerText = `$${(price * qty).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        }
+
+        window.onload = handleTypeChange;
+    </script>
+</body>
+</html>
