@@ -19,6 +19,9 @@
         .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
         .custom-input:focus { border-color: #000; }
         .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
+        .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
+        .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
+        .progress-bar { width: 0%; height: 8px; background: #83D644; transition: width 0.6s ease; border-radius: 4px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -31,21 +34,29 @@
                 </div>
             </a>
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
-                <a href="../index.html" class="hover:text-black">Wall Art</a>
-                <a href="../Banners/banners.html" class="hover:text-black">Banners</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black font-bold">Stickers</a>
+                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg">Register</button>
+        <button class="bg-red-600 text-white px-4 md:px-6 py-2 rounded-full font-black uppercase text-[9px] md:text-[10px] tracking-widest shadow-lg">Register</button>
     </nav>
 
     <div class="flex flex-row flex-grow w-full">
         <aside class="sidebar-fixed p-10 hidden lg:block">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer">Large Format</li>
-                <li class="sidebar-item active">A-Frame Signs</li>
-                <li class="sidebar-item cursor-pointer italic">Rigid Signs</li>
+                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer">Displays</li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer active"><a href="rigidsigns.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
 
@@ -55,7 +66,7 @@
                     
                     <div class="space-y-8">
                         <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px]">
-                            <img id="main-prod-img" src="../images/Rigid Signs/Standard-A-Frame.png" alt="A-Frame" class="max-h-[380px] drop-shadow-2xl transition-all duration-300">
+                            <img id="main-prod-img" src="../images/Rigid Signs/A-frame5.png" alt="A-Frame" class="max-h-[380px] drop-shadow-2xl transition-all duration-300">
                         </div>
                         <div class="pt-8 border-t border-gray-100">
                             <h2 class="text-2xl font-light text-gray-500 mb-6 tracking-tight italic text-black">Description</h2>
@@ -73,7 +84,7 @@
                     <div class="space-y-10">
                         <header>
                             <h1 id="prod-title" class="text-5xl heavy-italic text-gray-900 italic">A-Frame Signs</h1>
-                            <p class="text-xl font-black text-gray-400 italic mt-6" id="prod-range">$95.67 – $230.20</p>
+                            <p class="text-xl font-black text-gray-400 italic mt-6" id="prod-range">$95.67 – $198.39</p>
                         </header>
 
                         <div class="space-y-6">
@@ -99,14 +110,6 @@
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1"># Of Sides</label>
-                                <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
-                                    <option value="2">Double Sided</option>
-                                    <option value="1">Single Sided</option>
-                                </select>
-                            </div>
-
-                            <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Finishing / Lamination</label>
                                 <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown">
                                     <option value="none">No Lamination</option>
@@ -116,16 +119,38 @@
                                 </select>
                             </div>
 
+                            <div class="space-y-4">
+                                <label class="text-[10px] font-black uppercase text-red-500 italic ml-1">Validation Status</label>
+                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-12 rounded-[2.5rem]">
+                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Upload Artwork File</span>
+                                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
+                                </div>
+                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[3rem] p-10 shadow-2xl space-y-8">
+                                    <div class="flex gap-10 items-center">
+                                        <div class="w-32 h-32 bg-gray-50 rounded-3xl border p-2 flex items-center justify-center overflow-hidden"><img id="preview-thumb" class="max-h-full max-w-full object-contain"></div>
+                                        <div class="flex-grow">
+                                            <h4 id="status-title" class="text-3xl font-black uppercase text-blue-600 italic tracking-tighter mb-4">Analysis Complete</h4>
+                                            <div id="validation-text" class="text-lg text-gray-400 font-medium italic leading-tight"></div>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar h-full"></div></div>
+                                    <div class="flex gap-4">
+                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[13px] font-black uppercase py-6 rounded-3xl hover:bg-black transition-all shadow-lg italic">Approve</button>
+                                        <button onclick="resetUpload()" class="px-10 bg-gray-50 text-gray-300 text-[11px] font-black uppercase rounded-3xl italic">Discard</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="bg-gray-50/50 p-10 rounded-[2.5rem] border border-gray-100">
                                 <div class="price-row border-none">
-                                    <span class="text-[12px] font-black uppercase text-gray-900 italic">Total Price:</span>
+                                    <span class="text-[12px] font-black uppercase text-gray-900 italic tracking-widest">Total Price:</span>
                                     <span id="final-price" class="text-6xl heavy-italic italic text-black tracking-tighter">$95.67</span>
                                 </div>
                             </div>
 
                             <div class="flex gap-6">
                                 <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-xl">
-                                <button class="flex-grow bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic shadow-lg">Add to cart</button>
+                                <button id="add-to-cart-btn" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] transition-all cursor-not-allowed italic shadow-lg">Add to cart</button>
                             </div>
                         </div>
                     </div>
@@ -157,20 +182,20 @@
             if (type === 'standard') {
                 hardwareContainer.classList.add('hidden');
                 descTitle.innerText = "White Standard Signicade";
-                descBody.innerText = "Heavy-duty plastic A-frame fillable with sand/water. Double sided with regressed sign area to protect faces.";
-                descDetails.innerHTML = `<li>Dimensions: 46"H X 25"W x 3"D</li><li>Graphic Area: 36"H x 24"W</li><li>Weight: 19 lbs</li>`;
+                descBody.innerText = "This heavy-duty plastic A-frame is the perfect solution for sidewalk advertising. The frame can be filled with sand or water for greater stability. The double sided hardware includes regressed sign area that helps to protect sign faces.";
+                descDetails.innerHTML = `<li>Product Dimensions: 46"H X 25"W x 3"D</li><li>Graphic Dimensions: 36"H x 24" W</li><li>Weight: 19 lbs</li>`;
                 
-                const opt1 = document.createElement('option'); opt1.value = 'vinyl'; opt1.text = 'AB Vinyl';
-                const opt2 = document.createElement('option'); opt2.value = 'reflective'; opt2.text = 'Reflective AB Vinyl';
+                const opt1 = document.createElement('option'); opt1.value = 'vinyl'; opt1.text = 'AB Permanent Adhesive Vinyl';
+                const opt2 = document.createElement('option'); opt2.value = 'reflective'; opt2.text = 'Reflective AB Permanent Adhesive Vinyl';
                 matSelect.add(opt1); matSelect.add(opt2);
             } else {
                 hardwareContainer.classList.remove('hidden');
-                descTitle.innerText = "Deluxe Signicade";
-                descBody.innerText = "Quick-change graphics solution. Heavy-duty sandwich board with recessed graphic areas for inserts.";
-                descDetails.innerHTML = `<li>Dimensions: 46"H X 25"W x 3"D</li><li>Graphic Area: 36"H x 24"W</li><li>Weight: 19 lbs</li>`;
+                descTitle.innerText = "White or Black Deluxe Signicade";
+                descBody.innerText = "The Signicade Deluxe is the ultimate sidewalk advertising solution for quick change graphics. Coroplast mounted vinyl graphics slide easily into place for full-color signage.";
+                descDetails.innerHTML = `<li>Product Dimensions: 46"H X 25"W x 3"D</li><li>White or Black Heavy Duty Plastic</li><li>Graphic Dimensions: 36"H x 24" W</li><li>Weight: 19 lbs</li>`;
 
-                const opt1 = document.createElement('option'); opt1.value = 'coro'; opt1.text = 'Printed Coroplast Insert';
-                const opt2 = document.createElement('option'); opt2.value = 'reflective_coro'; opt2.text = 'Printed Reflective Coroplast';
+                const opt1 = document.createElement('option'); opt1.value = 'coro'; opt1.text = 'Single-Sided 4 mm Coroplast Inserts';
+                const opt2 = document.createElement('option'); opt2.value = 'reflective_coro'; opt2.text = 'Single-Sided Reflective Coroplast Inserts';
                 matSelect.add(opt1); matSelect.add(opt2);
             }
             calculatePrice();
@@ -183,15 +208,48 @@
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
             
             let price = 0;
-            if (type === 'standard') {
-                price = (mat === 'reflective') ? 191.48 : 95.67;
-                if (lam !== 'none') price += 5.91;
-            } else {
+            if (type === 'deluxe') {
                 price = (mat === 'reflective_coro') ? 193.89 : 120.89;
                 if (lam !== 'none') price += 4.50;
+            } else {
+                price = (mat === 'reflective') ? 191.48 : 95.67;
+                if (lam !== 'none') price += 5.91;
             }
             
             document.getElementById('final-price').innerText = `$${(price * qty).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        }
+
+        function processFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                document.getElementById('drop-zone').classList.add('hidden');
+                document.getElementById('validation-panel').classList.remove('hidden');
+                reader.onload = (e) => {
+                    document.getElementById('preview-thumb').src = e.target.result;
+                    setTimeout(() => { 
+                        document.getElementById('upload-progress').style.width = '100%'; 
+                        document.getElementById('validation-text').innerHTML = `Dimensions verified... confirmed.<br>A-Frame hardware compatible.`;
+                    }, 1000);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function approveArt() {
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
+            btn.classList.remove('cursor-not-allowed');
+            document.getElementById('status-title').innerText = "Artwork Approved";
+            document.getElementById('status-title').classList.replace('text-blue-600', 'text-[#83D644]');
+        }
+
+        function resetUpload() {
+            document.getElementById('drop-zone').classList.remove('hidden');
+            document.getElementById('validation-panel').classList.add('hidden');
+            document.getElementById('file-input').value = "";
+            document.getElementById('add-to-cart-btn').disabled = true;
+            document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+            document.getElementById('upload-progress').style.width = '0%';
         }
 
         window.onload = handleTypeChange;
