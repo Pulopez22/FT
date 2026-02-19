@@ -4,22 +4,18 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // Vital para leer el JSON del checkout
+app.use(express.json()); // Esto permite que el servidor lea los datos del checkout
 
 app.post('/api/place-order', async (req, res) => {
     try {
-        // Leemos los datos tal como los envía el checkout nuevo
         const { customer, items, total } = req.body;
 
+        // Si el servidor recibe "undefined", aquí lo atrapamos antes de que truene
         if (!customer || !items) {
-            return res.status(400).send('Missing order data');
+            return res.status(400).send('Error: Datos incompletos');
         }
 
-        const orderDetails = items.map(item => {
-            return `- ${item.product}: $${item.price}\n  Details: ${item.details}`;
-        }).join('\n\n');
-
-        let transporter = nodemailer.createTransport({
+        const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: 'pulopez20@gmail.com',
@@ -30,32 +26,18 @@ app.post('/api/place-order', async (req, res) => {
         const mailOptions = {
             from: '"Square Foot Printing" <pulopez20@gmail.com>',
             to: 'za19012245@zapopan.tecmm.edu.mx',
-            subject: `NEW ORDER: ${customer.name}`,
-            text: `
-NEW ORDER RECEIVED
-----------------------------
-CUSTOMER:
-Name: ${customer.name}
-Email: ${customer.email}
-Phone: ${customer.phone}
-Address: ${customer.address}
-
-ITEMS:
-${orderDetails}
-
-TOTAL: ${total}
-----------------------------
-`
+            subject: `NUEVA ORDEN: ${customer.name}`,
+            text: `Cliente: ${customer.name}\nTotal: ${total}\nArtículos: ${JSON.stringify(items)}`
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).json({ message: 'Order processed successfully' });
+        res.status(200).json({ success: true });
 
     } catch (error) {
-        console.error('SERVER ERROR:', error);
-        res.status(500).send('Error processing order: ' + error.message);
+        console.error('Error en el servidor:', error);
+        res.status(500).send('Error interno: ' + error.message);
     }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server live on port ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor listo en puerto ${PORT}`));
