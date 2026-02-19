@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed - Square Foot Printing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fff; color: #000; }
+        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <nav class="border-b py-6 px-10 flex justify-between items-center bg-white/95 backdrop-blur-md z-50">
+        <div class="flex items-center gap-8 mx-auto lg:mx-0">
+            <a href="index.html" class="bg-black p-2 rounded-lg shadow-xl">
+                <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
+            </a>
+        </div>
+        <div class="hidden lg:flex items-center gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+            <a href="index.html" class="hover:text-black transition-colors">Home</a>
+            <a href="#" class="hover:text-black transition-colors">Support</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center p-6 md:p-12">
+        <div class="max-w-4xl w-full text-center space-y-10">
+            
+            <div class="flex justify-center">
+                <div class="bg-green-50 p-8 rounded-full border border-green-100 animate-bounce">
+                    <i data-lucide="check-circle" class="w-20 h-20 text-green-500"></i>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h1 class="text-6xl md:text-7xl heavy-italic italic tracking-tighter leading-none">Order Received!</h1>
+                <p class="text-gray-400 font-bold uppercase text-xs md:text-sm tracking-[0.3em]">Thank you for your business</p>
+                <p class="text-sm font-black text-black uppercase">Order ID: <span id="order-id" class="text-red-600">#SQFT-8429</span></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                
+                <div class="bg-gray-50 border border-gray-100 rounded-[2.5rem] p-8 space-y-6 shadow-sm">
+                    <div>
+                        <h3 class="heavy-italic text-sm mb-4 flex items-center gap-2">
+                            <i data-lucide="map-pin" class="text-red-600 w-4 h-4"></i> Pickup Location
+                        </h3>
+                        <p class="text-[11px] font-black uppercase leading-relaxed text-black">
+                            Square Foot Printing<br>
+                            6155 S Edmond St<br>
+                            Las Vegas, NV 89118
+                        </p>
+                    </div>
+                    <div class="pt-4 border-t border-gray-200">
+                        <p class="text-[9px] font-black uppercase text-gray-400">Hours:</p>
+                        <p class="text-[10px] font-black uppercase text-black">Mon - Fri: 10am - 5pm</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-100 rounded-[2.5rem] p-8 space-y-6 shadow-sm">
+                    <div>
+                        <h3 class="heavy-italic text-sm mb-4 flex items-center gap-2">
+                            <i data-lucide="credit-card" class="text-red-600 w-4 h-4"></i> Payment Method
+                        </h3>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-white p-2 rounded-lg border border-gray-100">
+                                <i data-lucide="wallet" class="w-5 h-5 text-gray-400"></i>
+                            </div>
+                            <p class="text-[11px] font-black uppercase text-black">Pay at Pickup / Invoice</p>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-gray-200">
+                        <p class="text-[9px] font-black uppercase text-gray-400">Status:</p>
+                        <p class="text-[10px] font-black uppercase text-orange-500">Pending Verification</p>
+                    </div>
+                </div>
+
+                <div class="bg-black text-white rounded-[2.5rem] p-8 space-y-6 shadow-2xl">
+                    <h3 class="heavy-italic text-sm text-red-600">What's Next?</h3>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3 items-start">
+                            <i data-lucide="mail" class="w-4 h-4 text-gray-500"></i>
+                            <p class="text-[10px] font-bold uppercase leading-tight">Check your email for the order receipt.</p>
+                        </li>
+                        <li class="flex gap-3 items-start">
+                            <i data-lucide="printer" class="w-4 h-4 text-gray-500"></i>
+                            <p class="text-[10px] font-bold uppercase leading-tight">We will notify you when it's ready.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-10">
+                <a href="index.html" class="inline-block bg-white border-2 border-black text-black px-12 py-5 rounded-2xl heavy-italic italic text-sm tracking-widest hover:bg-black hover:text-white transition-all shadow-xl">
+                    Continue Shopping
+                </a>
+                <p class="mt-8 text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">2026 Square Foot Printing - Las Vegas</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-12 border-t border-gray-100 text-center">
+        <div class="bg-black p-3 rounded-xl inline-block mb-4 shadow-xl">
+            <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto">
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById('order-id').innerText = '#SQFT-' + Math.floor(1000 + Math.random() * 9000);
+    </script>
+</body>
+</html>
