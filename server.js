@@ -32,8 +32,8 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'TU_CORREO@gmail.com',
-                pass: 'TU_CONTRASEÑA_DE_APLICACION'
+                user: 'pulopez20@gmail.com',
+                pass: 'svik ahzr txww cerv'
             }
         });
 
