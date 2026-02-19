@@ -105,8 +105,7 @@
                 <h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Summary</h3>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="order-count">0 Items</p>
             </div>
-            <div id="summary-items" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white">
-                </div>
+            <div id="summary-items" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
             <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
                 <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Total Due</span><span id="final-total" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
                 <button onclick="placeOrder()" id="order-btn" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Send Order Now</button>
@@ -117,7 +116,6 @@
     <script>
         lucide.createIcons();
 
-        // Carga y muestra los items del carrito
         function loadItems() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('summary-items');
@@ -132,7 +130,6 @@
                 const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
                 total += priceNum;
                 
-                // Formateo de opciones dinámicas para visualización en el resumen
                 const details = item.options ? 
                     Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : 
                     (item.specs || "Custom Order");
@@ -154,58 +151,45 @@
             document.getElementById('order-count').innerText = `${cart.length} Items`;
         }
 
-        // Envía la orden al servidor en Render usando JSON
         async function placeOrder() {
             const btn = document.getElementById('order-btn');
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const name = document.getElementById('cust-name').value;
-            const email = document.getElementById('cust-email').value;
-
-            if(!name || !email || cart.length === 0) { 
-                alert("Please complete the form and ensure your cart is not empty."); 
-                return; 
-            }
-
+            
             btn.innerText = "SENDING...";
             btn.disabled = true;
 
-            const orderData = {
-                customer: { 
-                    name, 
-                    email, 
-                    phone: document.getElementById('cust-phone').value, 
-                    address: document.getElementById('cust-address').value 
+            const data = {
+                customer: {
+                    name: document.getElementById('cust-name').value,
+                    email: document.getElementById('cust-email').value,
+                    phone: document.getElementById('cust-phone').value,
+                    address: document.getElementById('cust-address').value
                 },
-                items: cart.map(i => ({ 
-                    product: i.name, 
-                    price: i.price, 
-                    details: i.options ? JSON.stringify(i.options) : (i.specs || "No details") 
-                })),
+                items: cart,
                 total: document.getElementById('final-total').innerText
             };
 
             try {
-                // Conexión directa a tu servidor en Render
+                // Fetch with explicit CORS mode to prevent browser blocking
                 const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(orderData)
+                    mode: 'cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
                 });
 
-                if(res.ok) { 
-                    alert("Success! Your order has been received. Check your email."); 
-                    localStorage.removeItem('sqft_cart'); 
-                    window.location.href = "index.html"; 
+                if (res.ok) {
+                    alert("Order sent successfully!");
+                    localStorage.removeItem('sqft_cart');
+                    window.location.href = "index.html";
                 } else {
-                    const serverMsg = await res.text();
-                    throw new Error(serverMsg);
+                    alert("Server error 500. Please check Render Logs.");
                 }
-            } catch (e) { 
-                console.error("Submission Error:", e);
-                alert("Error: Render server might be asleep. Open https://ft-f34l.onrender.com first.");
-            } finally { 
-                btn.innerText = "Send Order Now"; 
-                btn.disabled = false; 
+            } catch (e) {
+                alert("Connection failed. Render might be starting up.");
+            } finally {
+                btn.innerText = "Send Order Now";
+                btn.disabled = false;
             }
         }
 
