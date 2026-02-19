@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Banners - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Estructura fija para Sidebar e independiente para contenido */
-        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         
         .sidebar-fixed { 
@@ -21,7 +21,7 @@
         .sidebar-item.active { border-right: 3px solid #000; }
 
         .main-content-scroll { 
-            height: calc(100vh - 73px); overflow-y: auto; flex-grow: 1;
+            min-height: calc(100vh - 73px); flex-grow: 1;
             background-color: white; display: flex; flex-direction: column;
         }
 
@@ -38,9 +38,15 @@
 
         .filter-btn { transition: all 0.3s ease; border: 1px solid #f3f4f6; }
         .filter-btn.active { background-color: #000; color: #fff; border-color: #000; }
+
+        /* Cart Sidebar Styles */
+        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
@@ -49,38 +55,44 @@
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
                 </div>
             </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
-                <a href="banners.html" class="text-black border-b-2 border-black pb-1">Banners</a>
+               <a href="banners.html" class="text-black border-b-2 border-black pb-1">Banners</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
                 <a href="#" class="hover:text-black transition-colors">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
                 <a href="#" class="hover:text-black transition-colors">Apparel</a>
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg">Register</button>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
+        </div>
     </nav>
 
     <div class="flex flex-row flex-grow w-full">
-        <aside class="sidebar-fixed p-10 hidden lg:block">
+        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
-            <ul class="space-y-6">
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer active"><a href="banners.html" class="block w-full">Banners</a></li>
-                <li class="sidebar-item cursor-pointer">Displays</li>
-                <li class="sidebar-item cursor-pointer">Large Format Printing</li>
-                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
-                <li class="sidebar-item cursor-pointer">Rigid Signs</li>
+                <li class="sidebar-item cursor-pointer"><a href="../RigidSigns/rigid-signs.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
 
-        <main class="main-content-scroll">
+        <main class="main-content-scroll text-black">
             <div class="p-12 flex-grow">
                 <header class="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
                     <div>
-                        <h1 class="text-5xl heavy-italic text-gray-900 mb-4">Vinyl & Fabric Banners</h1>
+                        <h1 class="text-5xl heavy-italic text-gray-900 mb-4 italic leading-none tracking-tighter">Vinyl & Fabric Banners</h1>
                         <div class="h-2 w-24 bg-black rounded-full"></div>
                     </div>
                     
@@ -95,32 +107,46 @@
                     </div>
             </div>
 
-            <footer class="bg-white border-t py-12 px-10 text-center w-full">
-                <div class="bg-black p-2 rounded-lg inline-block mb-4 shadow-lg">
-                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto">
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto">
                 </div>
-                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">© 2026 Square Foot Printing - Las Vegas</p>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
     </div>
 
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Checkout</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
+
     <script>
-        // Listado de Banners con descripciones y precios reales
+        lucide.createIcons();
+
         const banners = [
-            { name: '13oz Standard Banner', priceVal: 1.00, priceStr: '$1.00 - $3.00 sq/ft', img: '../images/Banners/AMS-Banner2..png', desc: 'Durable vinyl for indoor and outdoor use.' },
-            { name: '13oz Super Smooth Banner', priceVal: 1.25, priceStr: '$1.25 sq/ft', img: '../images/Banners/AMS-Banner4..png', desc: 'Premium reinforced vinyl for high durability.' },
-            { name: '10oz Mesh Banner', priceVal: 2.00, priceStr: '$2.00 sq/ft', img: '../images/Banners/AMS-Mesh-Banner-01.png', desc: 'Perforated material for windy conditions.' },
-            { name: 'Wrinkle Free Fabric', priceVal: 3.00, priceStr: '$3.00 - $5.00 sq/ft', img: '../images/Banners/AMS-Fabric-6.png', desc: 'Polyester fabric with matte finishing.' },
-            { name: '18oz HD Banner', priceVal: 3.00, priceStr: '$3.00 sq/ft', img: '../images/Banners/AMS-Banner2..png', desc: 'Heavy duty, smooth blockout vinyl.' },
-            { name: 'Tension Fabric', priceVal: 6.00, priceStr: '$6.00 - $10.00 sq/ft', img: '../images/Banners/TensionFabric-3.png', desc: 'Elastic fabric for trade show displays.' },
-            { name: 'Blockout Fabric', priceVal: 6.75, priceStr: '$6.75 - $11.25 sq/ft', img: '../images/Banners/BlockOutFabric-1.png', desc: 'Opaque fabric prevents light pass-through.' },
-            { name: 'Pole Banners', priceVal: 39.34, priceStr: '$39.34 - $171.66 / unit', img: '../images/Banners/Pole-Banner-04.png', desc: 'Double sided street and parking banners.' }
+            { name: '13oz Standard Banner', priceVal: 1.00, priceStr: '$1.00 - $3.00 sq/ft', img: '../images/Banners/AMS-Banner2..png', desc: 'Durable vinyl for indoor and outdoor use.', url: 'standard-banner.html' },
+            { name: '13oz Super Smooth Banner', priceVal: 1.25, priceStr: '$1.25 sq/ft', img: '../images/Banners/AMS-Banner4..png', desc: 'Premium reinforced vinyl for high durability.', url: 'smooth-banner.html' },
+            { name: '10oz Mesh Banner', priceVal: 2.00, priceStr: '$2.00 sq/ft', img: '../images/Banners/AMS-Mesh-Banner-01.png', desc: 'Perforated material for windy conditions.', url: 'mesh-banner.html' },
+            { name: 'Wrinkle Free Fabric', priceVal: 3.00, priceStr: '$3.00 - $5.00 sq/ft', img: '../images/Banners/AMS-Fabric-6.png', desc: 'Polyester fabric with matte finishing.', url: 'fabric-banner.html' },
+            { name: '18oz HD Banner', priceVal: 3.00, priceStr: '$3.00 sq/ft', img: '../images/Banners/AMS-Banner2..png', desc: 'Heavy duty, smooth blockout vinyl.', url: 'hdbanner.html' },
+            { name: 'Tension Fabric', priceVal: 6.00, priceStr: '$6.00 - $10.00 sq/ft', img: '../images/Banners/TensionFabric-3.png', desc: 'Elastic fabric for trade show displays.', url: 'tensionfabric.html' },
+            { name: 'Blockout Fabric', priceVal: 6.75, priceStr: '$6.75 - $11.25 sq/ft', img: '../images/Banners/BlockOutFabric-1.png', desc: 'Opaque fabric prevents light pass-through.', url: 'blockoutFabric.html' },
+            { name: 'Pole Banners', priceVal: 39.34, priceStr: '$39.34 - $171.66 / unit', img: '../images/Banners/Pole-Banner-04.png', desc: 'Double sided street and parking banners.', url: 'pole-banners.html' }
         ];
 
         function renderBanners(data) {
             const grid = document.getElementById('banner-grid');
             grid.innerHTML = data.map(b => `
-                <div onclick="navigateToProduct('${b.name}')" class="product-card bg-white overflow-hidden cursor-pointer group shadow-sm border border-gray-100">
+                <div onclick="window.location.href='${b.url}'" class="product-card bg-white overflow-hidden cursor-pointer group shadow-sm border border-gray-100">
                     <div class="h-80 p-10 flex items-center justify-center group-hover:bg-gray-50 transition-colors">
                         <img src="${b.img}" alt="${b.name}" class="object-contain h-full drop-shadow-xl transition-transform group-hover:scale-110">
                     </div>
@@ -139,32 +165,6 @@
             `).join('');
         }
 
-        // Lógica de navegación mejorada
-        function navigateToProduct(name) {
-            // Ejemplo de mapeo a páginas específicas si decides crearlas
-            if (name === '13oz Standard Banner') {
-                window.location.href = 'standard-banner.html';
-            } else if (name === '13oz Super Smooth Banner') {
-                window.location.href = 'smooth-banner.html';
-            } else if (name === '10oz Mesh Banner') {
-                window.location.href = 'mesh-banner.html';
-            } else if (name === 'Wrinkle Free Fabric') {
-                window.location.href = 'fabric-banner.html';
-            } else if (name === '18oz HD Banner') {
-                window.location.href = 'hdbanner.html';
-            } else if (name === 'Tension Fabric') {
-                window.location.href = 'tensionfabric.html';
-            } else if (name === 'Blockout Fabric') {
-                window.location.href = 'blockoutFabric.html';
-            } else if (name === 'Pole Banners') {
-                window.location.href = 'pole-banners.html';
-            } else {
-                console.log("Configurando " + name);
-                // Por ahora, podrías mandar a una página genérica de contacto o detalles
-                // window.location.href = 'product-configurator.html?item=' + encodeURIComponent(name);
-            }
-        }
-
         function applySort(type, btn) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -175,7 +175,56 @@
             renderBanners(sorted);
         }
 
-        window.onload = () => applySort('random', document.querySelector('.filter-btn'));
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open'); overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
+                renderCart();
+            }
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-300 italic py-20 uppercase font-black text-[11px]">Cart Empty</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    container.innerHTML += `
+                        <div class="flex gap-6 border-b border-gray-50 pb-6 last:border-0 text-black">
+                            <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div>
+                            <div class="flex flex-col justify-between flex-grow">
+                                <div class="flex justify-between">
+                                    <h4 class="text-sm font-black uppercase italic tracking-tighter">${item.name}</h4>
+                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.specs}</p>
+                                <div class="flex justify-between items-end mt-4"><span class="text-[10px] font-bold text-gray-400 uppercase">Qty: ${item.qty}</span><span class="text-xl font-black italic">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div>
+                            </div>
+                        </div>`;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
+        }
+
+        window.onload = () => { applySort('random', document.querySelector('.filter-btn')); renderCart(); };
     </script>
 </body>
 </html>

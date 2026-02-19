@@ -8,21 +8,29 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
         .sidebar-item.active { border-right: 3px solid #000; }
-        .main-content-scroll { height: calc(100vh - 73px); overflow-y: auto; flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
+        .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
         .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
         .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 4px; background: #83D644; transition: width 0.6s ease; border-radius: 2px; }
+        .thumb-img { width: 64px; height: 64px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s; }
+        .thumb-active { border: 2px solid black !important; }
+
+        /* Cart Sidebar */
+        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
@@ -31,30 +39,36 @@
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                <a href="../index.html" class="hover:text-black">Wall Art</a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic text-black">
+                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="banners.html" class="text-black border-b-2 border-black pb-1">Banners</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
                 <a href="#" class="hover:text-black transition-colors">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors text-black">Stickers</a>
                 <a href="#" class="hover:text-black transition-colors">Apparel</a>
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <button class="bg-red-600 text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-red-700 transition-all">Register</button>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
+        </div>
     </nav>
 
-    <div class="flex flex-row flex-grow w-full">
-        <aside class="sidebar-fixed p-10 hidden lg:block">
+    <div class="flex flex-row flex-grow w-full text-black">
+        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
-            <ul class="space-y-6">
-                <li class="sidebar-item"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
-                <li class="sidebar-item active font-black text-black"><a href="banners.html" class="block w-full">Banners</a></li>
-                <li class="sidebar-item cursor-pointer">Displays</li>
-                <li class="sidebar-item cursor-pointer">Large Format Printing</li>
-                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer active"><a href="banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
-                <li class="sidebar-item cursor-pointer">Rigid Signs</li>
+                <li class="sidebar-item cursor-pointer"><a href="../RigidSigns/rigid-signs.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
 
@@ -63,11 +77,11 @@
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
                     
                     <div class="space-y-8">
-                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative overflow-hidden">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative overflow-hidden text-black">
                             <img id="main-prod-img" src="../images/Banners/Pole-Banner-04.png" alt="Pole Banner" class="max-h-[400px] drop-shadow-2xl transition-all duration-300">
                         </div>
                         
-                        <div class="flex gap-4 justify-center flex-wrap">
+                        <div class="flex gap-4 justify-center flex-wrap" id="thumb-container">
                             <div class="w-24 h-24 rounded-xl overflow-hidden border-2 border-black cursor-pointer thumb-container" onclick="changeImage(this)">
                                 <img src="../images/Banners/Pole-Banner-04.png" class="w-full h-full object-cover">
                             </div>
@@ -76,17 +90,17 @@
                             </div>
                         </div>
 
-                        <div class="pt-8 border-t border-gray-100">
+                        <div class="pt-8 border-t border-gray-100 italic text-black">
                             <h2 class="text-2xl font-light text-gray-500 mb-6 tracking-tight">Description</h2>
-                            <h3 class="text-3xl font-normal text-gray-800 mb-6 italic">Pole Banners</h3>
+                            <h3 class="text-3xl font-normal text-gray-800 mb-6">Pole Banners</h3>
                             <div class="text-[14px] text-gray-600 leading-[1.7] space-y-5 font-medium">
-                                <p>Light Pole banners have high visual impact and citywide exposure. Take your message to the streets with these Double Sided graphics. Available in 18, 24 or 30 inches wide and up to 96 inches tall. We print in full color on your choice of 13 oz or 18 oz matte vinyl. Finished banners include 2" inch pole pockets and a grommet at each corner seam to keep your product in place.</p>
+                                <p>Light Pole banners have high visual impact and citywide exposure. Take your message to the streets with these Double Sided graphics.</p>
                                 <div>
-                                    <h4 class="font-black text-gray-900 mb-3 tracking-wider text-xs uppercase">Features:</h4>
-                                    <ul class="list-disc pl-5 space-y-2">
-                                        <li>18", 24", 30" inches wide. Heights available 24" to 96".</li>
-                                        <li>Hardware set includes 2 Fiberglass Arms, 2 Brackets and 4 Steel Bands.</li>
-                                        <li>Brass Grommets on each corner.</li>
+                                    <h4 class="font-black text-gray-900 mb-3 tracking-wider text-xs uppercase underline">Features:</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-[12px]">
+                                        <li>Widths: 18", 24", 30". Heights: 24" to 96".</li>
+                                        <li>Choice of 13 oz or 18 oz matte vinyl.</li>
+                                        <li>Hardware set option available.</li>
                                     </ul>
                                 </div>
                             </div>
@@ -95,115 +109,138 @@
 
                     <div class="space-y-8">
                         <header>
-                            <h1 class="text-4xl heavy-italic text-gray-900 leading-none italic">Pole Banners</h1>
-                            <p class="text-1xl font-black text-gray-400 italic mt-6">$39.34 – $171.66</p>
+                            <h1 id="prod-title" class="text-4xl heavy-italic text-gray-900 leading-none italic">Pole Banners</h1>
+                            <p class="text-1xl font-black text-gray-400 italic mt-6" id="prod-range">$39.34 – $171.66</p>
                         </header>
 
-                        <div class="grid grid-cols-1 gap-5">
+                        <div class="grid grid-cols-1 gap-5 text-black">
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1">Size</label>
-                                <select id="size-select" class="custom-dropdown"><option>18" x 36"</option><option>18" x 36"</option><option>18" x 60"</option><option>18" x 72"</option><option>18" x 84"</option><option>18" x 96"</option><option>24" x 36"</option><option>24" x 48"</option><option>24" x 60"</option><option>24" x 72"</option><option>24" x 84"</option><option>24" x 96"</option><option>30" x 36"</option><option>30" x 48"</option><option>30" x 60"</option><option>30" x 72"</option><option>30" x 84"</option><option>30" x 96"</option></select>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1 italic">Size</label>
+                                <select id="size-select" class="custom-dropdown text-black">
+                                    <option>18" x 36"</option><option>18" x 60"</option><option>18" x 72"</option><option>18" x 84"</option><option>18" x 96"</option>
+                                    <option>24" x 36"</option><option>24" x 48"</option><option>24" x 60"</option><option>24" x 72"</option><option>24" x 84"</option><option>24" x 96"</option>
+                                    <option>30" x 36"</option><option>30" x 48"</option><option>30" x 60"</option><option>30" x 72"</option><option>30" x 84"</option><option>30" x 96"</option>
+                                </select>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1">Graphic Material</label>
-                                <select class="custom-dropdown"><option>18oz HD Matte Banner</option><option>13oz Matte Banner</option></select>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1 italic">Graphic Material</label>
+                                <select id="mat-select" class="custom-dropdown text-black">
+                                    <option>18oz HD Matte Banner</option>
+                                    <option>13oz Matte Banner</option>
+                                </select>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1"># of Sides</label>
-                                <select class="custom-dropdown"><option>Double Sided</option></select>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1 italic"># of Sides</label>
+                                <select id="sides-select" class="custom-dropdown text-black">
+                                    <option>Double Sided</option>
+                                    <option>Single Sided</option>
+                                </select>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1">Hardware</label>
-                                <select class="custom-dropdown"><option>Pole Set Hardware & Graphic</option><option>Graphic Only</option></select>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1 italic">Hardware</label>
+                                <select id="hw-select" class="custom-dropdown text-black">
+                                    <option>Pole Set Hardware & Graphic</option>
+                                    <option>Graphic Only</option>
+                                </select>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1">Pole Pocket</label>
-                                <select class="custom-dropdown"><option>2" Top & Bottom</option></select>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1 italic">Pole Pocket</label>
+                                <select id="pocket-select" class="custom-dropdown text-black">
+                                    <option>2" Top & Bottom</option>
+                                    <option>3" Top & Bottom</option>
+                                </select>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1">Hem</label>
-                                <select class="custom-dropdown"><option>All Sides</option></select>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1 italic">Hem</label>
+                                <select id="hem-select" class="custom-dropdown text-black">
+                                    <option>All Sides</option>
+                                    <option>No Hem</option>
+                                </select>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1">Grommet</label>
-                                <select class="custom-dropdown"><option>4 Corners Only</option></select>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1 italic">Grommet</label>
+                                <select id="grommet-select" class="custom-dropdown text-black">
+                                    <option>4 Corners Only</option>
+                                    <option>No Grommets</option>
+                                </select>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1">Center Windslit</label>
-                                <select class="custom-dropdown"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-2 ml-1 italic">Center Windslit</label>
+                                <select id="windslit-select" class="custom-dropdown text-black">
+                                    <option>0</option><option>1</option><option>2</option><option>3</option>
+                                </select>
                             </div>
 
                             <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] ml-1">Turnaround</label>
-                                    <button onclick="resetAll()" class="text-[10px] font-bold text-gray-900 flex items-center gap-1.5 hover:text-red-600 transition-colors">
-                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Clear
-                                    </button>
+                                <div class="flex justify-between items-center mb-2 text-black">
+                                    <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] ml-1 italic">Turnaround</label>
+                                    <button onclick="resetAll()" class="text-[10px] font-bold text-gray-900 flex items-center gap-1.5 hover:text-red-600 transition-colors italic"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Clear</button>
                                 </div>
-                                <select id="turn-select" class="custom-dropdown">
+                                <select id="turn-select" class="custom-dropdown text-black">
                                     <option>3 - 5 Days</option>
-                                    <option>2 Days (3pm cut - off)</option>
+                                    <option>2 Days (3pm cut-off)</option>
                                 </select>
                             </div>
 
                             <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block ml-1">Upload & Validate Art</label>
+                                <label class="text-[10px] font-black uppercase text-red-500 tracking-[0.15em] block ml-1 italic">Validation Status</label>
                                 <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">
-                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest">Select Image File</span>
+                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic text-center">Select Image File</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
                                 </div>
-
                                 <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 shadow-2xl space-y-5">
-                                    <div class="flex gap-5 items-center">
-                                        <div class="w-24 h-24 bg-gray-50 rounded-2xl overflow-hidden border p-2">
-                                            <img id="preview-thumb" class="w-full h-full object-contain">
-                                        </div>
+                                    <div class="flex gap-5 items-center text-black">
+                                        <div class="w-24 h-24 bg-gray-50 rounded-2xl border p-2 flex items-center justify-center overflow-hidden"><img id="preview-thumb" class="max-h-full max-w-full object-contain text-black"></div>
                                         <div class="flex-grow">
-                                            <h4 id="status-title" class="text-[14px] font-black uppercase text-red-600 italic">ARTWORK SCALING REQUIRED</h4>
-                                            <div id="validation-text" class="text-[12px] text-gray-500 font-medium leading-relaxed mt-1">
-                                                <span class="text-red-500 font-bold">Dimensions Mismatch:</span><br>
-                                                <span id="file-dims" class="text-gray-400">Your file: 0.32" x 0.16" (at 1000 DPI).</span><br>
-                                                <span id="requested-dims" class="text-gray-400">Requested: <span class="text-black font-bold">30" x 60"</span>.</span><br>
-                                                <span class="text-black italic underline font-bold mt-1 block italic">We will scale your artwork.</span>
-                                            </div>
+                                            <h4 id="status-title" class="text-[14px] font-black uppercase text-red-600 italic tracking-tighter text-black">ANALYZING ARTWORK...</h4>
+                                            <div id="validation-text" class="text-[12px] text-gray-500 font-medium leading-relaxed mt-1 italic text-black"></div>
                                         </div>
                                     </div>
-                                    <div class="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
-                                        <div id="upload-progress" class="progress-bar"></div>
-                                    </div>
+                                    <div class="w-full bg-gray-100 h-1 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
                                     <div class="flex gap-3" id="action-buttons">
-                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[10px] font-black uppercase py-4 rounded-2xl hover:bg-black transition-all shadow-lg">Approve & Continue</button>
-                                        <button onclick="resetUpload()" class="px-6 bg-gray-100 text-gray-400 text-[10px] font-black uppercase rounded-2xl">Discard</button>
+                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[10px] font-black uppercase py-4 rounded-2xl hover:bg-black transition-all shadow-lg italic tracking-widest">APPROVE & CONTINUE</button>
+                                        <button onclick="resetUpload()" class="px-6 bg-gray-100 text-gray-400 text-[10px] font-black uppercase rounded-2xl italic text-black">Discard</button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100 mt-5">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[11px] font-black uppercase text-gray-900 tracking-widest italic">Total:</span>
-                                <span id="final-price" class="text-5xl heavy-italic italic text-black">$39.34</span>
+                            <div class="bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100 mt-5">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[11px] font-black uppercase text-gray-900 tracking-widest italic text-black">Total:</span>
+                                    <span id="final-price" class="text-5xl heavy-italic italic text-black">$39.34</span>
+                                </div>
                             </div>
+                            <button id="add-to-cart-btn" onclick="addToCart()" disabled class="w-full bg-gray-200 text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed mt-4 shadow-md italic">Add to cart</button>
                         </div>
-
-                        <button id="add-to-cart-btn" disabled class="w-full bg-gray-200 text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed mt-4">Add to cart</button>
                     </div>
                 </div>
             </div>
-
-            <footer class="bg-white border-t py-12 px-10 text-center w-full">
-                <div class="bg-black p-2 rounded-lg inline-block mb-4 shadow-lg"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto"></div>
-                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">© 2026 Square Foot Printing - Las Vegas</p>
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
     </div>
+
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black text-black text-black"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black text-black text-black">$0.00</span></div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-black text-black text-black">Checkout</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
 
     <script>
         lucide.createIcons();
@@ -218,41 +255,121 @@
         function processFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
+                const selectedSize = document.getElementById('size-select').value;
                 document.getElementById('drop-zone').classList.add('hidden');
                 document.getElementById('validation-panel').classList.remove('hidden');
-                setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
                 reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = function() {
-                        document.getElementById('preview-thumb').src = e.target.result;
-                        const realW = (this.width / 1000).toFixed(2);
-                        const realH = (this.height / 1000).toFixed(2);
-                        document.getElementById('file-dims').innerText = `Your file: ${realW}" x ${realH}" (at 1000 DPI).`;
-                    };
+                    document.getElementById('preview-thumb').src = e.target.result;
+                    setTimeout(() => { 
+                        document.getElementById('upload-progress').style.width = '100%'; 
+                        document.getElementById('status-title').innerText = "Analysis Complete";
+                        document.getElementById('status-title').className = "text-[14px] font-black uppercase text-blue-600 italic tracking-tighter text-black";
+                        document.getElementById('validation-text').innerHTML = `<span>Requested: ${selectedSize}</span><br><span class="text-black font-bold mt-1 block italic underline">We will scale your artwork.</span>`;
+                    }, 800);
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function approveArt() {
-            const btn = document.getElementById('add-to-cart-btn'); 
-            btn.disabled = false;
-            btn.classList.replace('bg-gray-200', 'bg-[#83D644]');
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
             btn.classList.remove('cursor-not-allowed');
+            document.getElementById('action-buttons').classList.add('hidden');
             document.getElementById('status-title').innerText = "Artwork Approved";
             document.getElementById('status-title').className = "text-[14px] font-black uppercase text-green-600 italic";
-            document.getElementById('action-buttons').classList.add('hidden');
         }
 
         function resetUpload() {
-            document.getElementById('drop-zone').classList.remove('hidden'); 
+            document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
-            document.getElementById('upload-progress').style.width = '0%'; 
             document.getElementById('file-input').value = "";
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = true; btn.classList.replace('bg-black', 'bg-gray-200');
         }
 
-        function resetAll() { document.querySelectorAll('select').forEach(s => s.selectedIndex = 0); }
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open'); overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
+                renderCart();
+            }
+        }
+
+        function addToCart() {
+            const specs = [
+                document.getElementById('size-select').value,
+                document.getElementById('mat-select').value,
+                document.getElementById('hw-select').value,
+                document.getElementById('pocket-select').value,
+                document.getElementById('windslit-select').value + " Windslits"
+            ].join(' | ');
+
+            const priceVal = document.getElementById('final-price').innerText.replace('$', '').replace(',', '');
+            const thumb = document.getElementById('preview-thumb').src;
+
+            const newItem = {
+                name: "Pole Banner",
+                specs: specs,
+                size: document.getElementById('size-select').value,
+                qty: 1,
+                price: parseFloat(priceVal),
+                image: thumb
+            };
+
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            renderCart();
+            toggleCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Cart Empty</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    container.innerHTML += `
+                        <div class="flex gap-6 border-b border-gray-50 pb-6 last:border-0 text-black">
+                            <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div>
+                            <div class="flex flex-col justify-between flex-grow">
+                                <div class="flex justify-between">
+                                    <h4 class="text-sm font-black uppercase italic tracking-tighter text-black">${item.name}</h4>
+                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black text-black"></i></button>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black">${item.specs}</p>
+                                <div class="flex justify-between items-end mt-4 text-black"><span class="text-[10px] font-bold text-gray-400 uppercase">Qty: ${item.qty}</span><span class="text-xl font-black italic text-black">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div>
+                            </div>
+                        </div>`;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
+        }
+
+        function resetAll() { 
+            document.querySelectorAll('select').forEach(s => s.selectedIndex = 0); 
+        }
+
+        window.onload = () => { renderCart(); };
     </script>
 </body>
 </html>
