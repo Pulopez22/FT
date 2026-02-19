@@ -130,7 +130,6 @@
                 const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
                 total += priceNum;
                 
-                // Formateo de opciones dinámicas para visualización en checkout
                 const details = item.options ? 
                     Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : 
                     (item.specs || "Custom Order");
@@ -155,48 +154,53 @@
         async function placeOrder() {
             const btn = document.getElementById('order-btn');
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const name = document.getElementById('cust-name').value;
-            const email = document.getElementById('cust-email').value;
+            const nameInput = document.getElementById('cust-name');
+            const emailInput = document.getElementById('cust-email');
 
-            if(!name || !email || cart.length === 0) { 
+            if(!nameInput.value || !emailInput.value || cart.length === 0) { 
                 alert("Please complete the form and add items to your cart before sending."); 
                 return; 
             }
 
-            btn.innerText = "SENDING TO RENDER...";
+            btn.innerText = "SENDING...";
             btn.disabled = true;
 
+            // Updated Data Structure to match the new server.js
             const orderData = {
                 customer: { 
-                    name, 
-                    email, 
+                    name: nameInput.value, 
+                    email: emailInput.value, 
                     phone: document.getElementById('cust-phone').value, 
                     address: document.getElementById('cust-address').value 
                 },
-                // Mapeamos los items al formato JSON limpio que espera el servidor
                 items: cart.map(i => ({ 
                     product: i.name, 
                     price: i.price, 
-                    details: i.options ? JSON.stringify(i.options) : (i.specs || "No details") 
+                    // Send details as a clean string
+                    details: i.options ? Object.entries(i.options).map(([k,v]) => `${k}: ${v}`).join(' | ') : (i.specs || "No details")
                 })),
                 total: document.getElementById('final-total').innerText
             };
 
             try {
+                // Connecting to Render API
                 const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(orderData)
                 });
+
                 if(res.ok) { 
                     alert("Success! Your order has been received. We will contact you soon via email."); 
                     localStorage.removeItem('sqft_cart'); 
                     window.location.href = "index.html"; 
                 } else {
-                    throw new Error("Server rejected order");
+                    const serverError = await res.text();
+                    throw new Error(serverError);
                 }
             } catch (e) { 
-                alert("Error connecting to the order server. Please ensure the Render service is awake."); 
+                console.error("Order Submission Error:", e);
+                alert("Error: Render received the data but crashed (500) or is offline. Please check Render Logs.");
             } finally { 
                 btn.innerText = "Send Order Now"; 
                 btn.disabled = false; 
