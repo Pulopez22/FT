@@ -3,23 +3,23 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 const app = express();
-
-// Permitimos explícitamente tu dominio de Vercel para evitar bloqueos
-app.use(cors({
-    origin: '*', // Esto permite peticiones de cualquier lugar para pruebas
-    methods: ['POST', 'GET']
-}));
-
-app.use(express.json());
+app.use(cors());
+app.use(express.json()); // Vital para leer el JSON del checkout
 
 app.post('/api/place-order', async (req, res) => {
     try {
+        // Leemos los datos tal como los envía el checkout nuevo
         const { customer, items, total } = req.body;
-        
-        // Si no hay datos, lanzamos error claro
-        if (!customer || !items) throw new Error("No data received");
 
-        const transporter = nodemailer.createTransport({
+        if (!customer || !items) {
+            return res.status(400).send('Missing order data');
+        }
+
+        const orderDetails = items.map(item => {
+            return `- ${item.product}: $${item.price}\n  Details: ${item.details}`;
+        }).join('\n\n');
+
+        let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: 'pulopez20@gmail.com',
@@ -28,19 +28,34 @@ app.post('/api/place-order', async (req, res) => {
         });
 
         const mailOptions = {
-            from: '"Square Foot Order" <pulopez20@gmail.com>',
+            from: '"Square Foot Printing" <pulopez20@gmail.com>',
             to: 'za19012245@zapopan.tecmm.edu.mx',
-            subject: `ORDER: ${customer.name}`,
-            text: `Customer: ${customer.name}\nTotal: ${total}\nItems: ${JSON.stringify(items)}`
+            subject: `NEW ORDER: ${customer.name}`,
+            text: `
+NEW ORDER RECEIVED
+----------------------------
+CUSTOMER:
+Name: ${customer.name}
+Email: ${customer.email}
+Phone: ${customer.phone}
+Address: ${customer.address}
+
+ITEMS:
+${orderDetails}
+
+TOTAL: ${total}
+----------------------------
+`
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).json({ success: true });
+        res.status(200).json({ message: 'Order processed successfully' });
+
     } catch (error) {
-        console.error("ERROR:", error.message);
-        res.status(500).json({ error: error.message });
+        console.error('SERVER ERROR:', error);
+        res.status(500).send('Error processing order: ' + error.message);
     }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server live on ${PORT}`));
+app.listen(PORT, () => console.log(`Server live on port ${PORT}`));

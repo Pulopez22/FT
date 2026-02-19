@@ -137,58 +137,54 @@
         }
 
         async function placeOrder() {
-            const btn = document.getElementById('order-btn');
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const name = document.getElementById('cust-name').value;
-            const email = document.getElementById('cust-email').value;
+    const btn = document.getElementById('order-btn');
+    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+    const name = document.getElementById('cust-name').value;
+    
+    if(!name || cart.length === 0) {
+        alert("Please fill your name and add items to cart.");
+        return;
+    }
 
-            if(!name || !email || cart.length === 0) { 
-                alert("Please complete the form and ensure your cart is not empty."); 
-                return; 
-            }
+    btn.innerText = "SENDING...";
+    btn.disabled = true;
 
-            btn.innerText = "SENDING...";
-            btn.disabled = true;
+    const data = {
+        customer: {
+            name: name,
+            email: document.getElementById('cust-email').value,
+            phone: document.getElementById('cust-phone').value,
+            address: document.getElementById('cust-address').value
+        },
+        items: cart.map(i => ({
+            product: i.name,
+            price: i.price,
+            details: i.options ? Object.entries(i.options).map(([k,v]) => `${k}: ${v}`).join(' | ') : (i.specs || "No details")
+        })),
+        total: document.getElementById('final-total').innerText
+    };
 
-            // Formato de datos optimizado para el server.js
-            const orderData = {
-                customer: { 
-                    name, email, 
-                    phone: document.getElementById('cust-phone').value, 
-                    address: document.getElementById('cust-address').value 
-                },
-                items: cart.map(i => ({ 
-                    product: i.name, 
-                    price: i.price, 
-                    details: i.options ? Object.entries(i.options).map(([k,v]) => `${k}: ${v}`).join(', ') : (i.specs || "No details")
-                })),
-                total: document.getElementById('final-total').innerText
-            };
+    try {
+        const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
 
-            try {
-                // Forzamos modo CORS para evitar el bloqueo del navegador
-                const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(orderData)
-                });
-
-                if(res.ok) { 
-                    alert("Success! Your order has been received."); 
-                    localStorage.removeItem('sqft_cart'); 
-                    window.location.href = "index.html"; 
-                } else {
-                    throw new Error("Server Error 500");
-                }
-            } catch (e) { 
-                // Error 500 o fallo de conexión
-                alert("Server error 500 or Connection Failed. Ensure Render is Live and check Logs."); 
-            } finally { 
-                btn.innerText = "Send Order Now"; 
-                btn.disabled = false; 
-            }
+        if (res.ok) {
+            alert("Order sent successfully!");
+            localStorage.removeItem('sqft_cart');
+            window.location.href = "index.html";
+        } else {
+            alert("Error 500: Check Render Logs again.");
         }
+    } catch (e) {
+        alert("Connection failed. Make sure Render is awake.");
+    } finally {
+        btn.innerText = "Send Order Now";
+        btn.disabled = false;
+    }
+}
 
         window.onload = loadItems;
     </script>
