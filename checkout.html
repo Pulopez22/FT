@@ -5,29 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <script src="lucide.js"></script> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
-        
-        .sidebar-fixed { 
-            width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; 
-            background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto;
-        }
-
+        .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
         .sidebar-item.active { border-right: 3px solid #000; }
-
-        .main-content-scroll { 
-            min-height: calc(100vh - 73px); flex-grow: 1;
-            background-color: white; display: flex; flex-direction: column;
-        }
-
+        .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
         .custom-input { width: 100%; padding: 1.25rem; border-radius: 1.5rem; border: 1px solid #f3f4f6; font-weight: 700; outline: none; background: #f9fafb; transition: all 0.3s; }
         .custom-input:focus { border-color: #000; background: #fff; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
-
         #checkout-sidebar { width: 450px; height: calc(100vh - 73px); position: sticky; top: 73px; border-left: 1px solid #e5e7eb; background: white; display: flex; flex-direction: column; }
     </style>
 </head>
@@ -89,7 +77,7 @@
                     </section>
 
                     <section class="rounded-[2.5rem] overflow-hidden border-4 border-black h-64 shadow-2xl grayscale contrast-125">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3221.32!2d-115.17!3d36.16!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzbCsDA5JzM2LjAiTiAxMTXCsDEwJzEyLjAiVw!5e0!3m2!1sen!2sus!4v1700000000000" class="w-full h-full border-0"></iframe>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3222.18204618778!2d-115.1764673!3d36.1365403!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c8c38676d9178d%3A0xc00867858c2f1e!2sLas%20Vegas%20Premium%20Outlets%20North!5e0!3m2!1sen!2sus!4v1700000000000" class="w-full h-full border-0"></iframe>
                     </section>
                 </div>
             </div>
@@ -129,10 +117,7 @@
             container.innerHTML = cart.map(item => {
                 const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
                 total += priceNum;
-                
-                const details = item.options ? 
-                    Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : 
-                    (item.specs || "Custom Order");
+                const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : (item.specs || "Custom Order");
 
                 return `
                 <div class="flex gap-4 border-b border-gray-50 pb-6 last:border-0">
@@ -154,42 +139,54 @@
         async function placeOrder() {
             const btn = document.getElementById('order-btn');
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            
+            const name = document.getElementById('cust-name').value;
+            const email = document.getElementById('cust-email').value;
+
+            if(!name || !email || cart.length === 0) { 
+                alert("Please complete the form and ensure your cart is not empty."); 
+                return; 
+            }
+
             btn.innerText = "SENDING...";
             btn.disabled = true;
 
-            const data = {
-                customer: {
-                    name: document.getElementById('cust-name').value,
-                    email: document.getElementById('cust-email').value,
-                    phone: document.getElementById('cust-phone').value,
-                    address: document.getElementById('cust-address').value
+            // Formato de datos optimizado para el server.js
+            const orderData = {
+                customer: { 
+                    name, email, 
+                    phone: document.getElementById('cust-phone').value, 
+                    address: document.getElementById('cust-address').value 
                 },
-                items: cart,
+                items: cart.map(i => ({ 
+                    product: i.name, 
+                    price: i.price, 
+                    details: i.options ? Object.entries(i.options).map(([k,v]) => `${k}: ${v}`).join(', ') : (i.specs || "No details")
+                })),
                 total: document.getElementById('final-total').innerText
             };
 
             try {
-                // Fetch with explicit CORS mode to prevent browser blocking
+                // Forzamos modo CORS para evitar el bloqueo del navegador
                 const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
                     method: 'POST',
-                    mode: 'cors', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    mode: 'cors',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(orderData)
                 });
 
-                if (res.ok) {
-                    alert("Order sent successfully!");
-                    localStorage.removeItem('sqft_cart');
-                    window.location.href = "index.html";
+                if(res.ok) { 
+                    alert("Success! Your order has been received."); 
+                    localStorage.removeItem('sqft_cart'); 
+                    window.location.href = "index.html"; 
                 } else {
-                    alert("Server error 500. Please check Render Logs.");
+                    throw new Error("Server Error 500");
                 }
-            } catch (e) {
-                alert("Connection failed. Render might be starting up.");
-            } finally {
-                btn.innerText = "Send Order Now";
-                btn.disabled = false;
+            } catch (e) { 
+                // Error 500 o fallo de conexión
+                alert("Server error 500 or Connection Failed. Ensure Render is Live and check Logs."); 
+            } finally { 
+                btn.innerText = "Send Order Now"; 
+                btn.disabled = false; 
             }
         }
 
