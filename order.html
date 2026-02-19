@@ -3,114 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmed - Square Foot Printing</title>
+    <title>Order Success - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; color: #000; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        .sidebar-item { transition: all 0.2s; }
+        .sidebar-item:hover { color: #000; padding-left: 4px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <nav class="border-b py-6 px-10 flex justify-between items-center bg-white/95 backdrop-blur-md z-50">
-        <div class="flex items-center gap-8 mx-auto lg:mx-0">
-            <a href="index.html" class="bg-black p-2 rounded-lg shadow-xl">
-                <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
+        <div class="flex items-center gap-8">
+            <a href="index.html" class="flex items-center group">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
+                </div>
             </a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+                <a href="index.html" class="text-black border-b-2 border-black pb-1">Wall Art</a>
+                <a href="Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
+            </div>
         </div>
-        <div class="hidden lg:flex items-center gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
-            <a href="index.html" class="hover:text-black transition-colors">Home</a>
-            <a href="#" class="hover:text-black transition-colors">Support</a>
+        <div class="flex gap-4 items-center">
+            <button class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 transition-colors border-b-2 border-black pb-0.5">Track My Order</button>
         </div>
     </nav>
 
-    <main class="flex-grow flex items-center justify-center p-6 md:p-12">
-        <div class="max-w-4xl w-full text-center space-y-10">
-            
-            <div class="flex justify-center">
-                <div class="bg-green-50 p-8 rounded-full border border-green-100 animate-bounce">
-                    <i data-lucide="check-circle" class="w-20 h-20 text-green-500"></i>
+    <div class="flex flex-grow">
+        <aside class="w-72 border-r h-[calc(100vh-70px)] sticky top-[70px] p-8 hidden lg:block bg-white overflow-y-auto">
+            <h3 class="text-[10px] font-black uppercase mb-8 text-gray-400 tracking-widest border-b pb-2">Product Categories</h3>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+                <li class="sidebar-item cursor-pointer"><a href="AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer">Displays</li>
+                <li class="sidebar-item cursor-pointer"><a href="LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer">Printed Fabric</li>
+                <li class="sidebar-item cursor-pointer"><a href="Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+            </ul>
+        </aside>
+
+        <main class="flex-grow flex flex-col items-center justify-center p-6 md:p-12 text-center bg-gray-50/30">
+            <div class="mb-8 relative">
+                <div class="absolute inset-0 bg-red-100 rounded-full scale-150 blur-3xl opacity-40 animate-pulse"></div>
+                <div class="bg-red-600 text-white p-6 rounded-full relative shadow-2xl">
+                    <i data-lucide="check-circle-2" class="w-16 h-16"></i>
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <h1 class="text-6xl md:text-7xl heavy-italic italic tracking-tighter leading-none">Order Received!</h1>
-                <p class="text-gray-400 font-bold uppercase text-xs md:text-sm tracking-[0.3em]">Thank you for your business</p>
-                <p class="text-sm font-black text-black uppercase">Order ID: <span id="order-id" class="text-red-600">#SQFT-8429</span></p>
-            </div>
+            <h1 class="text-5xl md:text-7xl heavy-italic italic mb-4 tracking-tighter">Order Received!</h1>
+            <p class="text-gray-500 max-w-lg mx-auto mb-12 font-medium leading-relaxed">
+                Your high-resolution files have been successfully uploaded to our Las Vegas facility. We are reviewing your design for production.
+            </p>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-                
-                <div class="bg-gray-50 border border-gray-100 rounded-[2.5rem] p-8 space-y-6 shadow-sm">
-                    <div>
-                        <h3 class="heavy-italic text-sm mb-4 flex items-center gap-2">
-                            <i data-lucide="map-pin" class="text-red-600 w-4 h-4"></i> Pickup Location
-                        </h3>
-                        <p class="text-[11px] font-black uppercase leading-relaxed text-black">
-                            Square Foot Printing<br>
-                            6155 S Edmond St<br>
-                            Las Vegas, NV 89118
-                        </p>
-                    </div>
-                    <div class="pt-4 border-t border-gray-200">
-                        <p class="text-[9px] font-black uppercase text-gray-400">Hours:</p>
-                        <p class="text-[10px] font-black uppercase text-black">Mon - Fri: 10am - 5pm</p>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full mb-12">
+                <div class="p-10 border border-gray-100 rounded-[2.5rem] bg-white shadow-sm transition-transform hover:-translate-y-1">
+                    <i data-lucide="file-check" class="mx-auto mb-4 text-red-600 w-8 h-8"></i>
+                    <h3 class="heavy-italic text-sm mb-2">File Review</h3>
+                    <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Verifying resolution</p>
                 </div>
-
-                <div class="bg-gray-50 border border-gray-100 rounded-[2.5rem] p-8 space-y-6 shadow-sm">
-                    <div>
-                        <h3 class="heavy-italic text-sm mb-4 flex items-center gap-2">
-                            <i data-lucide="credit-card" class="text-red-600 w-4 h-4"></i> Payment Method
-                        </h3>
-                        <div class="flex items-center gap-3">
-                            <div class="bg-white p-2 rounded-lg border border-gray-100">
-                                <i data-lucide="wallet" class="w-5 h-5 text-gray-400"></i>
-                            </div>
-                            <p class="text-[11px] font-black uppercase text-black">Pay at Pickup / Invoice</p>
-                        </div>
-                    </div>
-                    <div class="pt-4 border-t border-gray-200">
-                        <p class="text-[9px] font-black uppercase text-gray-400">Status:</p>
-                        <p class="text-[10px] font-black uppercase text-orange-500">Pending Verification</p>
-                    </div>
+                <div class="p-10 border border-gray-100 rounded-[2.5rem] bg-white shadow-sm transition-transform hover:-translate-y-1">
+                    <i data-lucide="printer" class="mx-auto mb-4 text-red-600 w-8 h-8"></i>
+                    <h3 class="heavy-italic text-sm mb-2">Production</h3>
+                    <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Printing process</p>
                 </div>
-
-                <div class="bg-black text-white rounded-[2.5rem] p-8 space-y-6 shadow-2xl">
-                    <h3 class="heavy-italic text-sm text-red-600">What's Next?</h3>
-                    <ul class="space-y-4">
-                        <li class="flex gap-3 items-start">
-                            <i data-lucide="mail" class="w-4 h-4 text-gray-500"></i>
-                            <p class="text-[10px] font-bold uppercase leading-tight">Check your email for the order receipt.</p>
-                        </li>
-                        <li class="flex gap-3 items-start">
-                            <i data-lucide="printer" class="w-4 h-4 text-gray-500"></i>
-                            <p class="text-[10px] font-bold uppercase leading-tight">We will notify you when it's ready.</p>
-                        </li>
-                    </ul>
+                <div class="p-10 border border-gray-100 rounded-[2.5rem] bg-white shadow-sm transition-transform hover:-translate-y-1">
+                    <i data-lucide="truck" class="mx-auto mb-4 text-red-600 w-8 h-8"></i>
+                    <h3 class="heavy-italic text-sm mb-2">Ready</h3>
+                    <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Pickup or Shipping</p>
                 </div>
             </div>
 
-            <div class="pt-10">
-                <a href="index.html" class="inline-block bg-white border-2 border-black text-black px-12 py-5 rounded-2xl heavy-italic italic text-sm tracking-widest hover:bg-black hover:text-white transition-all shadow-xl">
-                    Continue Shopping
-                </a>
-                <p class="mt-8 text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">2026 Square Foot Printing - Las Vegas</p>
-            </div>
-        </div>
-    </main>
+            <button onclick="window.location.href='index.html'" class="bg-black text-white px-12 py-6 rounded-2xl heavy-italic italic text-xs tracking-[0.3em] hover:bg-red-600 transition-all shadow-2xl active:scale-95">
+                Continue Shopping
+            </button>
 
-    <footer class="py-12 border-t border-gray-100 text-center">
-        <div class="bg-black p-3 rounded-xl inline-block mb-4 shadow-xl">
-            <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto">
-        </div>
-    </footer>
+            <footer class="mt-20 pt-10 border-t border-gray-100 w-full">
+                <div class="bg-black p-2 rounded-lg inline-block mb-4 shadow-lg">
+                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto">
+                </div>
+                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas, NV</p>
+            </footer>
+        </main>
+    </div>
 
     <script>
+        // Inicializar iconos de Lucide
         lucide.createIcons();
-        document.getElementById('order-id').innerText = '#SQFT-' + Math.floor(1000 + Math.random() * 9000);
+
+        // Verificar si el carrito tiene items para mostrar el punto rojo
+        function updateCartDot() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const dot = document.getElementById('cart-dot');
+            if (cart.length > 0) {
+                dot.classList.remove('hidden');
+            }
+        }
+        window.onload = updateCartDot;
     </script>
 </body>
 </html>
