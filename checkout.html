@@ -114,34 +114,29 @@
     </div>
 
     <script>
-        // Inicialización segura de iconos
+        // Inicialización de iconos Lucide
         if (window.lucide) {
             lucide.createIcons();
         }
 
         function loadItems() {
-            // Buscamos el carrito bajo múltiples nombres para evitar el "blanco"
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || 
-                         JSON.parse(localStorage.getItem('cart')) || 
-                         JSON.parse(localStorage.getItem('cartItems')) || [];
-            
+            // Regresamos a la llave original sqft_cart que usabas a mediodía
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('summary-items');
-            const countDisplay = document.getElementById('order-count');
             const totalDisplay = document.getElementById('final-total');
+            const countDisplay = document.getElementById('order-count');
             let total = 0;
 
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase text-[10px] italic">Your cart is empty</div>`;
-                countDisplay.innerText = "0 Items";
                 totalDisplay.innerText = "$0.00";
+                countDisplay.innerText = "0 Items";
                 return;
             }
 
             container.innerHTML = cart.map(item => {
                 const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
                 total += priceNum;
-                const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : (item.specs || "Custom Order");
-
                 return `
                 <div class="flex gap-4 border-b border-gray-50 pb-6 last:border-0">
                     <div class="w-20 h-20 bg-gray-50 rounded-2xl border flex items-center justify-center p-2 overflow-hidden">
@@ -149,7 +144,6 @@
                     </div>
                     <div class="flex-grow">
                         <h4 class="text-[11px] font-black uppercase italic tracking-tighter leading-tight">${item.name}</h4>
-                        <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${details}</p>
                         <p class="text-lg font-black italic mt-3 text-right">$${priceNum.toFixed(2)}</p>
                     </div>
                 </div>`;
@@ -161,57 +155,47 @@
 
         async function placeOrder() {
             const btn = document.getElementById('order-btn');
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || 
-                         JSON.parse(localStorage.getItem('cart')) || [];
-            const name = document.getElementById('cust-name').value;
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             
-            if(!name || cart.length === 0) {
-                alert("Please fill your name and ensure you have items in your cart.");
-                return;
-            }
-
             btn.innerText = "SENDING...";
             btn.disabled = true;
 
-            const data = {
+            // Versión original: Enviamos como FormData usando el campo 'data'
+            const formData = new FormData();
+            const payload = {
                 customer: {
-                    name: name,
+                    name: document.getElementById('cust-name').value,
                     email: document.getElementById('cust-email').value,
                     phone: document.getElementById('cust-phone').value,
                     address: document.getElementById('cust-address').value
                 },
-                items: cart.map(i => ({
-                    product: i.name,
-                    price: i.price,
-                    details: i.options ? Object.entries(i.options).map(([k,v]) => `${k}: ${v}`).join(' | ') : (i.specs || "No details")
-                })),
+                items: cart,
                 total: document.getElementById('final-total').innerText
             };
+
+            formData.append('data', JSON.stringify(payload));
 
             try {
                 const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: formData // Importante: Sin encabezados de Content-Type manuales
                 });
 
                 if (res.ok) {
-                    alert("Order sent successfully!");
+                    alert("Order placed successfully!");
                     localStorage.removeItem('sqft_cart');
-                    localStorage.removeItem('cart');
                     window.location.href = "index.html";
                 } else {
-                    alert("Server error 500: Check Render Logs.");
+                    alert("Server error. Please check Render Logs.");
                 }
             } catch (e) {
-                alert("Connection failed. Make sure Render is awake.");
+                alert("Connection error. Make sure Render is awake.");
             } finally {
                 btn.innerText = "Send Order Now";
                 btn.disabled = false;
             }
         }
 
-        // Ejecutar carga cuando el contenido está listo
         document.addEventListener('DOMContentLoaded', loadItems);
     </script>
 </body>
