@@ -5,17 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="lucide.js"></script> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <script src="lucide.js"></script> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
-        .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
+        
+        .sidebar-fixed { 
+            width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; 
+            background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto;
+        }
+
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
         .sidebar-item.active { border-right: 3px solid #000; }
-        .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
+
+        .main-content-scroll { 
+            min-height: calc(100vh - 73px); flex-grow: 1;
+            background-color: white; display: flex; flex-direction: column;
+        }
+
         .custom-input { width: 100%; padding: 1.25rem; border-radius: 1.5rem; border: 1px solid #f3f4f6; font-weight: 700; outline: none; background: #f9fafb; transition: all 0.3s; }
         .custom-input:focus { border-color: #000; background: #fff; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+
         #checkout-sidebar { width: 450px; height: calc(100vh - 73px); position: sticky; top: 73px; border-left: 1px solid #e5e7eb; background: white; display: flex; flex-direction: column; }
     </style>
 </head>
@@ -29,9 +41,9 @@
                 </div>
             </a>
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
-                <a href="index.html" class="hover:text-black">Wall Art</a>
-                <a href="Banners/banners.html" class="hover:text-black">Banners</a>
-                <a href="Stickers/stickers.html" class="hover:text-black">Stickers</a>
+                <a href="index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -58,7 +70,7 @@
 
                 <div class="max-w-3xl space-y-12">
                     <section class="space-y-6">
-                        <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Customer Details</h2>
+                        <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 italic font-bold">Customer Details</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input type="text" id="cust-name" placeholder="FULL NAME" class="custom-input">
                             <input type="email" id="cust-email" placeholder="EMAIL ADDRESS" class="custom-input">
@@ -68,11 +80,11 @@
                     </section>
 
                     <section class="space-y-6">
-                        <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Payment Preview</h2>
+                        <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 italic font-bold">Payment Preview</h2>
                         <div class="flex gap-4 p-8 border rounded-[2rem] border-gray-100 bg-gray-50/50 items-center">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-6 grayscale opacity-50">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" class="h-4 grayscale opacity-50">
-                            <p class="text-[9px] font-bold text-gray-400 uppercase italic ml-auto">Payment link will be sent to email</p>
+                            <p class="text-[9px] font-bold text-gray-400 uppercase italic ml-auto tracking-widest">Payment link will be sent to email</p>
                         </div>
                     </section>
 
@@ -83,7 +95,9 @@
             </div>
 
             <footer class="bg-white border-t py-16 px-10 text-center w-full">
-                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
+                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto">
+                </div>
                 <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
@@ -95,13 +109,17 @@
             </div>
             <div id="summary-items" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
             <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-                <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Total Due</span><span id="final-total" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
+                <div class="flex justify-between items-end">
+                    <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Total Due</span>
+                    <span id="final-total" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span>
+                </div>
                 <button onclick="placeOrder()" id="order-btn" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Send Order Now</button>
             </div>
         </aside>
     </div>
 
     <script>
+        // Inicializa iconos desde el archivo local
         lucide.createIcons();
 
         function loadItems() {
@@ -136,55 +154,57 @@
             document.getElementById('order-count').innerText = `${cart.length} Items`;
         }
 
+        // Función de envío sincronizada con el nuevo server.js
         async function placeOrder() {
-    const btn = document.getElementById('order-btn');
-    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    const name = document.getElementById('cust-name').value;
-    
-    if(!name || cart.length === 0) {
-        alert("Please fill your name and add items to cart.");
-        return;
-    }
+            const btn = document.getElementById('order-btn');
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const name = document.getElementById('cust-name').value;
+            
+            if(!name || cart.length === 0) {
+                alert("Please fill your name and add items to cart.");
+                return;
+            }
 
-    btn.innerText = "SENDING...";
-    btn.disabled = true;
+            btn.innerText = "SENDING...";
+            btn.disabled = true;
 
-    const data = {
-        customer: {
-            name: name,
-            email: document.getElementById('cust-email').value,
-            phone: document.getElementById('cust-phone').value,
-            address: document.getElementById('cust-address').value
-        },
-        items: cart.map(i => ({
-            product: i.name,
-            price: i.price,
-            details: i.options ? Object.entries(i.options).map(([k,v]) => `${k}: ${v}`).join(' | ') : (i.specs || "No details")
-        })),
-        total: document.getElementById('final-total').innerText
-    };
+            const data = {
+                customer: {
+                    name: name,
+                    email: document.getElementById('cust-email').value,
+                    phone: document.getElementById('cust-phone').value,
+                    address: document.getElementById('cust-address').value
+                },
+                // Mapeo limpio para evitar errores de parseo en el servidor
+                items: cart.map(i => ({
+                    product: i.name,
+                    price: i.price,
+                    details: i.options ? Object.entries(i.options).map(([k,v]) => `${k}: ${v}`).join(' | ') : (i.specs || "No details")
+                })),
+                total: document.getElementById('final-total').innerText
+            };
 
-    try {
-        const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+            try {
+                const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
 
-        if (res.ok) {
-            alert("Order sent successfully!");
-            localStorage.removeItem('sqft_cart');
-            window.location.href = "index.html";
-        } else {
-            alert("Error 500: Check Render Logs again.");
+                if (res.ok) {
+                    alert("Order sent successfully!");
+                    localStorage.removeItem('sqft_cart');
+                    window.location.href = "index.html";
+                } else {
+                    alert("Server error 500: Check Render Logs for JSON syntax errors.");
+                }
+            } catch (e) {
+                alert("Connection failed. Make sure to open https://ft-f34l.onrender.com first to wake it up.");
+            } finally {
+                btn.innerText = "Send Order Now";
+                btn.disabled = false;
+            }
         }
-    } catch (e) {
-        alert("Connection failed. Make sure Render is awake.");
-    } finally {
-        btn.innerText = "Send Order Now";
-        btn.disabled = false;
-    }
-}
 
         window.onload = loadItems;
     </script>
