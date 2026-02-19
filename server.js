@@ -1,34 +1,27 @@
 const express = require('express');
-const multer = require('multer');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
-const path = require('path');
-const fs = require('fs');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // Essential to read the JSON sent from checkout.html
 
-// CONFIGURACIÓN DE ALMACENAMIENTO
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const dir = './uploads';
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-        cb(null, dir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-const upload = multer({ storage: storage });
-
-// RUTA PARA RECIBIR EL PEDIDO
-app.post('/api/place-order', upload.array('files'), async (req, res) => {
+// ORDER RECEPTION ROUTE
+app.post('/api/place-order', async (req, res) => {
     try {
-        const orderData = JSON.parse(req.body.data);
-        const files = req.files;
+        // Receiving data directly from req.body
+        const { customer, items, total } = req.body;
 
-        // CONFIGURA TU CORREO AQUÍ
+        if (!customer || !items) {
+            return res.status(400).send('Missing order data');
+        }
+
+        // Formatting products and their dynamic options for the email
+        const orderDetails = items.map(item => {
+            return `- ${item.product}: $${item.price}\n  Details: ${item.details}`;
+        }).join('\n\n');
+
+        // EMAIL CONFIGURATION
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -38,19 +31,35 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         });
 
         const mailOptions = {
-            from: 'Square Foot Printing Web',
+            from: '"Square Foot Printing" <pulopez20@gmail.com>',
             to: 'za19012245@zapopan.tecmm.edu.mx',
-            subject: `New Order from ${orderData.customer_name}`,
-            text: `Customer: ${orderData.customer_name}\nTotal: ${orderData.total_price}\nFiles received: ${files.length}`
+            subject: `New Order Received from ${customer.name}`,
+            text: `
+NEW ORDER DETAILS
+----------------------------
+CUSTOMER INFO:
+Name: ${customer.name}
+Email: ${customer.email}
+Phone: ${customer.phone}
+Address: ${customer.address}
+
+ORDER ITEMS:
+${orderDetails}
+
+ORDER TOTAL: ${total}
+----------------------------
+`
         };
 
         await transporter.sendMail(mailOptions);
         res.status(200).send({ message: 'Order processed successfully' });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error processing order');
+        console.error('SERVER ERROR:', error);
+        res.status(500).send('Error processing order: ' + error.message);
     }
 });
 
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+// Dynamic port assignment for Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
