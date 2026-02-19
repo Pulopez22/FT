@@ -41,9 +41,9 @@
                 </div>
             </a>
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
-                <a href="index.html" class="hover:text-black transition-colors">Wall Art</a>
-                <a href="Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
-                <a href="Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
+                <a href="index.html" class="hover:text-black">Wall Art</a>
+                <a href="Banners/banners.html" class="hover:text-black">Banners</a>
+                <a href="Stickers/stickers.html" class="hover:text-black">Stickers</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -70,7 +70,7 @@
 
                 <div class="max-w-3xl space-y-12">
                     <section class="space-y-6">
-                        <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 italic font-bold">Customer Details</h2>
+                        <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Customer Details</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input type="text" id="cust-name" placeholder="FULL NAME" class="custom-input">
                             <input type="email" id="cust-email" placeholder="EMAIL ADDRESS" class="custom-input">
@@ -80,16 +80,16 @@
                     </section>
 
                     <section class="space-y-6">
-                        <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 italic font-bold">Payment Preview</h2>
+                        <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Payment Preview</h2>
                         <div class="flex gap-4 p-8 border rounded-[2rem] border-gray-100 bg-gray-50/50 items-center">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-6 grayscale opacity-50">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" class="h-4 grayscale opacity-50">
-                            <p class="text-[9px] font-bold text-gray-400 uppercase italic ml-auto tracking-widest">Payment link will be sent to email</p>
+                            <p class="text-[9px] font-bold text-gray-400 uppercase italic ml-auto">Payment link will be sent to email</p>
                         </div>
                     </section>
 
                     <section class="rounded-[2.5rem] overflow-hidden border-4 border-black h-64 shadow-2xl grayscale contrast-125">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.281!2d-115.1728!3d36.1147!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c8c4383428d4eb%3A0x43e217581470!2sLas%20Vegas%2C%20NV!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus" class="w-full h-full border-0"></iframe>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3221.32!2d-115.17!3d36.16!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzbCsDA5JzM2LjAiTiAxMTXCsDEwJzEyLjAiVw!5e0!3m2!1sen!2sus!4v1700000000000" class="w-full h-full border-0"></iframe>
                     </section>
                 </div>
             </div>
@@ -105,7 +105,8 @@
                 <h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Summary</h3>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="order-count">0 Items</p>
             </div>
-            <div id="summary-items" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+            <div id="summary-items" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white">
+                </div>
             <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
                 <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Total Due</span><span id="final-total" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
                 <button onclick="placeOrder()" id="order-btn" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Send Order Now</button>
@@ -116,6 +117,7 @@
     <script>
         lucide.createIcons();
 
+        // Carga y muestra los items del carrito
         function loadItems() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('summary-items');
@@ -130,6 +132,7 @@
                 const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
                 total += priceNum;
                 
+                // Formateo de opciones dinámicas para visualización en el resumen
                 const details = item.options ? 
                     Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : 
                     (item.specs || "Custom Order");
@@ -151,39 +154,38 @@
             document.getElementById('order-count').innerText = `${cart.length} Items`;
         }
 
+        // Envía la orden al servidor en Render usando JSON
         async function placeOrder() {
             const btn = document.getElementById('order-btn');
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const nameInput = document.getElementById('cust-name');
-            const emailInput = document.getElementById('cust-email');
+            const name = document.getElementById('cust-name').value;
+            const email = document.getElementById('cust-email').value;
 
-            if(!nameInput.value || !emailInput.value || cart.length === 0) { 
-                alert("Please complete the form and add items to your cart before sending."); 
+            if(!name || !email || cart.length === 0) { 
+                alert("Please complete the form and ensure your cart is not empty."); 
                 return; 
             }
 
             btn.innerText = "SENDING...";
             btn.disabled = true;
 
-            // Updated Data Structure to match the new server.js
             const orderData = {
                 customer: { 
-                    name: nameInput.value, 
-                    email: emailInput.value, 
+                    name, 
+                    email, 
                     phone: document.getElementById('cust-phone').value, 
                     address: document.getElementById('cust-address').value 
                 },
                 items: cart.map(i => ({ 
                     product: i.name, 
                     price: i.price, 
-                    // Send details as a clean string
-                    details: i.options ? Object.entries(i.options).map(([k,v]) => `${k}: ${v}`).join(' | ') : (i.specs || "No details")
+                    details: i.options ? JSON.stringify(i.options) : (i.specs || "No details") 
                 })),
                 total: document.getElementById('final-total').innerText
             };
 
             try {
-                // Connecting to Render API
+                // Conexión directa a tu servidor en Render
                 const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -191,16 +193,16 @@
                 });
 
                 if(res.ok) { 
-                    alert("Success! Your order has been received. We will contact you soon via email."); 
+                    alert("Success! Your order has been received. Check your email."); 
                     localStorage.removeItem('sqft_cart'); 
                     window.location.href = "index.html"; 
                 } else {
-                    const serverError = await res.text();
-                    throw new Error(serverError);
+                    const serverMsg = await res.text();
+                    throw new Error(serverMsg);
                 }
             } catch (e) { 
-                console.error("Order Submission Error:", e);
-                alert("Error: Render received the data but crashed (500) or is offline. Please check Render Logs.");
+                console.error("Submission Error:", e);
+                alert("Error: Render server might be asleep. Open https://ft-f34l.onrender.com first.");
             } finally { 
                 btn.innerText = "Send Order Now"; 
                 btn.disabled = false; 

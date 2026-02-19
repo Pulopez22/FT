@@ -4,15 +4,19 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // Vital para leer los datos del Checkout
+app.use(express.json());
 
 app.post('/api/place-order', async (req, res) => {
     try {
         const { customer, items, total } = req.body;
+        
+        // Validación básica para evitar el Error 500
+        if (!customer || !items) {
+            return res.status(400).send('Missing data');
+        }
 
-        // Formateamos los detalles para el correo
         const orderDetails = items.map(item => {
-            return `- ${item.product}: $${item.price}\n  Details: ${item.details}`;
+            return `- ${item.product}: $${item.price}\n  Specs: ${item.details}`;
         }).join('\n\n');
 
         let transporter = nodemailer.createTransport({
@@ -24,33 +28,30 @@ app.post('/api/place-order', async (req, res) => {
         });
 
         const mailOptions = {
-            from: '"Square Foot Printing" <pulopez20@gmail.com>',
+            from: '"Order System" <pulopez20@gmail.com>',
             to: 'za19012245@zapopan.tecmm.edu.mx',
-            subject: `NEW ORDER: ${customer.name}`,
+            subject: `NEW ORDER - ${customer.name}`,
             text: `
-NEW ORDER RECEIVED
-----------------------------
-CUSTOMER:
+CUSTOMER INFO:
 Name: ${customer.name}
 Email: ${customer.email}
 Phone: ${customer.phone}
 Address: ${customer.address}
 
-ITEMS:
+ORDER ITEMS:
 ${orderDetails}
 
 TOTAL: ${total}
-----------------------------
 `
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).send({ message: 'Order received' });
+        res.status(200).send({ message: 'Success' });
     } catch (error) {
-        console.error(error);
+        console.error('Error:', error);
         res.status(500).send('Server Error: ' + error.message);
     }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server live on ${PORT}`));
+app.listen(PORT, () => console.log(`Server live on port ${PORT}`));
