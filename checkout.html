@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="lucide.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script> 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
@@ -41,9 +41,9 @@
                 </div>
             </a>
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
-                <a href="index.html" class="hover:text-black transition-colors">Wall Art</a>
-                <a href="Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
-                <a href="Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
+                <a href="index.html" class="hover:text-black">Wall Art</a>
+                <a href="Banners/banners.html" class="hover:text-black">Banners</a>
+                <a href="Stickers/stickers.html" class="hover:text-black">Stickers</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -95,9 +95,7 @@
             </div>
 
             <footer class="bg-white border-t py-16 px-10 text-center w-full">
-                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
-                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto">
-                </div>
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
                 <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
@@ -109,26 +107,33 @@
             </div>
             <div id="summary-items" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
             <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-                <div class="flex justify-between items-end">
-                    <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Total Due</span>
-                    <span id="final-total" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span>
-                </div>
+                <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Total Due</span><span id="final-total" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
                 <button onclick="placeOrder()" id="order-btn" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Send Order Now</button>
             </div>
         </aside>
     </div>
 
     <script>
-        // Inicializa iconos desde el archivo local
-        lucide.createIcons();
+        // Inicialización segura de iconos
+        if (window.lucide) {
+            lucide.createIcons();
+        }
 
         function loadItems() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            // Buscamos el carrito bajo múltiples nombres para evitar el "blanco"
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || 
+                         JSON.parse(localStorage.getItem('cart')) || 
+                         JSON.parse(localStorage.getItem('cartItems')) || [];
+            
             const container = document.getElementById('summary-items');
+            const countDisplay = document.getElementById('order-count');
+            const totalDisplay = document.getElementById('final-total');
             let total = 0;
 
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase text-[10px] italic">Your cart is empty</div>`;
+                countDisplay.innerText = "0 Items";
+                totalDisplay.innerText = "$0.00";
                 return;
             }
 
@@ -150,18 +155,18 @@
                 </div>`;
             }).join('');
 
-            document.getElementById('final-total').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('order-count').innerText = `${cart.length} Items`;
+            totalDisplay.innerText = `$${total.toFixed(2)}`;
+            countDisplay.innerText = `${cart.length} Items`;
         }
 
-        // Función de envío sincronizada con el nuevo server.js
         async function placeOrder() {
             const btn = document.getElementById('order-btn');
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || 
+                         JSON.parse(localStorage.getItem('cart')) || [];
             const name = document.getElementById('cust-name').value;
             
             if(!name || cart.length === 0) {
-                alert("Please fill your name and add items to cart.");
+                alert("Please fill your name and ensure you have items in your cart.");
                 return;
             }
 
@@ -175,7 +180,6 @@
                     phone: document.getElementById('cust-phone').value,
                     address: document.getElementById('cust-address').value
                 },
-                // Mapeo limpio para evitar errores de parseo en el servidor
                 items: cart.map(i => ({
                     product: i.name,
                     price: i.price,
@@ -194,19 +198,21 @@
                 if (res.ok) {
                     alert("Order sent successfully!");
                     localStorage.removeItem('sqft_cart');
+                    localStorage.removeItem('cart');
                     window.location.href = "index.html";
                 } else {
-                    alert("Server error 500: Check Render Logs for JSON syntax errors.");
+                    alert("Server error 500: Check Render Logs.");
                 }
             } catch (e) {
-                alert("Connection failed. Make sure to open https://ft-f34l.onrender.com first to wake it up.");
+                alert("Connection failed. Make sure Render is awake.");
             } finally {
                 btn.innerText = "Send Order Now";
                 btn.disabled = false;
             }
         }
 
-        window.onload = loadItems;
+        // Ejecutar carga cuando el contenido está listo
+        document.addEventListener('DOMContentLoaded', loadItems);
     </script>
 </body>
 </html>
