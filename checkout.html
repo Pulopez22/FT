@@ -146,167 +146,94 @@
     </div>
 
     <script>
-        if (window.lucide) { lucide.createIcons(); }
+    if (window.lucide) { lucide.createIcons(); }
 
-        let currentMethod = 'pickup', currentPayment = '', realDigits = "";
+    let currentMethod = 'pickup', currentPayment = '', realDigits = "";
 
-        const cardDisplay = document.getElementById('cardNumberDisplay');
-        if(cardDisplay) {
-            cardDisplay.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace') realDigits = realDigits.slice(0, -1);
-                else if (/^\d$/.test(e.key) && realDigits.length < 16) realDigits += e.key;
-                else if (e.key !== 'Tab') e.preventDefault();
-                updateCardDisplay();
+    // Función para convertir las miniaturas del carrito en archivos reales
+    async function imageUrlToFile(url, filename) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            return new File([blob], filename, { type: blob.type });
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async function validateAndPlaceOrder() {
+        const btn = document.getElementById('place-order-btn');
+        const fields = ['fullName', 'emailAddress', 'phoneNumber'];
+        if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
+        
+        let isValid = true;
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && !el.value.trim()) { el.classList.add('input-error'); isValid = false; }
+            else if (el) { el.classList.remove('input-error'); }
+        });
+
+        if (!isValid) { alert("Please complete required fields."); return; }
+
+        btn.innerText = "SENDING...";
+        btn.disabled = true;
+
+        const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+        
+        // RECONSTRUCCIÓN DEL RESUMEN DETALLADO
+        let itemsSummary = cart.map((i, index) => {
+            // Extraemos todos los detalles técnicos (Grommets, Pockets, etc.)
+            let optionsText = i.options 
+                ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') 
+                : `Size: ${i.size}`;
+            
+            return `${index + 1}. ${i.name.toUpperCase()} [${optionsText}] - $${parseFloat(i.price).toFixed(2)}`;
+        }).join('\n');
+
+        const orderInfo = {
+            customer_name: document.getElementById('fullName').value,
+            customer_email: document.getElementById('emailAddress').value,
+            customer_phone: document.getElementById('phoneNumber').value,
+            total_price: document.getElementById('final-price-display').innerText,
+            delivery_method: currentMethod,
+            order_items: itemsSummary // Ahora incluye todos los detalles técnicos
+        };
+
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(orderInfo));
+
+        // ADJUNCIÓN AUTOMÁTICA DE IMÁGENES
+        for (let i = 0; i < cart.length; i++) {
+            const item = cart[i];
+            if (item.image) {
+                const file = await imageUrlToFile(item.image, `design-${i+1}.png`);
+                if (file) formData.append('files', file); 
+            }
+        }
+
+        try {
+            const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
+                method: 'POST',
+                body: formData
             });
-        }
 
-        function updateCardDisplay() {
-            let display = "";
-            for (let i = 0; i < realDigits.length; i++) {
-                if (i > 0 && i % 4 === 0) display += " ";
-                if (i < realDigits.length - 4) display += "·"; else display += realDigits[i];
+            if (res.ok) {
+                alert("Order placed successfully! Check your email.");
+                localStorage.removeItem('sqft_cart');
+                window.location.href = 'index.html';
+            } else {
+                alert("Error on server. Check Render logs.");
             }
-            cardDisplay.value = display;
+        } catch (err) {
+            alert("Connection failed.");
+        } finally {
+            btn.innerText = "Place Order Now";
+            btn.disabled = false;
         }
+    }
 
-        function formatExpiry(el) {
-            let val = el.value.replace(/\D/g, '');
-            if (val.length > 2) el.value = val.substring(0, 2) + '/' + val.substring(2, 4); else el.value = val;
-        }
-
-        function setMethod(type) {
-            currentMethod = type;
-            document.getElementById('pickup-box').classList.toggle('hidden', type !== 'pickup');
-            document.getElementById('shipping-box').classList.toggle('hidden', type !== 'shipping');
-            document.getElementById('method-pickup').className = type === 'pickup' ? "flex-1 border-2 border-black p-6 rounded-[1.5rem] bg-black text-white flex flex-col items-center gap-2 shadow-xl" : "flex-1 border-2 border-gray-100 p-6 rounded-[1.5rem] bg-white text-black flex flex-col items-center gap-2";
-            document.getElementById('method-shipping').className = type === 'shipping' ? "flex-1 border-2 border-black p-6 rounded-[1.5rem] bg-black text-white flex flex-col items-center gap-2 shadow-xl" : "flex-1 border-2 border-gray-100 p-6 rounded-[1.5rem] bg-white text-black flex flex-col items-center gap-2";
-        }
-
-        function selectPayment(method) {
-            currentPayment = method;
-            document.getElementById('pay-card').classList.toggle('active', method === 'card');
-            document.getElementById('pay-zelle').classList.toggle('active', method === 'zelle');
-            document.getElementById('card-details').classList.toggle('hidden', method !== 'card');
-        }
-
-        // FUNCIÓN NUEVA: Convierte URL de imagen en archivo real
-        async function imageUrlToFile(url, filename) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                return new File([blob], filename, { type: blob.type });
-            } catch (error) {
-                console.error("Error convirtiendo imagen:", url);
-                return null;
-            }
-        }
-
-        async function validateAndPlaceOrder() {
-            const btn = document.getElementById('place-order-btn');
-            const fields = ['fullName', 'emailAddress', 'phoneNumber'];
-            if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
-            if (currentPayment === 'card') fields.push('cardExpiry', 'cardCVC');
-            
-            let isValid = true;
-            fields.forEach(id => {
-                const el = document.getElementById(id);
-                if (el && !el.value.trim()) { el.classList.add('input-error'); el.placeholder = "REQUIRED"; isValid = false; }
-                else if (el) { el.classList.remove('input-error'); }
-            });
-
-            if (!isValid) { alert("Please complete all required fields."); return; }
-            if (!currentPayment) { alert("Please select a Payment Method."); return; }
-
-            btn.innerText = "SENDING...";
-            btn.disabled = true;
-
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            
-            let itemsSummary = cart.map((i, index) => {
-                let optionsText = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : `Size: ${i.size}`;
-                return `${index+1}. ${i.name} [${optionsText}] - $${parseFloat(i.price).toFixed(2)}`;
-            }).join('\n');
-
-            const orderInfo = {
-                customer_name: document.getElementById('fullName').value,
-                customer_email: document.getElementById('emailAddress').value,
-                customer_phone: document.getElementById('phoneNumber').value,
-                total_price: document.getElementById('final-price-display').innerText,
-                delivery_method: currentMethod,
-                order_items: itemsSummary
-            };
-
-            const formData = new FormData();
-            formData.append('data', JSON.stringify(orderInfo));
-
-            // CAPTURA AUTOMÁTICA DE IMÁGENES DEL CARRITO
-            for (let i = 0; i < cart.length; i++) {
-                const item = cart[i];
-                if (item.image) {
-                    const fileName = `item-${i + 1}-${item.name.replace(/\s+/g, '-').toLowerCase()}.png`;
-                    const file = await imageUrlToFile(item.image, fileName);
-                    if (file) {
-                        formData.append('files', file); // Esto lo recibe Multer y lo guarda en /uploads
-                    }
-                }
-            }
-
-            try {
-                const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (res.ok) {
-                    alert("Order placed successfully! Check your email.");
-                    localStorage.removeItem('sqft_cart');
-                    window.location.href = 'index.html';
-                } else {
-                    alert("Server error. Check Render Logs.");
-                }
-            } catch (err) {
-                alert("Connection failed. Ensure the server is awake.");
-            } finally {
-                btn.innerText = "Place Order Now";
-                btn.disabled = false;
-            }
-        }
-
-        function loadCheckoutData() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const container = document.getElementById('order-items-list');
-            let total = 0;
-            
-            if (cart.length === 0) {
-                container.innerHTML = '<p class="text-center py-10 text-gray-300 font-bold italic uppercase text-[10px]">Your cart is empty</p>';
-                return;
-            }
-
-            container.innerHTML = cart.map(item => {
-                const itemPrice = parseFloat(item.price) || 0;
-                total += itemPrice;
-
-                let detailsHtml = item.options ? Object.entries(item.options)
-                    .map(([key, val]) => `<span class="block text-[9px] text-gray-400 font-medium uppercase leading-tight">${key}: ${val}</span>`).join('') 
-                    : `<span class="block text-[9px] text-gray-400 font-medium uppercase">Size: ${item.size || 'Standard'}</span>`;
-
-                return `
-                    <div class="flex gap-4 border-b border-gray-50 pb-4 text-black">
-                        <div class="w-16 h-16 bg-white border rounded-xl p-2 flex-shrink-0 flex items-center justify-center">
-                            <img src="${item.image}" class="max-w-full max-h-full object-contain">
-                        </div>
-                        <div class="flex-grow">
-                            <div class="font-black text-[11px] uppercase italic leading-tight mb-1">${item.name}</div>
-                            ${detailsHtml}
-                        </div>
-                        <div class="font-bold text-sm">$${itemPrice.toFixed(2)}</div>
-                    </div>`;
-            }).join('');
-            
-            document.getElementById('final-price-display').innerText = `$${total.toFixed(2)}`;
-        }
-
-        window.onload = loadCheckoutData;
-    </script>
+    // Mantén tus funciones auxiliares (loadCheckoutData, setMethod, selectPayment, updateCardDisplay) 
+    // tal como las tienes en tu código original para no perder funcionalidad.
+</script>
 </body>
 </html>
