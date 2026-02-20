@@ -1,19 +1,34 @@
 const express = require('express');
+const multer = require('multer');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
-const multer = require('multer');
-const upload = multer();
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post('/api/place-order', upload.none(), async (req, res) => {
-    try {
-        // En esta versión original, los datos venían dentro de req.body.data
-        const orderData = JSON.parse(req.body.data);
-        const { customer, items, total } = orderData;
+// CONFIGURACIÓN DE ALMACENAMIENTO
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = './uploads';
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
 
+// RUTA PARA RECIBIR EL PEDIDO
+app.post('/api/place-order', upload.array('files'), async (req, res) => {
+    try {
+        const orderData = JSON.parse(req.body.data);
+        const files = req.files;
+
+        // CONFIGURA TU CORREO AQUÍ
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -23,30 +38,19 @@ app.post('/api/place-order', upload.none(), async (req, res) => {
         });
 
         const mailOptions = {
-            from: '"Square Foot Printing" <pulopez20@gmail.com>',
+            from: 'Square Foot Printing Web',
             to: 'za19012245@zapopan.tecmm.edu.mx',
-            subject: `NEW ORDER: ${customer.name}`,
-            text: `
-                CUSTOMER: ${customer.name}
-                EMAIL: ${customer.email}
-                PHONE: ${customer.phone}
-                ADDRESS: ${customer.address}
-
-                TOTAL: ${total}
-
-                ITEMS:
-                ${JSON.stringify(items, null, 2)}
-            `
+            subject: `New Order from ${orderData.customer_name}`,
+            text: `Customer: ${orderData.customer_name}\nTotal: ${orderData.total_price}\nFiles received: ${files.length}`
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).send('Order placed successfully');
+        res.status(200).send({ message: 'Order processed successfully' });
 
     } catch (error) {
-        console.error('Server Error:', error);
+        console.error(error);
         res.status(500).send('Error processing order');
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server live on port ${PORT}`));
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));
