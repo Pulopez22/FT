@@ -18,7 +18,7 @@
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover { color: #000; padding-left: 4px; }
         
-        /* Estilo unificado para botones de selección activa */
+        /* Botones de selección unificados */
         .select-button { cursor: pointer; transition: all 0.3s ease; border: 2px solid #f3f4f6; background-color: #f9fafb; color: #000; }
         .select-button.active { border-color: #000; background-color: #000 !important; color: #fff !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         #cardNumberDisplay { font-family: monospace; letter-spacing: 2px; font-size: 16px; }
@@ -33,6 +33,7 @@
                 <a href="index.html" class="text-black border-b-2 border-black pb-1">Wall Art</a>
                 <a href="Banners/banners.html" class="hover:text-black">Banners</a>
                 <a href="Stickers/stickers.html" class="hover:text-black">Stickers</a>
+                <a href="#" class="hover:text-black">Marketing Materials</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -48,6 +49,7 @@
                 <li class="sidebar-item"><a href="Banners/banners.html">Banners</a></li>
                 <li class="sidebar-item"><a href="Stickers/stickers.html">Stickers</a></li>
                 <li class="sidebar-item">Large Format Printing</li>
+                <li class="sidebar-item">Rigid Signs</li>
             </ul>
         </aside>
 
@@ -83,7 +85,7 @@
                             <div id="pickup-box" class="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 space-y-6">
                                 <div class="flex justify-between items-start">
                                     <p class="text-sm font-bold uppercase">6155 S Edmond St, Las Vegas, NV 89118</p>
-                                    <a href="https://maps.apple.com/?address=6155%20S%20Edmond%20St,%20Las%20Vegas,%20NV%2089118" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
+                                    <a href="https://maps.apple.com/?address=6155%20S%20Edmond%20St,%20Las%20Vegas,%20NV%2089118" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2 hover:bg-gray-100 transition-colors">
                                         <i data-lucide="apple" class="w-4 h-4 text-black"></i><span class="text-[9px] font-black uppercase italic">Open</span>
                                     </a>
                                 </div>
@@ -133,6 +135,7 @@
                     </div>
                 </div>
             </div>
+
             <footer class="mt-24 py-16 text-center border-t border-gray-100">
                 <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
                 <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
@@ -191,20 +194,20 @@
             });
 
             if (!isValid || !currentPayment) { 
-                alert("Please complete required fields and select a payment method."); 
+                alert("Please complete all required fields and select a payment method."); 
                 return; 
             }
 
             btn.innerText = "SENDING ORDER...";
             btn.disabled = true;
 
-            // Generación de ID y Fecha
+            // 1. GENERACIÓN DE ID Y FECHA
             const orderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
             const dateStr = new Date().toLocaleString();
 
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             
-            // Reconstrucción detallada de artículos
+            // 2. RECONSTRUCCIÓN DETALLADA DE ARTÍCULOS (Grommets, Hem, etc.)
             let itemsSummary = cart.map((i, index) => {
                 let optionsText = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : `Size: ${i.size}`;
                 return `${index + 1}. ${i.name.toUpperCase()} [${optionsText}, Quantity: ${i.quantity || 1}] - $${parseFloat(i.price).toFixed(2)}`;
@@ -224,7 +227,7 @@
             const formData = new FormData();
             formData.append('data', JSON.stringify(orderInfo));
 
-            // Captura de imágenes para /uploads
+            // 3. CAPTURA AUTOMÁTICA DE IMÁGENES PARA /UPLOADS
             for (let i = 0; i < cart.length; i++) {
                 if (cart[i].image) {
                     const file = await imageUrlToFile(cart[i].image, `design-${orderNumber}-${i+1}.png`);
@@ -237,7 +240,7 @@
                 if (res.ok) {
                     localStorage.removeItem('sqft_cart');
                     window.location.href = `order.html?id=${orderNumber}`;
-                } else { alert("Server error."); }
+                } else { alert("Server error. Check Render logs."); }
             } catch (e) { alert("Connection failed."); } finally {
                 btn.innerText = "Place Order Now";
                 btn.disabled = false;
