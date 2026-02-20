@@ -17,8 +17,10 @@
         label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.1em; margin-bottom: 0.6rem; display: block; margin-left: 0.5rem; }
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover { color: #000; padding-left: 4px; }
-        .payment-card { cursor: pointer; transition: all 0.3s ease; border: 2px solid #f3f4f6; }
-        .payment-card.active { border-color: #000; background-color: #fff; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        
+        /* Estilo unificado para botones de selección */
+        .select-button { cursor: pointer; transition: all 0.3s ease; border: 2px solid #f3f4f6; }
+        .select-button.active { border-color: #000; background-color: #000; color: #fff; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         #cardNumberDisplay { font-family: monospace; letter-spacing: 2px; font-size: 16px; }
     </style>
 </head>
@@ -31,7 +33,6 @@
                 <a href="index.html" class="text-black border-b-2 border-black pb-1">Wall Art</a>
                 <a href="Banners/banners.html" class="hover:text-black">Banners</a>
                 <a href="Stickers/stickers.html" class="hover:text-black">Stickers</a>
-                <a href="#" class="hover:text-black">Marketing Materials</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -72,28 +73,23 @@
                         <section class="space-y-8">
                             <h2 class="heavy-italic text-2xl mb-2 flex items-center gap-3"><i data-lucide="truck" class="text-red-600"></i> Delivery Method</h2>
                             <div class="flex gap-4">
-                                <button onclick="setMethod('pickup')" id="method-pickup" class="flex-1 border-2 border-black p-6 rounded-[1.5rem] bg-black text-white flex flex-col items-center gap-2 shadow-xl">
+                                <button onclick="setMethod('pickup')" id="method-pickup" class="select-button active flex-1 p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
                                     <i data-lucide="package"></i><span class="heavy-italic text-sm">Local Pickup</span>
                                 </button>
-                                <button onclick="setMethod('shipping')" id="method-shipping" class="flex-1 border-2 border-gray-100 p-6 rounded-[1.5rem] bg-white text-black flex flex-col items-center gap-2">
+                                <button onclick="setMethod('shipping')" id="method-shipping" class="select-button flex-1 p-6 rounded-[1.5rem] bg-gray-50 flex flex-col items-center gap-2">
                                     <i data-lucide="send"></i><span class="heavy-italic text-sm">Shipping</span>
                                 </button>
                             </div>
 
                             <div id="pickup-box" class="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 space-y-6">
                                 <div class="flex justify-between items-start">
-                                    <p class="text-sm font-bold uppercase text-black">6155 S Edmond St, Las Vegas, NV 89118</p>
-                                    <div class="flex gap-3">
-                                        <a href="https://maps.apple.com/?address=6155%20S%20Edmond%20St,%20Las%20Vegas,%20NV%2089118" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
-                                            <i data-lucide="apple" class="w-4 h-4 text-black"></i><span class="text-[9px] font-black uppercase italic">Open</span>
-                                        </a>
-                                        <a href="https://maps.google.com" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
-                                            <img src="https://www.gstatic.com/images/branding/product/1x/maps_96dp.png" class="w-4 h-4"><span class="text-[9px] font-black uppercase italic">Open</span>
-                                        </a>
-                                    </div>
+                                    <p class="text-sm font-bold uppercase">6155 S Edmond St, Las Vegas, NV 89118</p>
+                                    <a href="https://maps.apple.com/?address=6155%20S%20Edmond%20St,%20Las%20Vegas,%20NV%2089118" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
+                                        <i data-lucide="apple" class="w-4 h-4 text-black"></i><span class="text-[9px] font-black uppercase italic">Open</span>
+                                    </a>
                                 </div>
                                 <div class="w-full h-48 rounded-2xl overflow-hidden border border-gray-200">
-                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.975452243282!2d-115.19253482343948!3d36.069632308709425!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c8c60312384a33%3A0xc3f6b90757754f7a!2s6155%20S%20Edmond%20St%2C%20Las%20Vegas%2C%20NV%2089118!5e0!3m2!1sen!2sus!4v1708380000000!5m2!1sen!2sus" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                    <iframe src="http://googleusercontent.com/maps.google.com/5" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                                 </div>
                             </div>
 
@@ -109,10 +105,10 @@
                         <section class="space-y-8">
                             <h2 class="heavy-italic text-2xl mb-2 flex items-center gap-3"><i data-lucide="credit-card" class="text-red-600"></i> Payment Method</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div onclick="selectPayment('card')" id="pay-card" class="payment-card bg-gray-50 p-6 rounded-[1.5rem] flex items-center gap-4">
+                                <div onclick="selectPayment('card')" id="pay-card" class="select-button bg-gray-50 p-6 rounded-[1.5rem] flex items-center gap-4">
                                     <i data-lucide="credit-card"></i><span class="heavy-italic text-sm">Credit Card</span>
                                 </div>
-                                <div onclick="selectPayment('zelle')" id="pay-zelle" class="payment-card bg-gray-50 p-6 rounded-[1.5rem] flex items-center gap-4">
+                                <div onclick="selectPayment('zelle')" id="pay-zelle" class="select-button bg-gray-50 p-6 rounded-[1.5rem] flex items-center gap-4">
                                     <i data-lucide="wallet"></i><span class="heavy-italic text-sm">Zelle</span>
                                 </div>
                             </div>
@@ -132,7 +128,7 @@
                             <div id="order-items-list" class="p-8 space-y-6 max-h-[400px] overflow-y-auto"></div>
                             <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
                                 <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 italic">Total Amount</span><span id="final-price-display" class="text-5xl heavy-italic italic">$0.00</span></div>
-                                <button onclick="validateAndPlaceOrder()" id="place-order-btn" class="w-full bg-red-600 hover:bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic transition-all shadow-xl shadow-red-100">Place Order Now</button>
+                                <button onclick="validateAndPlaceOrder()" id="place-order-btn" class="w-full bg-red-600 hover:bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic transition-all shadow-xl">Place Order Now</button>
                             </div>
                         </div>
                     </div>
@@ -146,94 +142,115 @@
     </div>
 
     <script>
-    if (window.lucide) { lucide.createIcons(); }
+        if (window.lucide) { lucide.createIcons(); }
 
-    let currentMethod = 'pickup', currentPayment = '', realDigits = "";
+        let currentMethod = 'pickup', currentPayment = '', realDigits = "";
 
-    // Función para convertir las miniaturas del carrito en archivos reales
-    async function imageUrlToFile(url, filename) {
-        try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            return new File([blob], filename, { type: blob.type });
-        } catch (error) {
-            return null;
-        }
-    }
-
-    async function validateAndPlaceOrder() {
-        const btn = document.getElementById('place-order-btn');
-        const fields = ['fullName', 'emailAddress', 'phoneNumber'];
-        if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
-        
-        let isValid = true;
-        fields.forEach(id => {
-            const el = document.getElementById(id);
-            if (el && !el.value.trim()) { el.classList.add('input-error'); isValid = false; }
-            else if (el) { el.classList.remove('input-error'); }
-        });
-
-        if (!isValid) { alert("Please complete required fields."); return; }
-
-        btn.innerText = "SENDING...";
-        btn.disabled = true;
-
-        const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-        
-        // RECONSTRUCCIÓN DEL RESUMEN DETALLADO
-        let itemsSummary = cart.map((i, index) => {
-            // Extraemos todos los detalles técnicos (Grommets, Pockets, etc.)
-            let optionsText = i.options 
-                ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') 
-                : `Size: ${i.size}`;
+        // Unificamos la función de cambio de color para Delivery
+        function setMethod(type) {
+            currentMethod = type;
+            const isPickup = type === 'pickup';
+            document.getElementById('pickup-box').classList.toggle('hidden', !isPickup);
+            document.getElementById('shipping-box').classList.toggle('hidden', isPickup);
             
-            return `${index + 1}. ${i.name.toUpperCase()} [${optionsText}] - $${parseFloat(i.price).toFixed(2)}`;
-        }).join('\n');
-
-        const orderInfo = {
-            customer_name: document.getElementById('fullName').value,
-            customer_email: document.getElementById('emailAddress').value,
-            customer_phone: document.getElementById('phoneNumber').value,
-            total_price: document.getElementById('final-price-display').innerText,
-            delivery_method: currentMethod,
-            order_items: itemsSummary // Ahora incluye todos los detalles técnicos
-        };
-
-        const formData = new FormData();
-        formData.append('data', JSON.stringify(orderInfo));
-
-        // ADJUNCIÓN AUTOMÁTICA DE IMÁGENES
-        for (let i = 0; i < cart.length; i++) {
-            const item = cart[i];
-            if (item.image) {
-                const file = await imageUrlToFile(item.image, `design-${i+1}.png`);
-                if (file) formData.append('files', file); 
-            }
+            document.getElementById('method-pickup').classList.toggle('active', isPickup);
+            document.getElementById('method-shipping').classList.toggle('active', !isPickup);
         }
 
-        try {
-            const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
-                method: 'POST',
-                body: formData
-            });
+        // Unificamos la función de cambio de color para Payment
+        function selectPayment(method) {
+            currentPayment = method;
+            document.getElementById('pay-card').classList.toggle('active', method === 'card');
+            document.getElementById('pay-zelle').classList.toggle('active', method === 'zelle');
+            document.getElementById('card-details').classList.toggle('hidden', method !== 'card');
+        }
 
-            if (res.ok) {
-                alert("Order placed successfully! Check your email.");
-                localStorage.removeItem('sqft_cart');
-                window.location.href = 'index.html';
-            } else {
-                alert("Error on server. Check Render logs.");
-            }
-        } catch (err) {
-            alert("Connection failed.");
-        } finally {
-            btn.innerText = "Place Order Now";
-            btn.disabled = false;
+        function formatExpiry(el) {
+            let val = el.value.replace(/\D/g, '');
+            if (val.length > 2) el.value = val.substring(0, 2) + '/' + val.substring(2, 4); else el.value = val;
+        }
+
+        async function imageUrlToFile(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                return new File([blob], filename, { type: blob.type });
+            } catch (e) { return null; }
+        }
+
+        async function validateAndPlaceOrder() {
+    const btn = document.getElementById('place-order-btn');
+    const fields = ['fullName', 'emailAddress', 'phoneNumber'];
+    if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
+    
+    let isValid = true;
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.value.trim()) { el.classList.add('input-error'); isValid = false; }
+        else if (el) { el.classList.remove('input-error'); }
+    });
+
+    if (!isValid || !currentPayment) { alert("Please complete required fields."); return; }
+
+    btn.innerText = "SENDING...";
+    btn.disabled = true;
+
+    // GENERACIÓN DEL NÚMERO DE ORDEN
+    const orderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+    
+    let itemsSummary = cart.map((i, index) => {
+        let opts = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : `Size: ${i.size}`;
+        return `${index + 1}. ${i.name.toUpperCase()} [${opts}] - $${parseFloat(i.price).toFixed(2)}`;
+    }).join('\n');
+
+    const orderInfo = {
+        order_id: orderNumber, // Enviamos el ID al servidor
+        customer_name: document.getElementById('fullName').value,
+        customer_email: document.getElementById('emailAddress').value,
+        customer_phone: document.getElementById('phoneNumber').value,
+        total_price: document.getElementById('final-price-display').innerText,
+        delivery_method: currentMethod,
+        order_items: itemsSummary
+    };
+
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(orderInfo));
+
+    for (let i = 0; i < cart.length; i++) {
+        if (cart[i].image) {
+            const file = await imageUrlToFile(cart[i].image, `design-${i+1}.png`);
+            if (file) formData.append('files', file); 
         }
     }
 
-    // Mantén tus funciones auxiliares (loadCheckoutData, setMethod, selectPayment, updateCardDisplay) 
-    // tal como las tienes en tu código original para no perder funcionalidad.
-</script>
+    try {
+        const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { method: 'POST', body: formData });
+        if (res.ok) {
+            localStorage.removeItem('sqft_cart');
+            // REDIRECCIÓN A ORDER.HTML CON EL ID
+            window.location.href = `order.html?id=${orderNumber}`;
+        } else { alert("Server error."); }
+    } catch (e) { alert("Connection failed."); } finally {
+        btn.innerText = "Place Order Now";
+        btn.disabled = false;
+    }
+}
+
+        function loadCheckoutData() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('order-items-list');
+            let total = 0;
+            if (cart.length === 0) { container.innerHTML = '<p>Your cart is empty</p>'; return; }
+            container.innerHTML = cart.map(item => {
+                total += parseFloat(item.price);
+                let opts = item.options ? Object.entries(item.options).map(([k,v]) => `<span class="block text-[9px] uppercase">${k}: ${v}</span>`).join('') : '';
+                return `<div class="flex gap-4 border-b pb-4"><div class="w-16 h-16 bg-white border rounded-xl flex items-center justify-center"><img src="${item.image}" class="max-w-full max-h-full"></div><div class="flex-grow"><div class="font-black text-[11px] uppercase">${item.name}</div>${opts}</div><div class="font-bold text-sm">$${parseFloat(item.price).toFixed(2)}</div></div>`;
+            }).join('');
+            document.getElementById('final-price-display').innerText = `$${total.toFixed(2)}`;
+        }
+
+        window.onload = loadCheckoutData;
+    </script>
 </body>
 </html>

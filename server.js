@@ -39,8 +39,10 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const mailOptions = {
             from: '"Square Foot Printing" <pulopez20@gmail.com>',
             to: `za19012245@zapopan.tecmm.edu.mx, ${orderData.customer_email}`,
-            subject: `New Order: ${orderData.customer_name}`,
+            subject: `Order Confirmation: ${orderData.order_id}`,
             text: `
+
+            ORDER CONFIRMATION: ${orderData.order_id}
                 ORDER DETAILS
                 ----------------------
                 Customer: ${orderData.customer_name}
