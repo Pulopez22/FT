@@ -27,14 +27,19 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-        let transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: 'pulopez20@gmail.com',
-                pass: 'svik ahzr txww cerv'
-            }
-        });
-
+        // CONFIGURACIÓN REPARADA PARA RENDER
+let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // true para puerto 465, false para puerto 587
+    auth: {
+        user: 'pulopez20@gmail.com',
+        pass: 'svik ahzr txww cerv'
+    },
+    tls: {
+        rejectUnauthorized: false // Ayuda a evitar bloqueos de conexión en Render
+    }
+});
         const mailOptions = {
             from: '"Square Foot Printing" <pulopez20@gmail.com>',
             // Enviamos a la empresa y al email capturado del cliente
