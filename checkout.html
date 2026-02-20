@@ -69,14 +69,6 @@
                             </div>
                         </section>
 
-                        <section>
-                            <h2 class="heavy-italic text-2xl mb-8 flex items-center gap-3"><i data-lucide="upload-cloud" class="text-red-600"></i> Upload Designs</h2>
-                            <div class="bg-gray-50 p-8 rounded-[2.5rem] border border-dashed border-gray-300">
-                                <label>Select Files (Images or PDF)</label>
-                                <input type="file" id="fileInput" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white hover:file:bg-gray-800">
-                            </div>
-                        </section>
-
                         <section class="space-y-8">
                             <h2 class="heavy-italic text-2xl mb-2 flex items-center gap-3"><i data-lucide="truck" class="text-red-600"></i> Delivery Method</h2>
                             <div class="flex gap-4">
@@ -197,6 +189,18 @@
             document.getElementById('card-details').classList.toggle('hidden', method !== 'card');
         }
 
+        // FUNCIÓN NUEVA: Convierte URL de imagen en archivo real
+        async function imageUrlToFile(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                return new File([blob], filename, { type: blob.type });
+            } catch (error) {
+                console.error("Error convirtiendo imagen:", url);
+                return null;
+            }
+        }
+
         async function validateAndPlaceOrder() {
             const btn = document.getElementById('place-order-btn');
             const fields = ['fullName', 'emailAddress', 'phoneNumber'];
@@ -218,9 +222,9 @@
 
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             
-            let itemsSummary = cart.map(i => {
+            let itemsSummary = cart.map((i, index) => {
                 let optionsText = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : `Size: ${i.size}`;
-                return `- ${i.name} [${optionsText}] - $${parseFloat(i.price).toFixed(2)}`;
+                return `${index+1}. ${i.name} [${optionsText}] - $${parseFloat(i.price).toFixed(2)}`;
             }).join('\n');
 
             const orderInfo = {
@@ -235,11 +239,15 @@
             const formData = new FormData();
             formData.append('data', JSON.stringify(orderInfo));
 
-            // CAPTURA DE ARCHIVOS PARA MULTER
-            const fileInput = document.getElementById('fileInput');
-            if (fileInput.files.length > 0) {
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    formData.append('files', fileInput.files[i]); // "files" debe coincidir con upload.array('files')
+            // CAPTURA AUTOMÁTICA DE IMÁGENES DEL CARRITO
+            for (let i = 0; i < cart.length; i++) {
+                const item = cart[i];
+                if (item.image) {
+                    const fileName = `item-${i + 1}-${item.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+                    const file = await imageUrlToFile(item.image, fileName);
+                    if (file) {
+                        formData.append('files', file); // Esto lo recibe Multer y lo guarda en /uploads
+                    }
                 }
             }
 

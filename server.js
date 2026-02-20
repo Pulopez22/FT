@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Configuración de almacenamiento local
+// Configuración para guardar físicamente en la carpeta uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const dir = './uploads';
@@ -26,13 +26,13 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-        // CONFIGURACIÓN FINAL CON MAILTRAP PARA RENDER
+        // Configuración de Mailtrap para evitar bloqueos en Render
         var transporter = nodemailer.createTransport({
             host: "sandbox.smtp.mailtrap.io",
             port: 2525,
             auth: {
-                user: "09ee2ace2fcb4c", // Tu usuario real de Mailtrap
-                pass: "8a7eee9541e016"  // Tu password real de Mailtrap
+                user: "09ee2ace2fcb4c", // Tu usuario real
+                pass: "8a7eee9541e016"  // Tu password real
             }
         });
 
@@ -52,21 +52,21 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
                 ${orderData.order_items}
 
                 TOTAL: ${orderData.total_price}
-                FILES UPLOADED: ${files.length}
+                IMAGES SAVED IN SERVER: ${files.length}
                 ----------------------
             `,
-            // ESTO ES LO QUE FALTA: ADJUNTAR LOS ARCHIVOS AL CORREO
+            // Adjunta las imágenes de los productos al correo
             attachments: files.map(file => ({
                 filename: file.originalname,
-                path: file.path // Toma el archivo de la carpeta ./uploads y lo envía
+                path: file.path 
             }))
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).send({ message: 'Order processed successfully' });
+        res.status(200).send({ message: 'Order processed and images saved' });
 
     } catch (error) {
-        console.error("Server Error Detailed:", error);
+        console.error("Server Error:", error);
         res.status(500).send('Error processing order');
     }
 });
