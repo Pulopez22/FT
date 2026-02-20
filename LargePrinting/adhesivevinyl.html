@@ -32,7 +32,7 @@
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
         <div class="flex items-center gap-8">
@@ -74,7 +74,7 @@
             </ul>
         </aside>
 
-        <main class="main-content-scroll">
+        <main class="main-content-scroll text-black">
             <div class="p-12 flex-grow">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
                     
@@ -88,7 +88,7 @@
                             <img src="../images/Large Printing/AB-Vinyl-02.png" class="thumb-img" onclick="changeImage(this)">
                         </div>
 
-                        <div class="pt-8 border-t border-gray-100">
+                        <div class="pt-8 border-t border-gray-100 italic text-black">
                             <h2 class="text-2xl font-light text-gray-500 mb-6 tracking-tight">Description</h2>
                             <h3 class="text-3xl font-normal text-gray-800 mb-6 italic">Adhesive Back-lit Vinyl</h3>
                             <div class="text-[14px] text-gray-600 leading-[1.7] space-y-5 font-medium">
@@ -105,16 +105,16 @@
 
                         <div class="space-y-6">
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Material Color</label>
-                                <select id="mat-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Material Color</label>
+                                <select id="mat-select" onchange="calculatePrice()" class="custom-dropdown text-black text-black text-black">
                                     <option value="0">Translucent</option>
                                     <option value="0">Clear</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Finishing Options</label>
-                                <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Finishing Options</label>
+                                <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown text-black text-black text-black">
                                     <option value="0">Trim to Size</option>
                                     <option value="0.75">Contour Cut (+$0.75 sq/ft)</option>
                                     <option value="1.00">Mount to Supplied Substrate (+$1.00 sq/ft)</option>
@@ -123,8 +123,8 @@
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Lamination</label>
-                                <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Lamination</label>
+                                <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown text-black text-black text-black">
                                     <option value="0">No Lamination</option>
                                     <option value="0.75">Gloss UV Lamination (+$0.75 sq/ft)</option>
                                     <option value="1.75">Ultra Premium Gloss UV Lamination (+$2.75 sq/ft)</option>
@@ -133,37 +133,38 @@
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1">Turnaround</label>
-                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Turnaround</label>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black text-black text-black">
                                     <option value="0" selected>2-3 Days</option>
                                     <option value="50">Same Day Rush (Before 11am) +$50.00</option>
                                 </select>
                             </div>
 
                             <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-red-500 tracking-[0.15em] block ml-1">Validation Status</label>
+                                <label class="text-[10px] font-black uppercase text-red-500 tracking-[0.15em] block ml-1 italic">Validation Status</label>
                                 <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">
-                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Select Image File</span>
+                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic text-center">Select Image File</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
                                 </div>
                                 <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 shadow-2xl space-y-5 text-black">
                                     <div class="flex gap-5 items-center">
-                                        <div class="w-24 h-24 bg-gray-50 rounded-2xl border p-2"><img id="preview-thumb" class="w-full h-full object-contain"></div>
+                                        <div class="w-24 h-24 bg-gray-50 rounded-2xl border p-2 flex items-center justify-center overflow-hidden"><img id="preview-thumb" class="max-h-full max-w-full object-contain"></div>
                                         <div class="flex-grow">
-                                            <h4 id="status-title" class="text-[14px] font-black uppercase text-red-600 italic tracking-tighter">Validating Artwork...</h4>
+                                            <h4 id="status-title" class="text-[14px] font-black uppercase text-red-600 italic tracking-tighter">ANALYZING ARTWORK...</h4>
+                                            <div id="validation-text" class="text-[12px] text-gray-500 font-medium leading-relaxed mt-1 italic text-black text-black text-black"></div>
                                         </div>
                                     </div>
                                     <div class="w-full bg-gray-100 h-1 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
                                     <div class="flex gap-3" id="action-buttons">
-                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[10px] font-black uppercase py-4 rounded-2xl hover:bg-black transition-all shadow-lg italic">Approve & Continue</button>
-                                        <button onclick="resetUpload()" class="px-6 bg-gray-100 text-gray-400 text-[10px] font-black uppercase rounded-2xl italic">Discard</button>
+                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[10px] font-black uppercase py-4 rounded-2xl hover:bg-black transition-all shadow-lg italic tracking-widest text-black text-black">APPROVE & CONTINUE</button>
+                                        <button onclick="resetUpload()" class="px-6 bg-gray-100 text-gray-400 text-[10px] font-black uppercase rounded-2xl italic text-black">Discard</button>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="bg-gray-50/50 p-10 rounded-[2.5rem] border border-gray-100 shadow-inner text-black">
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Width (in)</span><input type="number" id="w-input" value="24" oninput="calculatePrice()" class="custom-input w-32"></div>
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Height (in)</span><input type="number" id="h-input" value="24" oninput="calculatePrice()" class="custom-input w-32"></div>
+                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Width (in)</span><input type="number" id="w-input" value="24" oninput="calculatePrice()" class="custom-input w-32 text-black text-black"></div>
+                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Height (in)</span><input type="number" id="h-input" value="24" oninput="calculatePrice()" class="custom-input w-32 text-black text-black"></div>
                                 <div class="price-row border-none pt-8">
                                     <span class="text-[11px] font-black uppercase text-gray-900 tracking-widest italic">Total Area: <span id="area-display" class="ml-2 text-gray-400 font-bold">4.00 sq ft</span></span>
                                     <span id="final-price" class="text-5xl heavy-italic italic">$8.00</span>
@@ -179,21 +180,21 @@
                 </div>
             </div>
             <footer class="bg-white border-t py-12 px-10 text-center w-full">
-                <div class="bg-black p-2 rounded-lg inline-block mb-4 shadow-lg"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto"></div>
-                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">© 2026 Square Foot Printing - Las Vegas</p>
+                <div class="bg-black p-2 rounded-lg inline-block mb-4 shadow-lg"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
     </div>
 
     <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col text-black">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter text-black">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
-            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Checkout</button>
+            <div class="flex justify-between items-end text-black text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-black">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
@@ -220,8 +221,14 @@
                 const reader = new FileReader();
                 document.getElementById('drop-zone').classList.add('hidden');
                 document.getElementById('validation-panel').classList.remove('hidden');
-                setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
-                reader.onload = (e) => { document.getElementById('preview-thumb').src = e.target.result; };
+                reader.onload = (e) => {
+                    document.getElementById('preview-thumb').src = e.target.result;
+                    setTimeout(() => { 
+                        document.getElementById('upload-progress').style.width = '100%'; 
+                        document.getElementById('status-title').innerText = "Analysis Complete";
+                        document.getElementById('status-title').className = "text-[14px] font-black uppercase text-blue-600 italic tracking-tighter text-black";
+                    }, 800);
+                };
                 reader.readAsDataURL(input.files[0]);
             }
         }
@@ -246,12 +253,6 @@
             document.getElementById('action-buttons').classList.remove('hidden');
         }
 
-        function changeImage(el) {
-            document.getElementById('main-prod-img').src = el.src;
-            document.querySelectorAll('.thumb-img').forEach(i => i.classList.remove('thumb-active'));
-            el.classList.add('thumb-active');
-        }
-
         function toggleCart() {
             const sidebar = document.getElementById('cart-sidebar');
             const overlay = document.getElementById('cart-overlay');
@@ -270,18 +271,28 @@
             const fin = document.getElementById('finish-select');
             const lam = document.getElementById('lam-select');
             const turn = document.getElementById('turn-select');
-            const specs = `${mat.options[mat.selectedIndex].text}, ${fin.options[fin.selectedIndex].text}, ${lam.options[lam.selectedIndex].text}, ${turn.options[turn.selectedIndex].text}`;
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const priceVal = document.getElementById('final-price').innerText.replace(/[$,]/g, '');
+
             const newItem = {
                 name: document.getElementById('prod-title').innerText,
-                specs: specs,
-                size: `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
-                qty: document.getElementById('qty-input').value,
-                price: parseFloat(document.getElementById('final-price').innerText.replace('$', '').replace(',', '')),
+                // Agrupamos en options para el correo detallado
+                options: {
+                    "Size": `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
+                    "Color": mat.options[mat.selectedIndex].text,
+                    "Finishing": fin.options[fin.selectedIndex].text,
+                    "Lamination": lam.options[lam.selectedIndex].text,
+                    "Turnaround": turn.options[turn.selectedIndex].text,
+                    "Quantity": qty
+                },
+                price: parseFloat(priceVal),
                 image: document.getElementById('preview-thumb').src
             };
+
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             cart.push(newItem);
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            renderCart();
             toggleCart();
         }
 
@@ -297,13 +308,23 @@
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
                     total += item.price;
+                    const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : (item.specs || "");
+                    
                     container.innerHTML += `
                         <div class="flex gap-6 border-b border-gray-50 pb-6 last:border-0 text-black">
-                            <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div>
+                            <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2 flex items-center justify-center">
+                                <img src="${item.image}" class="max-h-full max-w-full object-contain">
+                            </div>
                             <div class="flex flex-col justify-between flex-grow">
-                                <div class="flex justify-between"><h4 class="text-sm font-black uppercase italic">${item.name}</h4><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button></div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.specs}</p>
-                                <div class="flex justify-between items-end mt-4"><span class="text-[10px] font-bold text-gray-400 uppercase">Qty: ${item.qty}</span><span class="text-xl font-black italic">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div>
+                                <div class="flex justify-between">
+                                    <h4 class="text-sm font-black uppercase italic tracking-tighter text-black text-black">${item.name}</h4>
+                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black text-black">${details}</p>
+                                <div class="flex justify-between items-end mt-4">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase text-black">Qty: ${item.options?.Quantity || 1}</span>
+                                    <span class="text-xl font-black italic text-black">$${item.price.toFixed(2)}</span>
+                                </div>
                             </div>
                         </div>`;
                 });
@@ -318,12 +339,13 @@
             cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
         }
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('active');
+        function changeImage(el) {
+            document.getElementById('main-prod-img').src = el.src;
+            document.querySelectorAll('.thumb-img').forEach(i => i.classList.remove('thumb-active'));
+            el.classList.add('thumb-active');
         }
 
-        window.onload = calculatePrice;
+        window.onload = () => { calculatePrice(); renderCart(); };
     </script>
 </body>
 </html>
