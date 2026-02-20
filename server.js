@@ -25,22 +25,14 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-        // CONFIGURACIÓN OBLIGATORIA PARA RENDER (Puerto 587)
-        let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // STARTTLS
-    auth: {
-        user: 'pulopez20@gmail.com',
-        pass: 'svik ahzr txww cerv' // RECUERDA: Si usas verificación en 2 pasos, esto DEBE ser una "Contraseña de Aplicación"
-    },
-    tls: {
-        rejectUnauthorized: false,
-        minVersion: "TLSv1.2"
-    },
-    connectionTimeout: 20000, // Aumentamos a 20 segundos
-    greetingTimeout: 20000,
-    socketTimeout: 20000
+       // CONFIGURACIÓN FINAL CON MAILTRAP PARA RENDER
+var transporter = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "09ee2ace2fcb4c", // Tu usuario real de Mailtrap
+    pass: "8a7eee9541e016"  // Tu password real de Mailtrap
+  }
 });
 
         const mailOptions = {
