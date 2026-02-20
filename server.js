@@ -9,8 +9,9 @@ app.use(cors());
 app.use(express.json());
 
 /**
- * 1. PLANTILLA HTML PARA EL CORREO
- * Diseñada para coincidir con la estética de Square Foot Printing.
+ * 1. HTML EMAIL TEMPLATE
+ * Designed to match the Square Foot Printing aesthetic.
+ * Content translated to English for the Las Vegas market.
  */
 const emailTemplate = (orderData) => `
 <!DOCTYPE html>
@@ -34,24 +35,24 @@ const emailTemplate = (orderData) => `
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://tu-dominio.com/images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Square Foot Printing" width="180">
+            <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg   " alt="Square Foot Printing" width="180">
         </div>
         <div class="content">
-            <h1 class="heavy-italic">¡Gracias por tu pedido!</h1>
-            <p style="font-size: 16px;">Hola <strong>${orderData.customer_name}</strong>,</p>
-            <p>Hemos recibido tu orden <span class="order-id">${orderData.order_id}</span>. Nuestro equipo comenzará a procesarla en breve.</p>
+            <h1 class="heavy-italic">Thank you for your order!</h1>
+            <p style="font-size: 16px;">Hello <strong>${orderData.customer_name}</strong>,</p>
+            <p>We have successfully received your order <span class="order-id">${orderData.order_id}</span>. Our team will start processing it shortly.</p>
             
             <div class="details-box">
-                <h3 style="margin-top:0; border-bottom: 2px solid #000; padding-bottom: 10px; display: inline-block;">Resumen del Pedido</h3>
-                <p><strong>Fecha:</strong> ${orderData.order_date || 'N/A'}</p>
-                <p><strong>Método de Entrega:</strong> <span class="badge">${orderData.delivery_method.toUpperCase()}</span></p>
+                <h3 style="margin-top:0; border-bottom: 2px solid #000; padding-bottom: 10px; display: inline-block;">Order Summary</h3>
+                <p><strong>Date:</strong> ${orderData.order_date || 'N/A'}</p>
+                <p><strong>Delivery Method:</strong> <span class="badge">${orderData.delivery_method.toUpperCase()}</span></p>
                 <div style="margin-top: 20px;">
                     ${orderData.order_items.split('\n').filter(line => line.trim() !== '').map(item => `<div class="item">${item}</div>`).join('')}
                 </div>
                 <div class="total">Total: ${orderData.total_price}</div>
             </div>
             
-            <p style="margin-top: 30px; font-size: 13px; color: #666;">Si tienes alguna duda sobre tu diseño o el tiempo de entrega, responde directamente a este correo.</p>
+            <p style="margin-top: 30px; font-size: 13px; color: #666;">If you have any questions regarding your design or turnaround time, please reply directly to this email.</p>
         </div>
         <div class="footer">
             © 2026 Square Foot Printing - Las Vegas<br>
@@ -63,8 +64,7 @@ const emailTemplate = (orderData) => `
 `;
 
 /**
- * 2. CONFIGURACIÓN DE ALMACENAMIENTO (MULTER)
- * Guarda los archivos físicamente en la carpeta 'uploads' con un prefijo de fecha.
+ * 2. STORAGE CONFIGURATION (MULTER)
  */
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -79,15 +79,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 /**
- * 3. RUTA PRINCIPAL DE PEDIDOS
- * Recibe los datos JSON y los archivos de diseño.
+ * 3. MAIN ORDER ROUTE
  */
 app.post('/api/place-order', upload.array('files'), async (req, res) => {
     try {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-        // Configuración de Mailtrap (Ideal para pruebas en desarrollo)
+        // Mailtrap configuration (Development)
         const transporter = nodemailer.createTransport({
             host: "sandbox.smtp.mailtrap.io",
             port: 2525,
@@ -99,10 +98,10 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
 
         const mailOptions = {
             from: '"Square Foot Printing" <pulopez20@gmail.com>',
-            // Se envía la copia al administrador y al cliente automáticamente
+            // Copy sent to admin and customer
             to: `za19012245@zapopan.tecmm.edu.mx, ${orderData.customer_email}`,
-            subject: `Confirmación de Orden: ${orderData.order_id}`,
-            html: emailTemplate(orderData), // Uso de la nueva plantilla visual
+            subject: `Order Confirmation: ${orderData.order_id}`,
+            html: emailTemplate(orderData),
             attachments: files.map(file => ({
                 filename: file.originalname,
                 path: file.path
@@ -119,7 +118,7 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
 });
 
 /**
- * 4. INICIO DEL SERVIDOR
+ * 4. SERVER INITIALIZATION
  */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
