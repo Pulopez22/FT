@@ -8,7 +8,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Configuración de almacenamiento local para archivos
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const dir = './uploads';
@@ -23,26 +22,25 @@ const upload = multer({ storage: storage });
 
 app.post('/api/place-order', upload.array('files'), async (req, res) => {
     try {
-        // Extraemos los datos del paquete "data" enviado desde el checkout
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
         // CONFIGURACIÓN REPARADA PARA RENDER
-let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true para puerto 465, false para puerto 587
-    auth: {
-        user: 'pulopez20@gmail.com',
-        pass: 'svik ahzr txww cerv'
-    },
-    tls: {
-        rejectUnauthorized: false // Ayuda a evitar bloqueos de conexión en Render
-    }
-});
+        let transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false, // false para puerto 587
+            auth: {
+                user: 'pulopez20@gmail.com',
+                pass: 'svik ahzr txww cerv'
+            },
+            tls: {
+                rejectUnauthorized: false // Evita bloqueos de certificados en la nube
+            }
+        });
+
         const mailOptions = {
             from: '"Square Foot Printing" <pulopez20@gmail.com>',
-            // Enviamos a la empresa y al email capturado del cliente
             to: `za19012245@zapopan.tecmm.edu.mx, ${orderData.customer_email}`,
             subject: `New Order: ${orderData.customer_name}`,
             text: `
@@ -59,12 +57,11 @@ let transporter = nodemailer.createTransport({
                 TOTAL: ${orderData.total_price}
                 FILES RECEIVED: ${files.length}
                 ----------------------
-                We will contact you shortly to finalize the payment.
             `
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).send({ message: 'Order processed successfully' });
+        res.status(200).send({ message: 'Order processed' });
 
     } catch (error) {
         console.error("Server Error:", error);

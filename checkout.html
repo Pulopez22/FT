@@ -251,39 +251,39 @@
         }
 
         function loadCheckoutData() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const container = document.getElementById('order-items-list');
-            let total = 0;
-            
-            container.innerHTML = cart.map(item => {
-                const itemPrice = parseFloat(item.price) || 0;
-                total += itemPrice;
+    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+    const container = document.getElementById('order-items-list');
+    let total = 0;
+    
+    container.innerHTML = cart.map(item => {
+        const itemPrice = parseFloat(item.price) || 0;
+        total += itemPrice;
 
-                // Detalles visuales en el resumen
-                let detailsHtml = "";
-                if (item.options) {
-                    detailsHtml = Object.entries(item.options)
-                        .map(([key, val]) => `<span class="block text-[9px] text-gray-400 normal-case font-medium">${key}: ${val}</span>`)
-                        .join('');
-                } else if (item.size) {
-                    detailsHtml = `<span class="block text-[9px] text-gray-400 normal-case font-medium">Size: ${item.size}</span>`;
-                }
-
-                return `
-                    <div class="flex gap-4 border-b pb-4 text-black">
-                        <div class="w-16 h-16 bg-white border rounded-xl p-2 flex-shrink-0">
-                            <img src="${item.image}" class="w-full h-full object-contain">
-                        </div>
-                        <div class="flex-grow">
-                            <div class="font-black text-xs uppercase italic">${item.name}</div>
-                            ${detailsHtml}
-                        </div>
-                        <div class="font-bold text-sm">$${itemPrice.toFixed(2)}</div>
-                    </div>`;
-            }).join('');
-            
-            document.getElementById('final-price-display').innerText = `$${total.toFixed(2)}`;
+        // ESTA PARTE genera la lista de detalles técnicos
+        let detailsHtml = "";
+        if (item.options) {
+            detailsHtml = Object.entries(item.options)
+                .map(([key, val]) => `<span class="block text-[9px] text-gray-400 font-medium uppercase leading-tight">${key}: ${val}</span>`)
+                .join('');
+        } else {
+            detailsHtml = `<span class="block text-[9px] text-gray-400 font-medium uppercase">Size: ${item.size || 'Standard'}</span>`;
         }
+
+        return `
+            <div class="flex gap-4 border-b border-gray-50 pb-4 text-black">
+                <div class="w-16 h-16 bg-white border rounded-xl p-2 flex-shrink-0">
+                    <img src="${item.image}" class="w-full h-full object-contain">
+                </div>
+                <div class="flex-grow">
+                    <div class="font-black text-[11px] uppercase italic leading-tight mb-1">${item.name}</div>
+                    ${detailsHtml}
+                </div>
+                <div class="font-bold text-sm">$${itemPrice.toFixed(2)}</div>
+            </div>`;
+    }).join('');
+    
+    document.getElementById('final-price-display').innerText = `$${total.toFixed(2)}`;
+}
         window.onload = loadCheckoutData;
     </script>
 </body>
