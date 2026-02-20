@@ -8,6 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Configuración de almacenamiento local
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const dir = './uploads';
@@ -25,15 +26,15 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-       // CONFIGURACIÓN FINAL CON MAILTRAP PARA RENDER
-var transporter = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
-  auth: {
-    user: "09ee2ace2fcb4c", // Tu usuario real de Mailtrap
-    pass: "8a7eee9541e016"  // Tu password real de Mailtrap
-  }
-});
+        // CONFIGURACIÓN FINAL CON MAILTRAP PARA RENDER
+        var transporter = nodemailer.createTransport({
+            host: "sandbox.smtp.mailtrap.io",
+            port: 2525,
+            auth: {
+                user: "09ee2ace2fcb4c", // Tu usuario real de Mailtrap
+                pass: "8a7eee9541e016"  // Tu password real de Mailtrap
+            }
+        });
 
         const mailOptions = {
             from: '"Square Foot Printing" <pulopez20@gmail.com>',
@@ -51,8 +52,14 @@ var transporter = nodemailer.createTransport({
                 ${orderData.order_items}
 
                 TOTAL: ${orderData.total_price}
+                FILES UPLOADED: ${files.length}
                 ----------------------
-            `
+            `,
+            // ESTO ES LO QUE FALTA: ADJUNTAR LOS ARCHIVOS AL CORREO
+            attachments: files.map(file => ({
+                filename: file.originalname,
+                path: file.path // Toma el archivo de la carpeta ./uploads y lo envía
+            }))
         };
 
         await transporter.sendMail(mailOptions);
