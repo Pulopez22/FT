@@ -173,7 +173,7 @@
         </div>
         <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
             <a href="../checkout.html" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center block">Checkout</a>
         </div>
     </div>
@@ -233,24 +233,31 @@
             }
         }
 
+        // LÓGICA DE GUARDADO ACTUALIZADA
         function addToCart() {
+            const hem = document.getElementById('hem-select');
+            const grommet = document.getElementById('grommet-select');
             const pockets = document.getElementById('pocket-select');
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const priceVal = document.getElementById('final-price').innerText.replace(/[$,]/g, '');
+
             const newItem = {
                 name: document.getElementById('prod-title').innerText,
-                // Guardamos todas las opciones en 'options' para que checkout las vea
                 options: {
                     "Size": `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
-                    "Hem": document.getElementById('hem-select').value,
-                    "Grommets": document.getElementById('grommet-select').value,
+                    "Hem": hem.options[hem.selectedIndex].text,
+                    "Grommets": grommet.options[grommet.selectedIndex].text,
                     "Pockets": pockets.options[pockets.selectedIndex].text,
-                    "Quantity": document.getElementById('qty-input').value
+                    "Quantity": qty
                 },
-                price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
+                price: parseFloat(priceVal),
                 image: document.getElementById('preview-thumb').src
             };
+
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             cart.push(newItem);
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            renderCart();
             toggleCart();
         }
 
@@ -260,8 +267,9 @@
             container.innerHTML = '';
             let total = 0;
             cart.forEach((item, i) => {
-                const details = Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ');
                 total += item.price;
+                const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "";
+                
                 container.innerHTML += `
                     <div class="flex gap-4 border-b border-gray-100 pb-4">
                         <img src="${item.image}" class="w-16 h-16 rounded-lg object-contain border">
@@ -269,14 +277,14 @@
                             <h4 class="text-xs font-black uppercase italic">${item.name}</h4>
                             <p class="text-[9px] text-gray-400 font-bold uppercase">${details}</p>
                             <div class="flex justify-between items-end mt-2">
-                                <button onclick="removeItem(${i})" class="text-[9px] font-black text-red-500 uppercase">Remove</button>
-                                <span class="font-black italic text-sm">$${item.price.toFixed(2)}</span>
+                                <button onclick="removeItem(${i})" class="text-[9px] font-black text-red-500 uppercase text-black">Remove</button>
+                                <span class="font-black italic text-sm text-black">$${item.price.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>`;
             });
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
             lucide.createIcons();
         }
 
@@ -291,7 +299,7 @@
             el.classList.add('thumb-active');
         }
 
-        window.onload = renderCart;
+        window.onload = () => { calculatePrice(); renderCart(); };
     </script>
 </body>
 </html>

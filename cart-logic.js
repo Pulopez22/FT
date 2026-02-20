@@ -1,47 +1,60 @@
 /**
- * Square Foot Printing - Universal Cart Logic
- * Este archivo debe ser llamado en todas las pestañas de producto.
+ * Square Foot Printing - Universal Cart Logic [FINAL]
  */
-
 function addToCart() {
-    // 1. Capturar elementos básicos de la página
-    const productName = document.querySelector('h1')?.innerText || "Custom Product";
-    const productPrice = document.getElementById('total-price')?.innerText || "$0.00";
-    const mainImage = document.getElementById('main-img')?.src || "";
+    // 1. Elementos básicos (IDs consistentes en todas las páginas)
+    const productName = document.getElementById('prod-title')?.innerText || "Custom Product";
+    // Limpiamos el precio de símbolos para asegurar que sea un número
+    const productPrice = document.getElementById('final-price')?.innerText.replace(/[$,]/g, '') || "0.00";
+    const mainImage = document.getElementById('preview-thumb')?.src || document.getElementById('main-prod-img')?.src;
 
-    // 2. Objeto para almacenar las opciones personalizadas
+    // 2. Objeto para las opciones técnicas
     const selections = {};
 
-    // 3. Buscamos todos los menús desplegables (select) en la página
-    const selectElements = document.querySelectorAll('select');
+    // 3. Captura automática de medidas (Width/Height manual o Select)
+    const w = document.getElementById('w-input')?.value;
+    const h = document.getElementById('h-input')?.value;
+    if (w && h) {
+        selections["Size"] = `${w}" x ${h}"`;
+    } else {
+        const sizeSelect = document.getElementById('size-select');
+        if (sizeSelect) selections["Size"] = sizeSelect.value;
+    }
 
+    // 4. Captura automática de todos los menús desplegables (select)
+    const selectElements = document.querySelectorAll('select');
     selectElements.forEach(select => {
-        // Intentamos obtener el nombre de la opción desde el label o el atributo name
-        // Esto permite que si el producto tiene "Hem" o "Size", se guarde correctamente
-        const label = select.getAttribute('name') || 
-                      select.previousElementSibling?.innerText || 
-                      "Option";
-        
-        // Guardamos la opción seleccionada por el usuario
-        selections[label] = select.value;
+        // Evitamos duplicar el "Size" si ya lo capturamos arriba
+        if (select.id !== 'size-select') { 
+            const labelElement = select.parentElement.querySelector('label');
+            const labelName = labelElement ? labelElement.innerText.trim() : select.id;
+            selections[labelName] = select.options[select.selectedIndex].text;
+        }
     });
 
-    // 4. Crear el objeto final del producto
+    // 5. DETECCIÓN INTELIGENTE DE CANTIDAD (Qty)
+    // Buscamos el input de cantidad. Si no existe, por defecto es 1.
+    const qtyElement = document.getElementById('qty-input');
+    const quantity = qtyElement ? parseInt(qtyElement.value) : 1;
+
+    // 6. Crear el objeto final estructurado para el Checkout y Mailtrap
     const productEntry = {
         name: productName,
-        price: productPrice,
-        options: selections, // Aquí viajan los detalles específicos (Grommets, Velcro, etc.)
-        image: mainImage
+        price: parseFloat(productPrice),
+        options: selections, // Detalles técnicos completos
+        image: mainImage,
+        quantity: quantity // Cantidad validada
     };
 
-    // 5. Guardar en el carrito (localStorage)
+    // 7. Guardar en localStorage
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
     cart.push(productEntry);
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
 
-    // 6. Feedback visual para el cliente
-    alert(`Added to cart: ${productName}\nDetails: ${Object.keys(selections).length} options saved.`);
-    
-    // Opcional: Redirigir al checkout después de agregar
-    // window.location.href = '../checkout.html';
+    // 8. Feedback visual (Abre el sidebar si existe la función)
+    if (typeof toggleCart === "function") {
+        toggleCart();
+    } else {
+        alert(`${productName} added to cart!`);
+    }
 }

@@ -44,7 +44,7 @@
                 <a href="banners.html" class="text-black border-b-2 border-black pb-1">Banners</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
                 <a href="#" class="hover:text-black transition-colors">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors text-black">Stickers</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
                 <a href="#" class="hover:text-black transition-colors">Apparel</a>
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
@@ -217,7 +217,12 @@
                                     <span id="final-price" class="text-5xl heavy-italic italic text-black">$39.34</span>
                                 </div>
                             </div>
-                            <button id="add-to-cart-btn" onclick="addToCart()" disabled class="w-full bg-gray-200 text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed mt-4 shadow-md italic">Add to cart</button>
+
+                            <div class="flex gap-5">
+                                <input type="number" id="qty-input" value="1" min="1" class="w-24 p-5 border-2 border-gray-100 rounded-2xl font-black text-center text-black">
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed mt-0 shadow-md italic">Add to cart</button>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -234,10 +239,10 @@
             <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black text-black text-black"></div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black text-black text-black">$0.00</span></div>
-            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-black text-black text-black">Checkout</button>
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-black">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
@@ -301,30 +306,36 @@
             }
         }
 
+        // LÓGICA DE AGREGAR AL CARRITO (Usando el Qty recuperado)
         function addToCart() {
-            const specs = [
-                document.getElementById('size-select').value,
-                document.getElementById('mat-select').value,
-                document.getElementById('hw-select').value,
-                document.getElementById('pocket-select').value,
-                document.getElementById('windslit-select').value + " Windslits"
-            ].join(' | ');
-
-            const priceVal = document.getElementById('final-price').innerText.replace('$', '').replace(',', '');
+            const productName = document.getElementById('prod-title').innerText;
+            const priceVal = document.getElementById('final-price').innerText.replace(/[$,]/g, '');
             const thumb = document.getElementById('preview-thumb').src;
+            const quantity = parseInt(document.getElementById('qty-input').value) || 1;
+
+            const selectedOptions = {
+                "Size": document.getElementById('size-select').value,
+                "Material": document.getElementById('mat-select').value,
+                "Sides": document.getElementById('sides-select').value,
+                "Hardware": document.getElementById('hw-select').value,
+                "Pocket": document.getElementById('pocket-select').value,
+                "Hem": document.getElementById('hem-select').value,
+                "Grommet": document.getElementById('grommet-select').value,
+                "Turnaround": document.getElementById('turn-select').value
+            };
 
             const newItem = {
-                name: "Pole Banner",
-                specs: specs,
-                size: document.getElementById('size-select').value,
-                qty: 1,
+                name: productName,
                 price: parseFloat(priceVal),
-                image: thumb
+                options: selectedOptions,
+                image: thumb,
+                quantity: quantity
             };
 
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             cart.push(newItem);
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            
             renderCart();
             toggleCart();
         }
@@ -341,16 +352,20 @@
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
                     total += item.price;
+                    const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "";
+                    
                     container.innerHTML += `
                         <div class="flex gap-6 border-b border-gray-50 pb-6 last:border-0 text-black">
-                            <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div>
+                            <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border p-2 flex items-center justify-center">
+                                <img src="${item.image}" class="max-h-full max-w-full object-contain">
+                            </div>
                             <div class="flex flex-col justify-between flex-grow">
                                 <div class="flex justify-between">
                                     <h4 class="text-sm font-black uppercase italic tracking-tighter text-black">${item.name}</h4>
-                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black text-black"></i></button>
+                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                                 </div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black">${item.specs}</p>
-                                <div class="flex justify-between items-end mt-4 text-black"><span class="text-[10px] font-bold text-gray-400 uppercase">Qty: ${item.qty}</span><span class="text-xl font-black italic text-black">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black">${details}</p>
+                                <div class="flex justify-between items-end mt-4 text-black"><span class="text-[10px] font-bold text-gray-400 uppercase">Qty: ${item.quantity}</span><span class="text-xl font-black italic text-black">$${item.price.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div>
                             </div>
                         </div>`;
                 });
