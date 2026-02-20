@@ -8,6 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Configuración de almacenamiento local para archivos
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const dir = './uploads';
@@ -25,17 +26,17 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-        // CONFIGURACIÓN REPARADA PARA RENDER
+        // CONFIGURACIÓN REPARADA PARA RENDER (Puerto 587)
         let transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
             port: 587,
-            secure: false, // false para puerto 587
+            secure: false, // STARTTLS
             auth: {
                 user: 'pulopez20@gmail.com',
                 pass: 'svik ahzr txww cerv'
             },
             tls: {
-                rejectUnauthorized: false // Evita bloqueos de certificados en la nube
+                rejectUnauthorized: false // Evita bloqueos en la red de Render
             }
         });
 
@@ -57,11 +58,12 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
                 TOTAL: ${orderData.total_price}
                 FILES RECEIVED: ${files.length}
                 ----------------------
+                We will contact you shortly to finalize the payment.
             `
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).send({ message: 'Order processed' });
+        res.status(200).send({ message: 'Order processed successfully' });
 
     } catch (error) {
         console.error("Server Error:", error);
