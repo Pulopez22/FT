@@ -18,9 +18,9 @@
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover { color: #000; padding-left: 4px; }
         
-        /* Estilo unificado para botones de selección */
-        .select-button { cursor: pointer; transition: all 0.3s ease; border: 2px solid #f3f4f6; }
-        .select-button.active { border-color: #000; background-color: #000; color: #fff; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        /* Estilo unificado para botones de selección activa */
+        .select-button { cursor: pointer; transition: all 0.3s ease; border: 2px solid #f3f4f6; background-color: #f9fafb; color: #000; }
+        .select-button.active { border-color: #000; background-color: #000 !important; color: #fff !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         #cardNumberDisplay { font-family: monospace; letter-spacing: 2px; font-size: 16px; }
     </style>
 </head>
@@ -48,7 +48,6 @@
                 <li class="sidebar-item"><a href="Banners/banners.html">Banners</a></li>
                 <li class="sidebar-item"><a href="Stickers/stickers.html">Stickers</a></li>
                 <li class="sidebar-item">Large Format Printing</li>
-                <li class="sidebar-item">Rigid Signs</li>
             </ul>
         </aside>
 
@@ -76,7 +75,7 @@
                                 <button onclick="setMethod('pickup')" id="method-pickup" class="select-button active flex-1 p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
                                     <i data-lucide="package"></i><span class="heavy-italic text-sm">Local Pickup</span>
                                 </button>
-                                <button onclick="setMethod('shipping')" id="method-shipping" class="select-button flex-1 p-6 rounded-[1.5rem] bg-gray-50 flex flex-col items-center gap-2">
+                                <button onclick="setMethod('shipping')" id="method-shipping" class="select-button flex-1 p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
                                     <i data-lucide="send"></i><span class="heavy-italic text-sm">Shipping</span>
                                 </button>
                             </div>
@@ -105,10 +104,10 @@
                         <section class="space-y-8">
                             <h2 class="heavy-italic text-2xl mb-2 flex items-center gap-3"><i data-lucide="credit-card" class="text-red-600"></i> Payment Method</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div onclick="selectPayment('card')" id="pay-card" class="select-button bg-gray-50 p-6 rounded-[1.5rem] flex items-center gap-4">
+                                <div onclick="selectPayment('card')" id="pay-card" class="select-button p-6 rounded-[1.5rem] flex items-center gap-4">
                                     <i data-lucide="credit-card"></i><span class="heavy-italic text-sm">Credit Card</span>
                                 </div>
-                                <div onclick="selectPayment('zelle')" id="pay-zelle" class="select-button bg-gray-50 p-6 rounded-[1.5rem] flex items-center gap-4">
+                                <div onclick="selectPayment('zelle')" id="pay-zelle" class="select-button p-6 rounded-[1.5rem] flex items-center gap-4">
                                     <i data-lucide="wallet"></i><span class="heavy-italic text-sm">Zelle</span>
                                 </div>
                             </div>
@@ -144,25 +143,25 @@
     <script>
         if (window.lucide) { lucide.createIcons(); }
 
-        let currentMethod = 'pickup', currentPayment = '', realDigits = "";
+        let currentMethod = 'pickup', currentPayment = '';
 
-        // Unificamos la función de cambio de color para Delivery
         function setMethod(type) {
             currentMethod = type;
             const isPickup = type === 'pickup';
             document.getElementById('pickup-box').classList.toggle('hidden', !isPickup);
             document.getElementById('shipping-box').classList.toggle('hidden', isPickup);
             
+            // Cambio de color unificado
             document.getElementById('method-pickup').classList.toggle('active', isPickup);
             document.getElementById('method-shipping').classList.toggle('active', !isPickup);
         }
 
-        // Unificamos la función de cambio de color para Payment
         function selectPayment(method) {
             currentPayment = method;
-            document.getElementById('pay-card').classList.toggle('active', method === 'card');
-            document.getElementById('pay-zelle').classList.toggle('active', method === 'zelle');
-            document.getElementById('card-details').classList.toggle('hidden', method !== 'card');
+            const isCard = method === 'card';
+            document.getElementById('pay-card').classList.toggle('active', isCard);
+            document.getElementById('pay-zelle').classList.toggle('active', !isCard);
+            document.getElementById('card-details').classList.toggle('hidden', !isCard);
         }
 
         function formatExpiry(el) {
@@ -179,63 +178,71 @@
         }
 
         async function validateAndPlaceOrder() {
-    const btn = document.getElementById('place-order-btn');
-    const fields = ['fullName', 'emailAddress', 'phoneNumber'];
-    if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
-    
-    let isValid = true;
-    fields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && !el.value.trim()) { el.classList.add('input-error'); isValid = false; }
-        else if (el) { el.classList.remove('input-error'); }
-    });
+            const btn = document.getElementById('place-order-btn');
+            const fields = ['fullName', 'emailAddress', 'phoneNumber'];
+            if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
+            if (currentPayment === 'card') fields.push('cardExpiry', 'cardCVC');
+            
+            let isValid = true;
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && !el.value.trim()) { el.classList.add('input-error'); isValid = false; }
+                else if (el) { el.classList.remove('input-error'); }
+            });
 
-    if (!isValid || !currentPayment) { alert("Please complete required fields."); return; }
+            if (!isValid || !currentPayment) { 
+                alert("Please complete required fields and select a payment method."); 
+                return; 
+            }
 
-    btn.innerText = "SENDING...";
-    btn.disabled = true;
+            btn.innerText = "SENDING ORDER...";
+            btn.disabled = true;
 
-    // GENERACIÓN DEL NÚMERO DE ORDEN
-    const orderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    
-    let itemsSummary = cart.map((i, index) => {
-        let opts = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : `Size: ${i.size}`;
-        return `${index + 1}. ${i.name.toUpperCase()} [${opts}] - $${parseFloat(i.price).toFixed(2)}`;
-    }).join('\n');
+            // Generación de ID y Fecha
+            const orderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+            const dateStr = new Date().toLocaleString();
 
-    const orderInfo = {
-        order_id: orderNumber, // Enviamos el ID al servidor
-        customer_name: document.getElementById('fullName').value,
-        customer_email: document.getElementById('emailAddress').value,
-        customer_phone: document.getElementById('phoneNumber').value,
-        total_price: document.getElementById('final-price-display').innerText,
-        delivery_method: currentMethod,
-        order_items: itemsSummary
-    };
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            
+            // Reconstrucción detallada de artículos
+            let itemsSummary = cart.map((i, index) => {
+                let optionsText = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : `Size: ${i.size}`;
+                return `${index + 1}. ${i.name.toUpperCase()} [${optionsText}, Quantity: ${i.quantity || 1}] - $${parseFloat(i.price).toFixed(2)}`;
+            }).join('\n');
 
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(orderInfo));
+            const orderInfo = {
+                order_id: orderNumber,
+                order_date: dateStr,
+                customer_name: document.getElementById('fullName').value,
+                customer_email: document.getElementById('emailAddress').value,
+                customer_phone: document.getElementById('phoneNumber').value,
+                total_price: document.getElementById('final-price-display').innerText,
+                delivery_method: currentMethod,
+                order_items: itemsSummary
+            };
 
-    for (let i = 0; i < cart.length; i++) {
-        if (cart[i].image) {
-            const file = await imageUrlToFile(cart[i].image, `design-${i+1}.png`);
-            if (file) formData.append('files', file); 
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(orderInfo));
+
+            // Captura de imágenes para /uploads
+            for (let i = 0; i < cart.length; i++) {
+                if (cart[i].image) {
+                    const file = await imageUrlToFile(cart[i].image, `design-${orderNumber}-${i+1}.png`);
+                    if (file) formData.append('files', file); 
+                }
+            }
+
+            try {
+                const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { method: 'POST', body: formData });
+                if (res.ok) {
+                    localStorage.removeItem('sqft_cart');
+                    window.location.href = `order.html?id=${orderNumber}`;
+                } else { alert("Server error."); }
+            } catch (e) { alert("Connection failed."); } finally {
+                btn.innerText = "Place Order Now";
+                btn.disabled = false;
+            }
         }
-    }
-
-    try {
-        const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { method: 'POST', body: formData });
-        if (res.ok) {
-            localStorage.removeItem('sqft_cart');
-            // REDIRECCIÓN A ORDER.HTML CON EL ID
-            window.location.href = `order.html?id=${orderNumber}`;
-        } else { alert("Server error."); }
-    } catch (e) { alert("Connection failed."); } finally {
-        btn.innerText = "Place Order Now";
-        btn.disabled = false;
-    }
-}
 
         function loadCheckoutData() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
