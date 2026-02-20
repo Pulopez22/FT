@@ -89,13 +89,13 @@
                                         <a href="https://maps.apple.com/?address=6155%20S%20Edmond%20St,%20Las%20Vegas,%20NV%2089118" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
                                             <i data-lucide="apple" class="w-4 h-4 text-black"></i><span class="text-[9px] font-black uppercase italic">Open</span>
                                         </a>
-                                        <a href="https://www.google.com/maps/search/?api=1&query=6155+S+Edmond+St+Las+Vegas+NV+89118" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
+                                        <a href="http://googleusercontent.com/maps.google.com/6" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
                                             <img src="https://www.gstatic.com/images/branding/product/1x/maps_96dp.png" class="w-4 h-4"><span class="text-[9px] font-black uppercase italic">Open</span>
                                         </a>
                                     </div>
                                 </div>
                                 <div class="w-full h-48 rounded-2xl overflow-hidden border border-gray-200">
-                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.62!2d-115.19!3d36.07" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                    <iframe src="http://googleusercontent.com/maps.google.com/7" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                                 </div>
                                 <div class="pt-6 border-t border-gray-200 flex items-center gap-2 text-gray-400 font-black uppercase text-[10px]">
                                     <i data-lucide="clock" class="w-4 h-4"></i><span>Mon - Fri: 10am - 5pm</span>
@@ -153,7 +153,7 @@
 
     <script>
         lucide.createIcons();
-        emailjs.init("oKffXj32AcPr8tbqw"); //
+        emailjs.init("oKffXj32AcPr8tbqw"); 
         let currentMethod = 'pickup', currentPayment = '', realDigits = "";
 
         const cardDisplay = document.getElementById('cardNumberDisplay');
@@ -210,7 +210,12 @@
             if (!currentPayment) { alert("Please select a Payment Method."); return; }
 
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            let itemsSummary = cart.map(i => `- ${i.name} (${i.size}): ${i.image}`).join('\n');
+            
+            // MODIFICACIÓN: Construcción de resumen detallado para el email
+            let itemsSummary = cart.map(i => {
+                let optionsText = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : `Size: ${i.size}`;
+                return `- ${i.name} [${optionsText}] - $${parseFloat(i.price).toFixed(2)}`;
+            }).join('\n');
 
             const params = {
                 customer_name: document.getElementById('fullName').value,
@@ -221,11 +226,11 @@
                 payment_method: currentPayment,
                 card_last_4: realDigits.slice(-4),
                 total_price: document.getElementById('final-price-display').innerText,
-                order_items: itemsSummary //
+                order_items: itemsSummary 
             };
 
             try {
-                await emailjs.send('service_m8opa77', 'template_gwembsf', params); //
+                await emailjs.send('service_m8opa77', 'template_gwembsf', params);
                 localStorage.removeItem('sqft_cart');
                 window.location.href = 'order.html';
             } catch (err) { alert("Error sending order. Please try again."); }
@@ -235,10 +240,34 @@
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('order-items-list');
             let total = 0;
+            
             container.innerHTML = cart.map(item => {
-                total += parseFloat(item.price);
-                return `<div class="flex gap-4 border-b pb-4 text-black"><div class="w-16 h-16 bg-white border rounded-xl p-2 flex-shrink-0"><img src="${item.image}" class="w-full h-full object-contain"></div><div class="flex-grow font-black text-xs uppercase italic">${item.name}</div><div>$${parseFloat(item.price).toFixed(2)}</div></div>`;
+                const itemPrice = parseFloat(item.price) || 0;
+                total += itemPrice;
+
+                // MODIFICACIÓN: Generar lista visual de detalles técnicos
+                let detailsHtml = "";
+                if (item.options) {
+                    detailsHtml = Object.entries(item.options)
+                        .map(([key, val]) => `<span class="block text-[9px] text-gray-400 normal-case font-medium">${key}: ${val}</span>`)
+                        .join('');
+                } else if (item.size) {
+                    detailsHtml = `<span class="block text-[9px] text-gray-400 normal-case font-medium">Size: ${item.size}</span>`;
+                }
+
+                return `
+                    <div class="flex gap-4 border-b pb-4 text-black">
+                        <div class="w-16 h-16 bg-white border rounded-xl p-2 flex-shrink-0">
+                            <img src="${item.image}" class="w-full h-full object-contain">
+                        </div>
+                        <div class="flex-grow">
+                            <div class="font-black text-xs uppercase italic">${item.name}</div>
+                            ${detailsHtml}
+                        </div>
+                        <div class="font-bold text-sm">$${itemPrice.toFixed(2)}</div>
+                    </div>`;
             }).join('');
+            
             document.getElementById('final-price-display').innerText = `$${total.toFixed(2)}`;
         }
         window.onload = loadCheckoutData;
