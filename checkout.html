@@ -61,7 +61,6 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
                     <div class="lg:col-span-7 space-y-12">
-                        
                         <section>
                             <h2 class="heavy-italic text-2xl mb-8 flex items-center gap-3"><i data-lucide="user" class="text-red-600"></i> Contact Information</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -89,16 +88,13 @@
                                         <a href="https://maps.apple.com/?address=6155%20S%20Edmond%20St,%20Las%20Vegas,%20NV%2089118" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
                                             <i data-lucide="apple" class="w-4 h-4 text-black"></i><span class="text-[9px] font-black uppercase italic">Open</span>
                                         </a>
-                                        <a href="http://googleusercontent.com/maps.google.com/6" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
+                                        <a href="https://maps.google.com" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2">
                                             <img src="https://www.gstatic.com/images/branding/product/1x/maps_96dp.png" class="w-4 h-4"><span class="text-[9px] font-black uppercase italic">Open</span>
                                         </a>
                                     </div>
                                 </div>
                                 <div class="w-full h-48 rounded-2xl overflow-hidden border border-gray-200">
-                                    <iframe src="http://googleusercontent.com/maps.google.com/7" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-                                </div>
-                                <div class="pt-6 border-t border-gray-200 flex items-center gap-2 text-gray-400 font-black uppercase text-[10px]">
-                                    <i data-lucide="clock" class="w-4 h-4"></i><span>Mon - Fri: 10am - 5pm</span>
+                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.975452243282!2d-115.19253482343948!3d36.069632308709425!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c8c60312384a33%3A0xc3f6b90757754f7a!2s6155%20S%20Edmond%20St%2C%20Las%20Vegas%2C%20NV%2089118!5e0!3m2!1sen!2sus!4v1708380000000!5m2!1sen!2sus" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                                 </div>
                             </div>
 
@@ -121,7 +117,6 @@
                                     <i data-lucide="wallet"></i><span class="heavy-italic text-sm">Zelle</span>
                                 </div>
                             </div>
-
                             <div id="card-details" class="hidden bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 space-y-6">
                                 <div><label>Card Number</label><input type="text" id="cardNumberDisplay" placeholder="···· ···· ···· ····" class="input-field"></div>
                                 <div class="grid grid-cols-2 gap-6">
@@ -138,7 +133,7 @@
                             <div id="order-items-list" class="p-8 space-y-6 max-h-[400px] overflow-y-auto"></div>
                             <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
                                 <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 italic">Total Amount</span><span id="final-price-display" class="text-5xl heavy-italic italic">$0.00</span></div>
-                                <button onclick="validateAndPlaceOrder()" class="w-full bg-red-600 hover:bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic transition-all shadow-xl shadow-red-100">Place Order Now</button>
+                                <button onclick="validateAndPlaceOrder()" id="place-order-btn" class="w-full bg-red-600 hover:bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic transition-all shadow-xl shadow-red-100">Place Order Now</button>
                             </div>
                         </div>
                     </div>
@@ -153,7 +148,6 @@
 
     <script>
         lucide.createIcons();
-        emailjs.init("oKffXj32AcPr8tbqw"); 
         let currentMethod = 'pickup', currentPayment = '', realDigits = "";
 
         const cardDisplay = document.getElementById('cardNumberDisplay');
@@ -195,6 +189,7 @@
         }
 
         async function validateAndPlaceOrder() {
+            const btn = document.getElementById('place-order-btn');
             const fields = ['fullName', 'emailAddress', 'phoneNumber'];
             if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
             if (currentPayment === 'card') fields.push('cardExpiry', 'cardCVC');
@@ -206,34 +201,53 @@
                 else { el.classList.remove('input-error'); }
             });
 
-            if (!isValid) { alert("Please complete all required fields highlighted in red."); return; }
+            if (!isValid) { alert("Please complete all required fields."); return; }
             if (!currentPayment) { alert("Please select a Payment Method."); return; }
+
+            btn.innerText = "SENDING...";
+            btn.disabled = true;
 
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             
-            // MODIFICACIÓN: Construcción de resumen detallado para el email
+            // Construcción del resumen detallado para el servidor
             let itemsSummary = cart.map(i => {
                 let optionsText = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : `Size: ${i.size}`;
                 return `- ${i.name} [${optionsText}] - $${parseFloat(i.price).toFixed(2)}`;
             }).join('\n');
 
-            const params = {
+            // Paquete de datos para tu servidor en Render
+            const orderInfo = {
                 customer_name: document.getElementById('fullName').value,
                 customer_email: document.getElementById('emailAddress').value,
                 customer_phone: document.getElementById('phoneNumber').value,
-                delivery_method: currentMethod,
-                shipping_address: currentMethod === 'shipping' ? document.getElementById('streetAddress').value : 'Pickup',
-                payment_method: currentPayment,
-                card_last_4: realDigits.slice(-4),
                 total_price: document.getElementById('final-price-display').innerText,
-                order_items: itemsSummary 
+                delivery_method: currentMethod,
+                order_items: itemsSummary
             };
 
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(orderInfo)); // Tu servidor espera el campo 'data'
+
             try {
-                await emailjs.send('service_m8opa77', 'template_gwembsf', params);
-                localStorage.removeItem('sqft_cart');
-                window.location.href = 'order.html';
-            } catch (err) { alert("Error sending order. Please try again."); }
+                // Reemplaza con tu URL de Render real
+                const res = await fetch('https://ft-f34l.onrender.com/api/place-order', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (res.ok) {
+                    alert("Order placed successfully! Confirmation sent to your email.");
+                    localStorage.removeItem('sqft_cart');
+                    window.location.href = 'index.html';
+                } else {
+                    alert("Server error. Check your logs in Render.");
+                }
+            } catch (err) {
+                alert("Connection failed. Ensure the server is awake.");
+            } finally {
+                btn.innerText = "Place Order Now";
+                btn.disabled = false;
+            }
         }
 
         function loadCheckoutData() {
@@ -245,7 +259,7 @@
                 const itemPrice = parseFloat(item.price) || 0;
                 total += itemPrice;
 
-                // MODIFICACIÓN: Generar lista visual de detalles técnicos
+                // Detalles visuales en el resumen
                 let detailsHtml = "";
                 if (item.options) {
                     detailsHtml = Object.entries(item.options)
