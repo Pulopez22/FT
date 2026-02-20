@@ -29,16 +29,18 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
-    secure: false,
+    secure: false, // STARTTLS
     auth: {
         user: 'pulopez20@gmail.com',
-        pass: 'fdfy gnzc mkcm nkza' // Generada en el paso 1
+        pass: 'svik ahzr txww cerv' // RECUERDA: Si usas verificación en 2 pasos, esto DEBE ser una "Contraseña de Aplicación"
     },
     tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        minVersion: "TLSv1.2"
     },
-    connectionTimeout: 10000, // 10 segundos de espera
-    greetingTimeout: 10000
+    connectionTimeout: 20000, // Aumentamos a 20 segundos
+    greetingTimeout: 20000,
+    socketTimeout: 20000
 });
 
         const mailOptions = {
