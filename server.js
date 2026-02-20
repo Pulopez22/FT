@@ -27,17 +27,19 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
 
         // CONFIGURACIÓN OBLIGATORIA PARA RENDER (Puerto 587)
         let transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: false, // Debe ser false para el puerto 587
-            auth: {
-                user: 'pulopez20@gmail.com',
-                pass: 'svik ahzr txww cerv'
-            },
-            tls: {
-                rejectUnauthorized: false // Evita bloqueos de certificados en Render
-            }
-        });
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: 'pulopez20@gmail.com',
+        pass: 'fdfy gnzc mkcm nkza' // Generada en el paso 1
+    },
+    tls: {
+        rejectUnauthorized: false
+    },
+    connectionTimeout: 10000, // 10 segundos de espera
+    greetingTimeout: 10000
+});
 
         const mailOptions = {
             from: '"Square Foot Printing" <pulopez20@gmail.com>',
