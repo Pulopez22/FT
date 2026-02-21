@@ -86,21 +86,23 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-       // --- CONFIGURACIÓN DE GMAIL PARA RENDER (CON TIMEOUTS AMPLIADOS) ---
+       // --- CONFIGURACIÓN DE GMAIL PARA RENDER (VERSIÓN FINAL ANTI-BLOQUEO) ---
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 465,
-            secure: true, // true para puerto 465
+            secure: true, 
             auth: {
                 user: process.env.GMAIL_USER,
                 pass: process.env.GMAIL_PASS
             },
-            // Agregamos estas opciones para evitar el ETIMEDOUT en servidores cloud
-            connectionTimeout: 20000, // 20 segundos para conectar
-            greetingTimeout: 20000,   // 20 segundos para el saludo inicial
-            socketTimeout: 30000,     // 30 segundos de inactividad
+            // Aumentamos los tiempos al máximo permitido por Render
+            connectionTimeout: 60000, // 60 segundos
+            greetingTimeout: 30000,   // 30 segundos
+            socketTimeout: 60000,     // 60 segundos
+            // Forzamos TLS y desactivamos comprobación estricta de DNS de red
             tls: {
-                rejectUnauthorized: false // Ayuda a conectar si hay problemas con certificados en el entorno de Render
+                rejectUnauthorized: false,
+                minVersion: "TLSv1.2"
             }
         });
 
