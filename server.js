@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
@@ -85,25 +86,28 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-        // --- CONFIGURACIÓN DE GMAIL ---
+       // --- CONFIGURACIÓN DE GMAIL PARA RENDER (CON TIMEOUTS AMPLIADOS) ---
         const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use true para puerto 465, false para otros puertos
-    auth: {
-                user: 'pulopez20@gmail.com',
-                pass: 'sfbz ltxj xoox almt' // REEMPLAZAR POR TU CONTRASEÑA DE APLICACIÓN DE 16 DÍGITOS
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // true para puerto 465
+            auth: {
+                user: process.env.GMAIL_USER,
+                pass: process.env.GMAIL_PASS
+            },
+            // Agregamos estas opciones para evitar el ETIMEDOUT en servidores cloud
+            connectionTimeout: 20000, // 20 segundos para conectar
+            greetingTimeout: 20000,   // 20 segundos para el saludo inicial
+            socketTimeout: 30000,     // 30 segundos de inactividad
+            tls: {
+                rejectUnauthorized: false // Ayuda a conectar si hay problemas con certificados en el entorno de Render
             }
         });
 
         // --- OPCIONES DEL CORREO ---
         const mailOptions = {
-            from: '"Square Foot Printing" <pulopez20@gmail.com>',
-            // SE ENVÍA AL CLIENTE Y A TU EQUIPO DE PRODUCCIÓN
-            to: [
-                orderData.customer_email, 
-                'za19012245@zapopan.tecmm.edu.mx'
-            ].join(', '),
+            from: `"Square Foot Printing" <${process.env.GMAIL_USER}>`,
+            to: [orderData.customer_email, process.env.ADMIN_EMAIL].join(', '),
             subject: `Order Confirmation: ${orderData.order_id} - ${orderData.customer_name}`,
             html: emailTemplate(orderData),
             attachments: files.map(file => ({
