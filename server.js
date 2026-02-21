@@ -1,10 +1,8 @@
-require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
-const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -12,6 +10,8 @@ app.use(express.json());
 
 /**
  * 1. HTML EMAIL TEMPLATE
+ * Designed to match the Square Foot Printing aesthetic.
+ * Content translated to English for the Las Vegas market.
  */
 const emailTemplate = (orderData) => `
 <!DOCTYPE html>
@@ -35,19 +35,19 @@ const emailTemplate = (orderData) => `
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://squarefootprinting.com/wp-content/uploads/2018/05/SquareFootPrinting-Logo-White-Text-Lrg-01.png" alt="Square Foot Printing" width="180">
+            <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg   " alt="Square Foot Printing" width="180">
         </div>
         <div class="content">
             <h1 class="heavy-italic">Thank you for your order!</h1>
             <p style="font-size: 16px;">Hello <strong>${orderData.customer_name}</strong>,</p>
-            <p>We have successfully received your order <span class="order-id">${orderData.order_id}</span>. Our production team will start processing it shortly.</p>
+            <p>We have successfully received your order <span class="order-id">${orderData.order_id}</span>. Our team will start processing it shortly.</p>
             
             <div class="details-box">
                 <h3 style="margin-top:0; border-bottom: 2px solid #000; padding-bottom: 10px; display: inline-block;">Order Summary</h3>
-                <p><strong>Date:</strong> ${orderData.order_date || new Date().toLocaleDateString()}</p>
-                <p><strong>Delivery Method:</strong> <span class="badge">${orderData.delivery_method ? orderData.delivery_method.toUpperCase() : 'N/A'}</span></p>
+                <p><strong>Date:</strong> ${orderData.order_date || 'N/A'}</p>
+                <p><strong>Delivery Method:</strong> <span class="badge">${orderData.delivery_method.toUpperCase()}</span></p>
                 <div style="margin-top: 20px;">
-                    ${orderData.order_items ? orderData.order_items.split('\n').filter(line => line.trim() !== '').map(item => `<div class="item">${item}</div>`).join('') : '<p>Check attachment for details</p>'}
+                    ${orderData.order_items.split('\n').filter(line => line.trim() !== '').map(item => `<div class="item">${item}</div>`).join('')}
                 </div>
                 <div class="total">Total: ${orderData.total_price}</div>
             </div>
@@ -86,31 +86,21 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-       // --- CONFIGURACIÓN DE GMAIL PARA RENDER (VERSIÓN FINAL ANTI-BLOQUEO) ---
+        // Mailtrap configuration (Development)
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, 
+            host: "sandbox.smtp.mailtrap.io",
+            port: 2525,
             auth: {
-                user: process.env.GMAIL_USER,
-                pass: process.env.GMAIL_PASS
-            },
-            // Aumentamos los tiempos al máximo permitido por Render
-            connectionTimeout: 60000, // 60 segundos
-            greetingTimeout: 30000,   // 30 segundos
-            socketTimeout: 60000,     // 60 segundos
-            // Forzamos TLS y desactivamos comprobación estricta de DNS de red
-            tls: {
-                rejectUnauthorized: false,
-                minVersion: "TLSv1.2"
+                user: "09ee2ace2fcb4c",
+                pass: "8a7eee9541e016"
             }
         });
 
-        // --- OPCIONES DEL CORREO ---
         const mailOptions = {
-            from: `"Square Foot Printing" <${process.env.GMAIL_USER}>`,
-            to: [orderData.customer_email, process.env.ADMIN_EMAIL].join(', '),
-            subject: `Order Confirmation: ${orderData.order_id} - ${orderData.customer_name}`,
+            from: '"Square Foot Printing" <pulopez20@gmail.com>',
+            // Copy sent to admin and customer
+            to: `za19012245@zapopan.tecmm.edu.mx, ${orderData.customer_email}`,
+            subject: `Order Confirmation: ${orderData.order_id}`,
             html: emailTemplate(orderData),
             attachments: files.map(file => ({
                 filename: file.originalname,
@@ -118,18 +108,8 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
             }))
         };
 
-        // Enviar Correo
         await transporter.sendMail(mailOptions);
-
-        // --- LIMPIEZA DE ARCHIVOS ---
-        // Borramos los archivos del servidor para no agotar el espacio en disco
-        files.forEach(file => {
-            fs.unlink(file.path, (err) => {
-                if (err) console.error("Error deleting temp file:", file.path);
-            });
-        });
-
-        res.status(200).send({ message: 'Order processed and emails sent successfully' });
+        res.status(200).send({ message: 'Order processed successfully' });
 
     } catch (error) {
         console.error("Server Error Detailed:", error);
@@ -142,3 +122,5 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
  */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+//actualizacion
