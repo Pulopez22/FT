@@ -87,8 +87,10 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
 
         // --- CONFIGURACIÓN DE GMAIL ---
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use true para puerto 465, false para otros puertos
+    auth: {
                 user: 'pulopez20@gmail.com',
                 pass: 'sfbz ltxj xoox almt' // REEMPLAZAR POR TU CONTRASEÑA DE APLICACIÓN DE 16 DÍGITOS
             }
