@@ -242,7 +242,7 @@
             }
 
             try {
-                const res = await fetch('https://ft-f341.onrender.com/api/place-order', { method: 'POST', body: formData });
+                const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { method: 'POST', body: formData });
                 if (res.ok) {
                     localStorage.removeItem('sqft_cart');
                     window.location.href = `order.html?id=${orderNumber}`;
