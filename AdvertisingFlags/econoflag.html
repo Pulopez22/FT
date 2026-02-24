@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Econo Feather Flag - Square Foot Printing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
+        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
+        .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
+        .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
+        .sidebar-item.active { border-right: 3px solid #000; }
+        .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
+        .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
+        .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
+        .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
+        .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
+        .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
+
+        /* Validador con Medidas Fijas */
+        .canvas-container { position: relative; display: inline-block; border: 1px solid #e5e7eb; border-radius: 1.5rem; overflow: hidden; background: #f9fafb; }
+        .measure-label { position: absolute; background: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; color: black; }
+        .measure-h { top: 50%; right: 8px; transform: translateY(-50%) rotate(90deg); }
+        .measure-w { bottom: 8px; left: 50%; transform: translateX(-50%); }
+
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-black">
+
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
+        <div class="flex items-center gap-8">
+            <a href="../index.html" class="flex items-center group">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
+                </div>
+            </a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 text-black hover:text-red-600 transition-colors">Track My Order</button>
+        </div>
+    </nav>
+
+    <div class="flex flex-row flex-grow w-full">
+        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+                <li class="sidebar-item cursor-pointer active"><a href="advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content-scroll text-black text-black">
+            <div class="p-12 flex-grow">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
+                    
+                    <div class="space-y-8">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] relative">
+                            <img id="main-prod-img" src="../images/Advertising Flags/Econo-Feather-Flag-Main-1.png" alt="Econo Flag" class="max-h-[300px] drop-shadow-2xl">
+                        </div>
+
+                        <div class="pt-8 border-t border-gray-100 italic text-black">
+                            <h2 class="text-4xl heavy-italic mb-6 italic tracking-tighter">Econo Feather Flag</h2>
+                            <div class="text-[14px] text-gray-600 leading-[1.7] space-y-6 font-medium">
+                                <p>This flag is a fixed-size 16ft outdoor advertising flag. Printed on 4 oz. Polyester material with a dye sublimation process for long-lasting, vibrant colors.</p>
+                                <div>
+                                    <h4 class="font-black text-gray-900 mb-3 tracking-wider text-xs uppercase underline">Specifications:</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-[12px]">
+                                        <li>Fixed Size: 16ft Total Height</li>
+                                        <li>Scratch resistant & Washable</li>
+                                        <li>Indoor and outdoor capable</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-10">
+                        <header>
+                            <h1 id="prod-title" class="text-4xl heavy-italic text-gray-900 leading-none italic tracking-tighter">Econo Feather Flag</h1>
+                            <p class="text-1xl font-black text-gray-400 italic mt-6" id="prod-range">Precios fijos por configuración</p>
+                        </header>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Graphic Side</label>
+                                <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="single">Single Sided Print Thru</option>
+                                    <option value="reverse">Single Sided Print Thru Reverse</option>
+                                    <option value="none">No Graphic</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Hardware Configuration</label>
+                                <select id="hardware-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="Printed Flag Only (No Hardware)">Printed Flag Only (No Hardware)</option>
+                                    <option value="Printed Flag + Pole + Ground Stake">Printed Flag + Pole + Ground Stake</option>
+                                    <option value="Pole set only" class="hidden">Pole set only</option>
+                                    <option value="Ground stake" class="hidden">Ground stake</option>
+                                    <option value="Pole + ground stake" class="hidden">Pole + ground stake</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Turnaround</label>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="0" selected>Standard (2-3 Days)</option>
+                                    <option value="0">Next Day</option>
+                                    <option value="50.00">Same Day Rush +$50.00</option>
+                                </select>
+                            </div>
+
+                            <div id="validator-container" class="space-y-4">
+                                <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation</label>
+                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">
+                                    <span class="text-[11px] font-black text-gray-400 uppercase italic">Select Design File</span>
+                                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
+                                </div>
+                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6 text-black">
+                                    <div class="flex flex-col md:flex-row gap-8 items-center text-black">
+                                        <div class="canvas-container p-6 text-black">
+                                            <div class="measure-label measure-w">137.75"</div>
+                                            <div class="measure-label measure-h">30.75"</div>
+                                            <img id="preview-thumb" class="max-h-[220px] object-contain drop-shadow-md">
+                                        </div>
+                                        <div class="flex-grow">
+                                            <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing...</h4>
+                                            <div id="validation-text" class="text-[13px] text-gray-500 space-y-2 mt-2">
+                                                <p id="scale-info">Checking dimensions...</p>
+                                                <p id="action-info" class="font-black text-black italic">Artwork will be scaled to fixed size.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
+                                    <div class="flex gap-4">
+                                        <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-2xl hover:bg-black transition-all shadow-lg italic">Approve artwork</button>
+                                        <button onclick="resetUpload()" class="px-8 bg-gray-100 text-gray-400 text-[12px] font-black uppercase rounded-2xl italic">Discard</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="price-row border-none pt-8">
+                                <span class="text-[11px] font-black uppercase tracking-widest italic text-black">Estimated Total</span>
+                                <span id="final-price" class="text-5xl heavy-italic italic text-black">$0.00</span>
+                            </div>
+
+                            <div class="flex gap-5">
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-5 border-2 border-gray-100 rounded-2xl font-black text-center text-black">
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md">Add to Bag</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="cart-sidebar" class="text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter text-black">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white">Checkout</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()"></div>
+
+    <script>
+        lucide.createIcons();
+        let uploadedImageData = null;
+
+        const pricing_data = {
+            "single": { "Printed Flag Only (No Hardware)": 73.65, "Printed Flag + Pole + Ground Stake": 156.60 },
+            "reverse": { "Printed Flag Only (No Hardware)": 73.65, "Printed Flag + Pole + Ground Stake": 156.60 },
+            "none": { "Printed Flag Only (No Hardware)": 73.65, "Printed Flag + Pole + Ground Stake": 156.60, "Pole set only": 69.32, "Ground stake": 33.32, "Pole + ground stake": 102.64 }
+        };
+
+        function calculatePrice() {
+            const side = document.getElementById('side-select').value;
+            const hardware = document.getElementById('hardware-select');
+            const turnFee = parseFloat(document.getElementById('turn-select').value) || 0;
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const validator = document.getElementById('validator-container');
+
+            // Control de hardware extra
+            const extraHw = ["Pole set only", "Ground stake", "Pole + ground stake"];
+            Array.from(hardware.options).forEach(opt => {
+                if (extraHw.includes(opt.value)) opt.classList.toggle('hidden', side !== 'none');
+            });
+
+            if (side !== 'none' && extraHw.includes(hardware.value)) hardware.selectedIndex = 0;
+
+            // Mostrar/Ocultar validador
+            if (side === 'none') {
+                validator.classList.add('hidden');
+                document.getElementById('add-to-cart-btn').disabled = false;
+                document.getElementById('add-to-cart-btn').classList.replace('bg-gray-200', 'bg-black');
+            } else {
+                validator.classList.remove('hidden');
+                if (!document.getElementById('action-buttons')?.classList.contains('hidden')) {
+                    document.getElementById('add-to-cart-btn').disabled = true;
+                    document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+                }
+            }
+
+            const basePrice = pricing_data[side][hardware.value];
+            const total = (basePrice * qty) + turnFee;
+            document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function processFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                document.getElementById('drop-zone').classList.add('hidden');
+                document.getElementById('validation-panel').classList.remove('hidden');
+                reader.onload = (e) => {
+                    uploadedImageData = e.target.result;
+                    const img = new Image(); img.src = e.target.result;
+                    img.onload = function() {
+                        document.getElementById('preview-thumb').src = e.target.result;
+                        document.getElementById('status-title').innerText = "Analysis Complete";
+                        document.getElementById('scale-info').innerHTML = `Uploaded: <span class="font-bold text-black">${(this.width/300).toFixed(1)}" x ${(this.height/300).toFixed(1)}"</span>`;
+                        setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
+                    };
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function approveArt() {
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
+            document.getElementById('status-title').innerText = "ARTWORK APPROVED";
+            document.getElementById('status-title').className = "text-xl font-black uppercase text-green-600 italic tracking-tighter text-black text-black";
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); overlay.classList.remove('visible');
+            } else {
+                sidebar.classList.add('open'); overlay.classList.add('visible');
+                renderCart();
+            }
+        }
+
+        function addToCart() {
+            const side = document.getElementById('side-select').options[document.getElementById('side-select').selectedIndex].text;
+            const hw = document.getElementById('hardware-select').value;
+            const turn = document.getElementById('turn-select').options[document.getElementById('turn-select').selectedIndex].text;
+            const newItem = {
+                name: "Econo Feather Flag",
+                image: uploadedImageData || document.getElementById('main-prod-img').src,
+                price: parseFloat(document.getElementById('final-price').innerText.replace('$', '')),
+                options: { "Graphic": side, "Hardware": hw, "Turnaround": turn, "Quantity": document.getElementById('qty-input').value }
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem); localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            renderCart(); toggleCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = ''; let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Cart Empty</div>`;
+            } else {
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    const details = Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ');
+                    container.innerHTML += `<div class="flex gap-4 border-b pb-4 text-black"><img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg text-black"><div class="flex-grow py-1 text-black"><h4 class="text-[11px] font-black uppercase italic text-black">${item.name}</h4><p class="text-[9px] text-gray-400 font-bold uppercase mt-1">${details}</p><p class="font-black italic mt-1">$${item.price.toFixed(2)}</p></div><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black text-black"></i></button></div>`;
+                });
+            }
+            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
+            lucide.createIcons();
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
+        }
+
+        function resetUpload() {
+            document.getElementById('drop-zone').classList.remove('hidden');
+            document.getElementById('validation-panel').classList.add('hidden');
+            document.getElementById('file-input').value = "";
+        }
+
+        window.onload = () => { calculatePrice(); renderCart(); };
+    </script>
+</body>
+</html>
