@@ -3,32 +3,29 @@ const multer = require('multer');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
-const path = require('path'); // Añadido para manejar rutas de archivos
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 /**
- * 1. HTML EMAIL TEMPLATE
+ * 1. HTML EMAIL TEMPLATE (Con vinculación de archivos)
  */
 const emailTemplate = (orderData) => `
 <!DOCTYPE html>
 <html>
 <head>
     <style>
-        body { margin: 0; padding: 0; background-color: #f4f4f4; }
-        .container { font-family: 'Inter', sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; background-color: #ffffff; }
+        body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Inter', sans-serif; }
+        .container { max-width: 600px; margin: 20px auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; background-color: #ffffff; }
         .header { background-color: #000; padding: 30px; text-align: center; }
         .content { padding: 40px; color: #333; line-height: 1.6; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; color: #000; font-size: 28px; margin: 0; }
-        .order-id { color: #ef4444; font-weight: bold; }
         .details-box { background-color: #f9fafb; padding: 25px; border-radius: 12px; margin-top: 25px; border: 1px solid #f3f4f6; }
-        .footer { background-color: #f3f4f6; padding: 25px; text-align: center; font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 2px; }
-        .item { border-bottom: 1px solid #eee; padding: 12px 0; font-size: 14px; }
-        .item:last-child { border-bottom: none; }
-        .total { font-size: 22px; font-weight: 900; text-align: right; margin-top: 25px; color: #000; font-style: italic; }
-        .badge { background-color: #000; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .item { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .file-label { font-size: 11px; color: #ef4444; font-weight: bold; text-transform: uppercase; margin-top: 5px; display: block; }
+        .footer { background-color: #f3f4f6; padding: 25px; text-align: center; font-size: 10px; color: #9ca3af; }
     </style>
 </head>
 <body>
@@ -37,25 +34,32 @@ const emailTemplate = (orderData) => `
             <img src="cid:logo_sfp" alt="Square Foot Printing" width="180">
         </div>
         <div class="content">
-            <h1 class="heavy-italic">Thank you for your order!</h1>
-            <p style="font-size: 16px;">Hello <strong>${orderData.customer_name}</strong>,</p>
-            <p>We have successfully received your order <span class="order-id">${orderData.order_id}</span>. Our team will start processing it shortly.</p>
+            <h1 class="heavy-italic">New Order Received!</h1>
+            <p><strong>Order ID:</strong> ${orderData.order_id}</p>
+            <p><strong>Customer:</strong> ${orderData.customer_name} (${orderData.customer_email})</p>
             
             <div class="details-box">
-                <h3 style="margin-top:0; border-bottom: 2px solid #000; padding-bottom: 10px; display: inline-block;">Order Summary</h3>
-                <p><strong>Date:</strong> ${orderData.order_date || 'N/A'}</p>
-                <p><strong>Delivery Method:</strong> <span class="badge">${orderData.delivery_method.toUpperCase()}</span></p>
+                <h3 style="margin-top:0; border-bottom: 2px solid #000; padding-bottom: 10px;">Order Details</h3>
                 <div style="margin-top: 20px;">
-                    ${orderData.order_items.split('\n').filter(line => line.trim() !== '').map(item => `<div class="item">${item}</div>`).join('')}
+                    ${orderData.order_items.split('\n').filter(line => line.trim() !== '').map((item, index) => {
+                        // Extraemos el nombre del producto para generar el nombre del archivo esperado
+                        const productName = item.split('.')[1]?.split('[')[0]?.trim().replace(/\s+/g, '-').toLowerCase() || 'design';
+                        const expectedFileName = `${productName}-${orderData.order_id}-${index + 1}.png`;
+                        
+                        return `
+                            <div class="item">
+                                <strong>Item ${index + 1}:</strong> ${item}
+                                <span class="file-label italic">📎 File attached: ${expectedFileName}</span>
+                            </div>`;
+                    }).join('')}
                 </div>
-                <div class="total">Total: ${orderData.total_price}</div>
+                <div style="font-size: 22px; font-weight: 900; text-align: right; margin-top: 25px; font-style: italic;">
+                    Total: ${orderData.total_price}
+                </div>
             </div>
-            
-            <p style="margin-top: 30px; font-size: 13px; color: #666;">If you have any questions regarding your design or turnaround time, please reply directly to this email.</p>
         </div>
-        <div class="footer">
-            © 2026 Square Foot Printing - Las Vegas<br>
-            6155 S Edmond St, Las Vegas, NV 89118
+        <div class="footer italic uppercase tracking-widest">
+            © 2026 Square Foot Printing - Las Vegas facility
         </div>
     </div>
 </body>
@@ -63,7 +67,7 @@ const emailTemplate = (orderData) => `
 `;
 
 /**
- * 2. STORAGE CONFIGURATION (MULTER)
+ * 2. STORAGE CONFIGURATION
  */
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -72,7 +76,8 @@ const storage = multer.diskStorage({
         cb(null, dir);
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
+        // El frontend ya envía el nombre formateado, así que lo respetamos
+        cb(null, file.originalname);
     }
 });
 const upload = multer({ storage: storage });
@@ -94,12 +99,11 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
             }
         });
 
-        // Configuramos los adjuntos: el logo + los archivos del cliente
         const mailAttachments = [
             {
                 filename: 'logo.jpg',
-                path: './images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg',
-                cid: 'logo_sfp' // Este ID debe ser igual al del HTML
+                path: path.join(__dirname, 'images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg'),
+                cid: 'logo_sfp'
             },
             ...files.map(file => ({
                 filename: file.originalname,
@@ -109,23 +113,26 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
 
         const mailOptions = {
             from: '"Square Foot Printing" <pulopez20@gmail.com>',
-            to: [orderData.customer_email, process.env.ADMIN_EMAIL].join(', '),
+            to: `${orderData.customer_email}, za19012245@zapopan.tecmm.edu.mx`,
             subject: `Order Confirmation: ${orderData.order_id}`,
             html: emailTemplate(orderData),
             attachments: mailAttachments
         };
 
         await transporter.sendMail(mailOptions);
+
+        // Limpiar carpeta de uploads tras enviar
+        files.forEach(file => {
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        });
+
         res.status(200).send({ message: 'Order processed successfully' });
 
     } catch (error) {
-        console.error("Server Error Detailed:", error);
+        console.error("Error detallado:", error);
         res.status(500).send('Error processing order');
     }
 });
 
-/**
- * 4. SERVER INITIALIZATION
- */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor Square Foot corriendo en el puerto ${PORT}`));

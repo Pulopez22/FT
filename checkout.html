@@ -233,13 +233,18 @@
             const formData = new FormData();
             formData.append('data', JSON.stringify(orderInfo));
 
-            // 3. CAPTURA AUTOMÁTICA DE IMÁGENES PARA /UPLOADS
-            for (let i = 0; i < cart.length; i++) {
-                if (cart[i].image) {
-                    const file = await imageUrlToFile(cart[i].image, `design-${orderNumber}-${i+1}.png`);
-                    if (file) formData.append('files', file); 
-                }
-            }
+            // 3. CAPTURA AUTOMÁTICA DE IMÁGENES
+for (let i = 0; i < cart.length; i++) {
+    if (cart[i].image) {
+        // Limpiamos el nombre del producto para que no tenga espacios raros
+        const productName = cart[i].name.replace(/\s+/g, '-').toLowerCase();
+        // El nombre del archivo ahora será: coroplast-ORD-123456-1.png
+        const fileName = `${productName}-${orderNumber}-${i+1}.png`;
+        
+        const file = await imageUrlToFile(cart[i].image, fileName);
+        if (file) formData.append('files', file); 
+    }
+}
 
             try {
                 const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { method: 'POST', body: formData });
