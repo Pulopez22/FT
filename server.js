@@ -97,16 +97,15 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         });
 
         const mailOptions = {
-            from: '"Square Foot Printing" <pulopez20@gmail.com>',
-            // Copy sent to admin and customer
-            to: `za19012245@zapopan.tecmm.edu.mx, ${orderData.customer_email}`,
-            subject: `Order Confirmation: ${orderData.order_id}`,
-            html: emailTemplate(orderData),
-            attachments: files.map(file => ({
-                filename: file.originalname,
-                path: file.path
-            }))
-        };
+    from: '"Square Foot Printing" <pulopez20@gmail.com>', // Aquí irá tu correo oficial pronto
+    to: [orderData.customer_email, process.env.ADMIN_EMAIL].join(', '),
+    subject: `Order Confirmation: ${orderData.order_id}`,
+    html: emailTemplate(orderData),
+    attachments: files.map(file => ({
+        filename: file.originalname,
+        path: file.path
+    }))
+};
 
         await transporter.sendMail(mailOptions);
         res.status(200).send({ message: 'Order processed successfully' });
