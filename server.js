@@ -3,6 +3,7 @@ const multer = require('multer');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
+const path = require('path'); // Añadido para manejar rutas de archivos
 
 const app = express();
 app.use(cors());
@@ -10,8 +11,6 @@ app.use(express.json());
 
 /**
  * 1. HTML EMAIL TEMPLATE
- * Designed to match the Square Foot Printing aesthetic.
- * Content translated to English for the Las Vegas market.
  */
 const emailTemplate = (orderData) => `
 <!DOCTYPE html>
@@ -35,7 +34,7 @@ const emailTemplate = (orderData) => `
 <body>
     <div class="container">
         <div class="header">
-            <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg   " alt="Square Foot Printing" width="180">
+            <img src="cid:logo_sfp" alt="Square Foot Printing" width="180">
         </div>
         <div class="content">
             <h1 class="heavy-italic">Thank you for your order!</h1>
@@ -86,7 +85,6 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
 
-        // Mailtrap configuration (Development)
         const transporter = nodemailer.createTransport({
             host: "sandbox.smtp.mailtrap.io",
             port: 2525,
@@ -96,16 +94,26 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
             }
         });
 
+        // Configuramos los adjuntos: el logo + los archivos del cliente
+        const mailAttachments = [
+            {
+                filename: 'logo.jpg',
+                path: './images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg',
+                cid: 'logo_sfp' // Este ID debe ser igual al del HTML
+            },
+            ...files.map(file => ({
+                filename: file.originalname,
+                path: file.path
+            }))
+        ];
+
         const mailOptions = {
-    from: '"Square Foot Printing" <pulopez20@gmail.com>', // Aquí irá tu correo oficial pronto
-    to: [orderData.customer_email, process.env.ADMIN_EMAIL].join(', '),
-    subject: `Order Confirmation: ${orderData.order_id}`,
-    html: emailTemplate(orderData),
-    attachments: files.map(file => ({
-        filename: file.originalname,
-        path: file.path
-    }))
-};
+            from: '"Square Foot Printing" <pulopez20@gmail.com>',
+            to: [orderData.customer_email, process.env.ADMIN_EMAIL].join(', '),
+            subject: `Order Confirmation: ${orderData.order_id}`,
+            html: emailTemplate(orderData),
+            attachments: mailAttachments
+        };
 
         await transporter.sendMail(mailOptions);
         res.status(200).send({ message: 'Order processed successfully' });
@@ -121,5 +129,3 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
  */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-//actualizacion
