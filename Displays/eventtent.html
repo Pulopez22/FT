@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-Stand Banner - Square Foot Printing</title>
+    <title>Event Tent - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
                 <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
-            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 hover:text-red-600 transition-colors">Track My Order</button>
+            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 hover:text-red-600 transition-colors">Track Order</button>
         </div>
     </nav>
 
@@ -76,17 +76,18 @@
             <div class="p-12 flex-grow">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
                     <div class="space-y-8">
-                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] relative">
-                            <img id="main-prod-img" src="../images/Displays/SQFT-X-Stand-01_1200.png" alt="X-Stand Banner" class="max-h-[300px] drop-shadow-2xl">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative">
+                            <img id="main-prod-img" src="../images/Displays/UV-Tent-10FT-Full-Color-Print_2.png" alt="Event Tent" class="max-h-[400px] drop-shadow-2xl">
                         </div>
                         <div class="pt-8 border-t border-gray-100">
-                            <h2 class="text-4xl heavy-italic mb-6">X-Stand Banner Kit</h2>
+                            <h2 class="text-4xl heavy-italic mb-6">Pro-Series Event Tent</h2>
                             <div class="text-[14px] text-gray-600 leading-[1.8] space-y-6 font-medium">
-                                <p>Indoor events, retail stores, and trade shows. Lightweight construction. Includes nylon travel bag.</p>
+                                <p>Premium 10x10 outdoor advertising solution. Features 360-degree branding with high-resolution dye-sublimation printing on weather-resistant polyester.</p>
                                 <ul class="list-disc pl-5 space-y-3 text-[13px]">
-                                    <li>Sizes: 24" x 63" or 32" x 71"</li>
-                                    <li>Fiberglass and Aluminum X-Frame</li>
-                                    <li>Travel bag included</li>
+                                    <li><strong>Hardware:</strong> 40mm Hex Aluminum (Heavy Duty)</li>
+                                    <li><strong>Fabric:</strong> 6 oz. Waterproof & Scratch Resistant</li>
+                                    <li><strong>Print:</strong> Seam-to-seam full color sublimation</li>
+                                    <li><strong>Included:</strong> Frame, Canopy, Ropes, Stakes & Bag</li>
                                 </ul>
                             </div>
                         </div>
@@ -94,37 +95,67 @@
 
                     <div class="space-y-10">
                         <header>
-                            <h1 class="text-4xl heavy-italic text-gray-900 leading-none">X-Stand Banner</h1>
-                            <p class="text-1xl font-black text-gray-400 italic mt-6">$55.50 – $166.50 unit</p>
+                            <h1 class="text-4xl heavy-italic text-gray-900 leading-none">Event Tent (Full Color)</h1>
+                            <p class="text-1xl font-black text-gray-400 italic mt-6">Starting at $492.90</p>
                         </header>
 
                         <div class="space-y-6">
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Size Selection</label>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Graphic Options</label>
                                 <select id="size-select" onchange="calculatePrice()" class="custom-dropdown">
-                                    <option value="24x63" data-w="24" data-h="63">24" x 63"</option>
-                                    <option value="32x71" data-w="32" data-h="71">32" x 71"</option>
+                                    <option value="full_kit" data-w="120" data-h="137">Full Kit (Frame + Canopy)</option>
+                                    <option value="canopy_only" data-w="120" data-h="120">Canopy Graphic Only</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Banner Material</label>
-                                <select id="material-select" onchange="calculatePrice()" class="custom-dropdown">
-                                    <option value="13oz">13oz Matte Banner</option>
-                                    <option value="popup" selected>Pop Up Film</option>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Reinforcement Strip Color</label>
+                                <select id="strip-select" class="custom-dropdown">
+                                    <option value="white">White</option>
+                                    <option value="black">Black</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Full Walls (Single Sided)</label>
+                                <select id="fullwall-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="0">No Full Walls</option>
+                                    <option value="1">1 Full Wall (+$185)</option>
+                                    <option value="2">2 Full Walls (+$370)</option>
+                                    <option value="3">3 Full Walls (+$555)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Half Walls (Middle Walls)</label>
+                                <select id="halfwall-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="0">No Half Walls</option>
+                                    <option value="1">1 Half Wall (+$145)</option>
+                                    <option value="2">2 Half Walls (+$290)</option>
+                                    <option value="3">3 Half Walls (+$435)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Optional Accessories</label>
+                                <select id="acc-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="none">No Accessories</option>
+                                    <option value="bag">Upgrade Carry Bag w/ Wheels (+$45)</option>
+                                    <option value="sand">4 Sandbags (+$60)</option>
+                                    <option value="both">Bag + Sandbags (+$105)</option>
                                 </select>
                             </div>
 
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Turnaround</label>
                                 <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
-                                    <option value="Standard" selected>Standard (2-3 Days)</option>
-                                    <option value="Next Day">Next Day</option>
+                                    <option value="Standard" selected>Standard (3-5 Business Days)</option>
+                                    <option value="Quick">Quick Turn (1-2 Business Days)</option>
                                 </select>
                             </div>
 
                             <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest text-black">Art Validation Required</label>
+                                <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
                                 <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">
                                     <span class="text-[11px] font-black text-gray-400 uppercase italic">Select Design File</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
@@ -132,13 +163,13 @@
                                 <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6">
                                     <div class="flex flex-col md:flex-row gap-8 items-center">
                                         <div class="canvas-container p-6">
-                                            <div id="measure-w" class="measure-label measure-w">0"</div>
-                                            <div id="measure-h" class="measure-label measure-h">0"</div>
+                                            <div id="measure-w" class="measure-label measure-w">120"</div>
+                                            <div id="measure-h" class="measure-label measure-h">137"</div>
                                             <img id="preview-thumb" class="max-h-[220px] object-contain">
                                         </div>
                                         <div class="flex-grow">
                                             <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing...</h4>
-                                            <p id="scale-info" class="text-xs">Uploaded size: <span id="file-dims" class="font-bold">0" x 0"</span></p>
+                                            <p id="scale-info" class="text-xs">Uploaded: <span id="file-dims" class="font-bold">0" x 0"</span></p>
                                         </div>
                                     </div>
                                     <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
@@ -189,9 +220,16 @@
         lucide.createIcons();
         let uploadedImageData = null;
 
-        const pricing_matrix = {
-            "24x63": { "13oz": { "Standard": 55.50, "Next Day": 88.50 }, "popup": { "Standard": 72.00, "Next Day": 121.50 } },
-            "32x71": { "13oz": { "Standard": 69.00, "Next Day": 94.50 }, "popup": { "Standard": 94.50, "Next Day": 166.50 } }
+        // Configuration
+        const base_prices = {
+            "full_kit": { "Standard": 492.90, "Quick": 640.00 },
+            "canopy_only": { "Standard": 295.00, "Quick": 395.00 }
+        };
+
+        const extra_costs = {
+            "accessories": { "none": 0, "bag": 45, "sand": 60, "both": 105 },
+            "fullwall": 185,
+            "halfwall": 145
         };
 
         function toggleCart() {
@@ -200,16 +238,22 @@
         }
 
         function calculatePrice() {
-            const size = document.getElementById('size-select').value;
-            const mat = document.getElementById('material-select').value;
+            const kitType = document.getElementById('size-select').value;
             const turn = document.getElementById('turn-select').value;
+            const acc = document.getElementById('acc-select').value;
+            const fWalls = parseInt(document.getElementById('fullwall-select').value);
+            const hWalls = parseInt(document.getElementById('halfwall-select').value);
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-            const unitPrice = pricing_matrix[size][mat][turn];
+            let unitPrice = base_prices[kitType][turn];
+            unitPrice += extra_costs.accessories[acc];
+            unitPrice += (fWalls * extra_costs.fullwall);
+            unitPrice += (hWalls * extra_costs.halfwall);
+
             const total = unitPrice * qty;
-            
             document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
             
+            // Measure display
             const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
             document.getElementById('measure-w').innerText = sel.getAttribute('data-w') + '"';
             document.getElementById('measure-h').innerText = sel.getAttribute('data-h') + '"';
@@ -226,7 +270,7 @@
                     img.src = e.target.result;
                     img.onload = function() {
                         document.getElementById('preview-thumb').src = e.target.result;
-                        document.getElementById('file-dims').innerText = `${(this.width/100).toFixed(1)}" x ${(this.height/100).toFixed(1)}"`;
+                        document.getElementById('file-dims').innerText = `${(this.width/10).toFixed(1)}" x ${(this.height/10).toFixed(1)}"`;
                         document.getElementById('status-title').innerText = "Analysis Complete";
                         setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
                     };
@@ -253,15 +297,20 @@
         }
 
         function addToCart() {
-            const sizeText = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex].text;
-            const matText = document.getElementById('material-select').options[document.getElementById('material-select').selectedIndex].text;
-            const turnText = document.getElementById('turn-select').options[document.getElementById('turn-select').selectedIndex].text;
+            const kitLabel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex].text;
+            const fWalls = document.getElementById('fullwall-select').value;
+            const hWalls = document.getElementById('halfwall-select').value;
 
             const newItem = {
-                name: "X-Stand Banner",
-                image: uploadedImageData || "../images/Displays/SQFT-X-Stand-01_1200.png",
+                name: "Event Tent 10ft",
+                image: uploadedImageData || "../images/Displays/UV-Tent-10FT-Full-Color-Print_2.png",
                 price: parseFloat(document.getElementById('final-price').innerText.replace('$', '')),
-                options: { "Size": sizeText, "Material": matText, "Turnaround": turnText, "Qty": document.getElementById('qty-input').value }
+                options: { 
+                    "Kit": kitLabel, 
+                    "Full Walls": fWalls,
+                    "Half Walls": hWalls,
+                    "Qty": document.getElementById('qty-input').value 
+                }
             };
             
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
@@ -285,7 +334,16 @@
                 cart.forEach((item, i) => {
                     total += item.price;
                     const details = Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ');
-                    container.innerHTML += `<div class="flex gap-4 border-b pb-4"><img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg"><div class="flex-grow py-1"><h4 class="text-[11px] font-black uppercase italic">${item.name}</h4><p class="text-[9px] text-gray-400 font-bold uppercase mt-1">${details}</p><span class="text-lg font-black italic">$${item.price.toFixed(2)}</span></div><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
+                    container.innerHTML += `
+                        <div class="flex gap-4 border-b pb-4">
+                            <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg">
+                            <div class="flex-grow py-1">
+                                <h4 class="text-[11px] font-black uppercase italic">${item.name}</h4>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1">${details}</p>
+                                <span class="text-lg font-black italic">$${item.price.toFixed(2)}</span>
+                            </div>
+                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>`;
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
