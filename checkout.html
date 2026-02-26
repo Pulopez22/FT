@@ -17,8 +17,6 @@
         label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.1em; margin-bottom: 0.6rem; display: block; margin-left: 0.5rem; }
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover { color: #000; padding-left: 4px; }
-        
-        /* Botones de selección unificados */
         .select-button { cursor: pointer; transition: all 0.3s ease; border: 2px solid #f3f4f6; background-color: #f9fafb; color: #000; }
         .select-button.active { border-color: #000; background-color: #000 !important; color: #fff !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         #cardNumberDisplay { font-family: monospace; letter-spacing: 2px; font-size: 16px; }
@@ -44,7 +42,7 @@
         </div>
     </nav>
 
-    <div class="flex flex-row flex-grow w-full">
+    <div class="flex flex-row flex-grow w-full text-black">
         <aside class="w-72 border-r p-10 hidden lg:block bg-white sticky top-[73px] h-[calc(100vh-73px)] text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase text-black">
@@ -86,19 +84,12 @@
                                     <i data-lucide="send"></i><span class="heavy-italic text-sm">Shipping</span>
                                 </button>
                             </div>
-
                             <div id="pickup-box" class="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 space-y-6">
-                                <div class="flex justify-between items-start">
-                                    <p class="text-sm font-bold uppercase">6155 S Edmond St, Las Vegas, NV 89118</p>
-                                    <a href="https://maps.apple.com/?address=6155%20S%20Edmond%20St,%20Las%20Vegas,%20NV%2089118" target="_blank" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2 hover:bg-gray-100 transition-colors">
-                                        <i data-lucide="apple" class="w-4 h-4 text-black"></i><span class="text-[9px] font-black uppercase italic">Open</span>
-                                    </a>
-                                </div>
+                                <p class="text-sm font-bold uppercase">6155 S Edmond St, Las Vegas, NV 89118</p>
                                 <div class="w-full h-48 rounded-2xl overflow-hidden border border-gray-200">
-                                    <iframe src="http://googleusercontent.com/maps.google.com/5" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                    <iframe src="http://googleusercontent.com/maps.google.com/4" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                                 </div>
                             </div>
-
                             <div id="shipping-box" class="hidden space-y-6">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="md:col-span-2"><label>Street Address</label><input type="text" id="streetAddress" placeholder="123 Printing Way" class="input-field"></div>
@@ -128,12 +119,20 @@
                         </section>
                     </div>
 
-                    <div class="lg:col-span-5">
+                    <div class="lg:col-span-5 text-black">
                         <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl overflow-hidden sticky top-6">
-                            <div class="p-8 border-b border-gray-50 bg-gray-50/50"><h2 class="heavy-italic text-xl">Order Summary</h2></div>
+                            <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center text-black">
+                                <h2 class="heavy-italic text-xl">Order Summary</h2>
+                                <span id="item-count" class="bg-black text-white text-[10px] px-2 py-1 rounded-full font-black italic">0 ITEMS</span>
+                            </div>
+                            
                             <div id="order-items-list" class="p-8 space-y-6 max-h-[400px] overflow-y-auto"></div>
+
                             <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
-                                <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 italic">Total Amount</span><span id="final-price-display" class="text-5xl heavy-italic italic">$0.00</span></div>
+                                <div class="flex justify-between items-end">
+                                    <span class="text-[10px] font-black uppercase text-gray-400 italic">Total Amount</span>
+                                    <span id="final-price-display" class="text-5xl heavy-italic italic">$0.00</span>
+                                </div>
                                 <button onclick="validateAndPlaceOrder()" id="place-order-btn" class="w-full bg-red-600 hover:bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic transition-all shadow-xl">Place Order Now</button>
                             </div>
                         </div>
@@ -155,13 +154,10 @@
 
         function setMethod(type) {
             currentMethod = type;
-            const isPickup = type === 'pickup';
-            document.getElementById('pickup-box').classList.toggle('hidden', !isPickup);
-            document.getElementById('shipping-box').classList.toggle('hidden', isPickup);
-            
-            // Cambio de color unificado
-            document.getElementById('method-pickup').classList.toggle('active', isPickup);
-            document.getElementById('method-shipping').classList.toggle('active', !isPickup);
+            document.getElementById('pickup-box').classList.toggle('hidden', type === 'shipping');
+            document.getElementById('shipping-box').classList.toggle('hidden', type === 'pickup');
+            document.getElementById('method-pickup').classList.toggle('active', type === 'pickup');
+            document.getElementById('method-shipping').classList.toggle('active', type === 'shipping');
         }
 
         function selectPayment(method) {
@@ -177,6 +173,79 @@
             if (val.length > 2) el.value = val.substring(0, 2) + '/' + val.substring(2, 4); else el.value = val;
         }
 
+        // --- FUNCIONES PARA EDITAR / BORRAR PRODUCTOS ---
+
+        function loadCheckoutData() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('order-items-list');
+            const itemCountLabel = document.getElementById('item-count');
+            let total = 0;
+
+            itemCountLabel.innerText = `${cart.length} ITEMS`;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10">
+                        <p class="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Your cart is empty</p>
+                        <a href="index.html" class="text-red-600 text-[10px] font-black uppercase underline mt-2 inline-block">Go back to shop</a>
+                    </div>`;
+                document.getElementById('final-price-display').innerText = `$0.00`;
+                return;
+            }
+
+            container.innerHTML = cart.map((item, index) => {
+                total += parseFloat(item.price);
+                let opts = item.options ? Object.entries(item.options).map(([k,v]) => `<span class="block text-[9px] uppercase text-gray-500">${k}: ${v}</span>`).join('') : `<span class="block text-[9px] uppercase text-gray-500">Size: ${item.size}</span>`;
+                
+                return `
+                    <div class="flex gap-4 border-b border-gray-100 pb-4 group relative text-black">
+                        <div class="w-16 h-16 bg-white border rounded-xl flex items-center justify-center overflow-hidden shrink-0 text-black">
+                            <img src="${item.image}" class="object-cover w-full h-full text-black">
+                        </div>
+                        <div class="flex-grow text-black">
+                            <div class="font-black text-[11px] uppercase leading-tight text-black">${item.name}</div>
+                            ${opts}
+                            <div class="flex gap-4 mt-2">
+                                <button onclick="editItem(${index})" class="text-[9px] font-black text-black uppercase hover:text-red-600 transition-colors flex items-center gap-1">
+                                    <i data-lucide="edit-3" class="w-3 h-3"></i> Edit
+                                </button>
+                                <button onclick="removeItem(${index})" class="text-[9px] font-black text-red-600 uppercase hover:text-black transition-colors flex items-center gap-1">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                        <div class="text-right shrink-0 text-black">
+                            <div class="font-bold text-sm text-black">$${parseFloat(item.price).toFixed(2)}</div>
+                            <div class="text-[9px] font-bold text-gray-400 uppercase italic text-black">Qty: ${item.quantity || 1}</div>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            document.getElementById('final-price-display').innerText = `$${total.toFixed(2)}`;
+            if (window.lucide) { lucide.createIcons(); }
+        }
+
+        function removeItem(index) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            if(confirm("Remove this item from your order?")) {
+                cart.splice(index, 1);
+                localStorage.setItem('sqft_cart', JSON.stringify(cart));
+                loadCheckoutData();
+            }
+        }
+
+        function editItem(index) {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const item = cart[index];
+            if (item.url) {
+                cart.splice(index, 1);
+                localStorage.setItem('sqft_cart', JSON.stringify(cart));
+                window.location.href = item.url;
+            }
+        }
+
+        // --- FINALIZAR COMPRA ---
+
         async function imageUrlToFile(url, filename) {
             try {
                 const response = await fetch(url);
@@ -186,6 +255,9 @@
         }
 
         async function validateAndPlaceOrder() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            if (cart.length === 0) { alert("Your cart is empty!"); return; }
+
             const btn = document.getElementById('place-order-btn');
             const fields = ['fullName', 'emailAddress', 'phoneNumber'];
             if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
@@ -206,16 +278,12 @@
             btn.innerText = "SENDING ORDER...";
             btn.disabled = true;
 
-            // 1. GENERACIÓN DE ID Y FECHA
             const orderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
             const dateStr = new Date().toLocaleString();
 
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            
-            // 2. RECONSTRUCCIÓN DETALLADA DE ARTÍCULOS (Grommets, Hem, etc.)
             let itemsSummary = cart.map((i, index) => {
                 let optionsText = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : `Size: ${i.size}`;
-                return `${index + 1}. ${i.name.toUpperCase()} [${optionsText}, Quantity: ${i.quantity || 1}] - $${parseFloat(i.price).toFixed(2)}`;
+                return `${index + 1}. ${i.name.toUpperCase()} [${optionsText}, Qty: ${i.quantity || 1}] - $${parseFloat(i.price).toFixed(2)}`;
             }).join('\n');
 
             const orderInfo = {
@@ -232,18 +300,14 @@
             const formData = new FormData();
             formData.append('data', JSON.stringify(orderInfo));
 
-            // 3. CAPTURA AUTOMÁTICA DE IMÁGENES
-for (let i = 0; i < cart.length; i++) {
-    if (cart[i].image) {
-        // Limpiamos el nombre del producto para que no tenga espacios raros
-        const productName = cart[i].name.replace(/\s+/g, '-').toLowerCase();
-        // El nombre del archivo ahora será: coroplast-ORD-123456-1.png
-        const fileName = `${productName}-${orderNumber}-${i+1}.png`;
-        
-        const file = await imageUrlToFile(cart[i].image, fileName);
-        if (file) formData.append('files', file); 
-    }
-}
+            for (let i = 0; i < cart.length; i++) {
+                if (cart[i].image) {
+                    const productName = cart[i].name.replace(/\s+/g, '-').toLowerCase();
+                    const fileName = `${productName}-${orderNumber}-${i+1}.png`;
+                    const file = await imageUrlToFile(cart[i].image, fileName);
+                    if (file) formData.append('files', file); 
+                }
+            }
 
             try {
                 const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { method: 'POST', body: formData });
@@ -255,19 +319,6 @@ for (let i = 0; i < cart.length; i++) {
                 btn.innerText = "Place Order Now";
                 btn.disabled = false;
             }
-        }
-
-        function loadCheckoutData() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const container = document.getElementById('order-items-list');
-            let total = 0;
-            if (cart.length === 0) { container.innerHTML = '<p>Your cart is empty</p>'; return; }
-            container.innerHTML = cart.map(item => {
-                total += parseFloat(item.price);
-                let opts = item.options ? Object.entries(item.options).map(([k,v]) => `<span class="block text-[9px] uppercase">${k}: ${v}</span>`).join('') : '';
-                return `<div class="flex gap-4 border-b pb-4"><div class="w-16 h-16 bg-white border rounded-xl flex items-center justify-center"><img src="${item.image}" class="max-w-full max-h-full"></div><div class="flex-grow"><div class="font-black text-[11px] uppercase">${item.name}</div>${opts}</div><div class="font-bold text-sm">$${parseFloat(item.price).toFixed(2)}</div></div>`;
-            }).join('');
-            document.getElementById('final-price-display').innerText = `$${total.toFixed(2)}`;
         }
 
         window.onload = loadCheckoutData;

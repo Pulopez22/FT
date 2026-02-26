@@ -22,7 +22,6 @@
         .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
         .canvas-bg-grid { background-color: #f3f4f6; background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%); background-size: 20px 20px; }
         
-        /* Efecto Carrito y Fondo Opaco */
         #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
@@ -42,7 +41,7 @@
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain text-black">
                 </div>
             </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
                 <a href="../Displays/displays.html" class="hover:text-black transition-colors">Displays</a>
@@ -62,10 +61,10 @@
         </div>
     </nav>
 
-    <div class="flex flex-row flex-grow w-full text-black text-black">
+    <div class="flex flex-row flex-grow w-full text-black">
         <aside class="sidebar-fixed p-10 hidden lg:block text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
-           <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
@@ -84,7 +83,7 @@
                             <img id="main-prod-img" src="../images/Large Printing/AB-Vinyl-01.png" alt="Vinyl" class="max-h-[300px] drop-shadow-2xl transition-all duration-300">
                         </div>
                         
-                        <div class="flex gap-3 justify-center flex-wrap" id="thumb-container text-black text-black text-black">
+                        <div class="flex gap-3 justify-center flex-wrap" id="thumb-container">
                             <img src="../images/Large Printing/AB-Vinyl-01.png" class="thumb-img thumb-active" onclick="changeImage(this)">
                             <img src="../images/Large Printing/AB-Vinyl-02.png" class="thumb-img" onclick="changeImage(this)">
                         </div>
@@ -149,18 +148,16 @@
                                 </select>
                             </div>
 
-                         
+                            <div class="grid grid-cols-2 gap-6 relative text-black">
                                 <div id="limit-msg" class="hidden absolute -top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest text-black">Width Limit 52"</div>
-                                <div class="grid grid-cols-2 gap-6 text-black">
-                                    <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic text-black">Width (Max 52")</label><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input text-black"></div>
-                                    <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic text-black">Height (in)</label><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input text-black text-black"></div>
-                                </div>
+                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic text-black">Width (Max 52")</label><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input text-black"></div>
+                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic text-black">Height (in)</label><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input text-black"></div>
+                            </div>
 
-                                <div class="flex justify-between items-center pt-8 mt-6 border-t border-gray-200 text-black">
-                                    <div class="flex flex-col text-black"><span class="text-[10px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span><span class="text-[9px] font-bold text-gray-400 mt-1" id="area-display">4.000 sq ft</span></div>
-                                    <span id="final-price" class="text-4xl font-black italic leading-none text-black">$0.00</span>
-                                </div>
-                          
+                            <div class="flex justify-between items-center pt-8 mt-6 border-t border-gray-200 text-black">
+                                <div class="flex flex-col text-black"><span class="text-[10px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span><span class="text-[9px] font-bold text-gray-400 mt-1" id="area-display">4.000 sq ft</span></div>
+                                <span id="final-price" class="text-4xl font-black italic leading-none text-black">$0.00</span>
+                            </div>
 
                             <div class="space-y-4 text-black">
                                 <label class="text-[9px] font-black uppercase text-red-500 block italic tracking-widest text-black">Art Validation Required</label>
@@ -190,7 +187,7 @@
                                 </div>
                             </div>
 
-                            <div class="flex gap-4 text-black text-black text-black">
+                            <div class="flex gap-4 text-black">
                                 <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-4 border-2 border-gray-100 rounded-2xl font-black text-center text-lg text-black">
                                 <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-4 rounded-2xl text-[12px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md">Add to Bag</button>
                             </div>
@@ -209,11 +206,11 @@
     </div>
 
     <div id="cart-sidebar">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black text-black text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
             <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black text-black text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black text-black"></div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
             <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
             <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white text-center">Checkout</button>
@@ -322,21 +319,30 @@
             el.classList.add('thumb-active');
         }
 
+        // --- FUNCION DE AÑADIR CORREGIDA ---
         function addToCart() {
             const vinyl = document.getElementById('vinyl-type');
             const turn = document.getElementById('turn-select');
             const lam = document.getElementById('lam-select');
             const finish = document.getElementById('finish-select');
             
+            // CONSTRUIR LINK DINÁMICO PARA EDITAR
+            const editUrl = new URL(window.location.href);
+            editUrl.searchParams.set('w', document.getElementById('w-input').value);
+            editUrl.searchParams.set('h', document.getElementById('h-input').value);
+            editUrl.searchParams.set('v_type', vinyl.value);
+            editUrl.searchParams.set('lam', lam.value);
+            editUrl.searchParams.set('qty', document.getElementById('qty-input').value);
+
             const newItem = {
                 name: "Calendar Adhesive Vinyl",
                 image: uploadedImageData || document.getElementById('main-prod-img').src,
                 price: currentPriceValue,
+                url: editUrl.toString(), // Link de edición guardado
                 options: {
                     "Type": vinyl.options[vinyl.selectedIndex].text,
                     "Lamination": lam.options[lam.selectedIndex].text,
                     "Finishing": finish.options[finish.selectedIndex].text,
-                    "Turnaround": turn.options[turn.selectedIndex].text,
                     "Size": `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
                     "Quantity": document.getElementById('qty-input').value
                 }
@@ -382,7 +388,18 @@
             cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
         }
 
-        window.onload = () => { calculatePrice(); renderCart(); };
+        // --- LOGICA DE LECTURA DE URL AL CARGAR ---
+        window.onload = () => { 
+            const params = new URLSearchParams(window.location.search);
+            if(params.has('w')) document.getElementById('w-input').value = params.get('w');
+            if(params.has('h')) document.getElementById('h-input').value = params.get('h');
+            if(params.has('v_type')) document.getElementById('vinyl-type').value = params.get('v_type');
+            if(params.has('lam')) document.getElementById('lam-select').value = params.get('lam');
+            if(params.has('qty')) document.getElementById('qty-input').value = params.get('qty');
+            
+            calculatePrice(); 
+            renderCart(); 
+        };
     </script>
 </body>
 </html>
