@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Square Foot Printing - Sticker Configurator</title>
+    <title>Sticker - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #fff; color: #1a1a1a; }
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-x: hidden; }
+        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        
+        /* Estilos de Configuración */
         .options-container { border-radius: 20px; overflow: hidden; border: 1px solid #f3f4f6; background-color: white; }
         .selectable-item { padding: 16px; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; width: 100%; text-align: left; font-size: 13px; font-weight: 600; }
         .selectable-item:last-child { border-bottom: none; }
@@ -16,130 +20,162 @@
         
         #custom-size-panel { transition: all 0.3s ease; max-height: 0; overflow: hidden; opacity: 0; }
         #custom-size-panel.open { max-height: 400px; opacity: 1; border-top: 1px solid #f3f4f6; padding: 20px; }
+
+        /* Estilos del Menú Lateral y Carrito */
+        .sidebar-item:hover { color: #000; padding-left: 6px; transition: all 0.2s ease; }
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
+<body class="bg-white text-black">
 
-    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50">
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
         <div class="flex items-center gap-8">
             <a href="../index.html" class="flex items-center group">
-                <div class="bg-black p-2 rounded-lg transition-transform group-hover:scale-105 shadow-xl">
-                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" 
-                         alt="Square Foot Printing" class="h-8 md:h-10 w-auto object-contain">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-            <div class="hidden md:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                <span class="text-black border-b-2 border-black pb-1 italic">Sticker Configurator</span>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="stickers.html" class="text-black border-b-2 border-black pb-1">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
+        </div>
+        <div class="flex gap-4 items-center">
+            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            </button>
+            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 transition-colors border-b-2 border-black pb-0.5">Track My Order</button>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-6 py-12 flex-grow">
-        <header class="mb-12">
-            <h1 class="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Configure your Stickers</h1>
-            <div class="h-1.5 w-20 bg-black rounded-full mt-2"></div>
-        </header>
+    <div class="flex">
+        <aside class="w-72 border-r h-[calc(100vh-73px)] sticky top-[73px] p-8 hidden lg:block bg-white overflow-y-auto">
+            <h3 class="text-[10px] font-black uppercase mb-8 text-gray-400 tracking-widest border-b pb-2">Product Categories</h3>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
+                <li class="sidebar-item cursor-pointer text-black font-black"><a href="stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+            </ul>
+        </aside>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
-            
-            <div class="space-y-6">
-                <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em]">1. Shape & Finish</h3>
-                <div id="shape-options" class="options-container shadow-sm">
-                    <button onclick="selectItem(this, 'shape')" class="selectable-item item-active">
-                        <div class="icon-box">🐱</div> <span>Contour Cut</span>
-                    </button>
-                    <button onclick="selectItem(this, 'shape')" class="selectable-item">
-                        <div class="icon-box">⬜</div> <span>Square</span>
-                    </button>
-                    <button onclick="selectItem(this, 'shape')" class="selectable-item">
-                        <div class="icon-box">◯</div> <span>Circle</span>
-                    </button>
-                    <button onclick="selectItem(this, 'shape')" class="selectable-item">
-                        <div class="icon-box">⬜</div> <span>Orillas redondas</span>
-                    </button>
+        <main class="flex-grow p-6 md:p-12">
+            <header class="mb-12">
+                <h1 class="text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter">Configure your Stickers</h1>
+                <div class="h-2 w-24 bg-black rounded-full"></div>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <div class="space-y-8">
+                    <section>
+                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4">1. Shape & Finish</h3>
+                        <div id="shape-options" class="options-container shadow-sm mb-4">
+                            <button onclick="selectItem(this, 'shape')" class="selectable-item item-active">
+                                <div class="icon-box">🐱</div> <span>Contour Cut</span>
+                            </button>
+                            <button onclick="selectItem(this, 'shape')" class="selectable-item">
+                                <div class="icon-box">⬜</div> <span>Square</span>
+                            </button>
+                            <button onclick="selectItem(this, 'shape')" class="selectable-item">
+                                <div class="icon-box">◯</div> <span>Circle</span>
+                            </button>
+                        </div>
+                        <select id="finish-select" onchange="updateSummary()" class="w-full p-4 border border-gray-100 rounded-2xl bg-white font-black text-xs uppercase outline-none focus:border-black transition-all">
+                            <option>Glossy Finish</option>
+                            <option>Matte Finish</option>
+                        </select>
+                    </section>
                 </div>
 
-                <div id="shape-tip" class="bg-blue-50 border border-blue-100 p-4 rounded-2xl">
-                    <p class="text-[10px] font-black text-blue-600 uppercase tracking-tight flex items-center italic">
-                        <span class="mr-2">✨</span> Pro tip: Use PNG for exact contour.
-                    </p>
-                </div>
-
-                <select id="finish-select" onchange="updateSummary()" class="w-full p-4 border border-gray-100 rounded-2xl bg-white font-black text-xs uppercase outline-none focus:border-black transition-all">
-                    <option>Glossy Finish</option>
-                    <option>Matte Finish</option>
-                </select>
-            </div>
-
-            <div class="space-y-6">
-                <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em]">2. Size</h3>
-                <div id="size-options" class="options-container shadow-sm">
-                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item item-active">2 x 2 in</button>
-                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">4 x 4 in</button>
-                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">6 x 6 in</button>
-                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">8 x 8 in</button>
-                    <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">10 x 10 in</button>
-                    <button onclick="toggleCustomControls(true); selectItem(this, 'size')" class="selectable-item text-red-600">Custom Size</button>
-                    
-                    <div id="custom-size-panel" class="bg-gray-50">
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="text-[9px] uppercase font-black text-gray-400 block mb-1">Width (in)</label>
-                                <input type="number" id="custom-w" value="3.0" step="0.1" oninput="validateLimits(this); updateSummary();" class="w-full p-3 border rounded-xl font-black outline-none focus:border-black">
-                            </div>
-                            <div>
-                                <label class="text-[9px] uppercase font-black text-gray-400 block mb-1">Height (in)</label>
-                                <input type="number" id="custom-h" value="3.0" step="0.1" oninput="validateLimits(this); updateSummary();" class="w-full p-3 border rounded-xl font-black outline-none focus:border-black">
+                <div class="space-y-8">
+                    <section>
+                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4">2. Size & Quantity</h3>
+                        <div id="size-options" class="options-container shadow-sm mb-6">
+                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item item-active">2 x 2 in</button>
+                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">4 x 4 in</button>
+                            <button onclick="toggleCustomControls(true); selectItem(this, 'size')" class="selectable-item text-red-600">Custom Size</button>
+                            
+                            <div id="custom-size-panel" class="bg-gray-50">
+                                <div class="grid grid-cols-2 gap-4 mb-2">
+                                    <input type="number" id="custom-w" value="3.0" step="0.1" oninput="validateLimits(this); updateSummary();" class="p-3 border rounded-xl font-black text-center outline-none">
+                                    <input type="number" id="custom-h" value="3.0" step="0.1" oninput="validateLimits(this); updateSummary();" class="p-3 border rounded-xl font-black text-center outline-none">
+                                </div>
                             </div>
                         </div>
-                        <p class="text-[9px] text-gray-400 font-bold uppercase italic">* Max size: 12 inches</p>
+
+                        <div id="qty-options" class="options-container shadow-sm">
+                            <button onclick="selectItem(this, 'qty')" class="selectable-item item-active justify-between">
+                                <span>50 pcs</span> <span class="font-black">$36</span>
+                            </button>
+                            <button onclick="selectItem(this, 'qty')" class="selectable-item justify-between">
+                                <span>100 pcs</span> <span class="font-black">$52</span>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="lg:sticky lg:top-32 h-fit">
+                    <div class="bg-white p-8 border border-gray-100 rounded-[2.5rem] shadow-2xl">
+                        <h3 class="text-xl font-black mb-6 uppercase italic tracking-tighter">Order Summary</h3>
+                        <div id="order-summary" class="bg-gray-50 p-5 rounded-2xl mb-8 border border-gray-100 text-[10px] font-black text-gray-500 uppercase leading-relaxed tracking-widest">
+                            Sticker / Contour Cut / Glossy / 2x2 in / 50 pcs
+                        </div>
+                        <div class="flex justify-between items-end mb-10 px-2">
+                            <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest">Total</span>
+                            <span id="final-price" class="text-4xl font-black italic tracking-tighter">$36.00</span>
+                        </div>
+
+                        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileAndRedirect(this)">
+                        <button onclick="document.getElementById('file-input').click()" class="w-full bg-black hover:bg-red-600 text-white font-black py-6 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl transition-all">
+                            Upload & Edit ↓
+                        </button>
                     </div>
                 </div>
             </div>
+        </main>
+    </div>
 
-            <div class="space-y-6">
-                <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em]">3. Quantity</h3>
-                <div id="qty-options" class="options-container shadow-sm">
-                    <button onclick="selectItem(this, 'qty')" class="selectable-item item-active justify-between">
-                        <span>50 pcs</span> <span class="font-black">$36</span>
-                    </button>
-                    <button onclick="selectItem(this, 'qty')" class="selectable-item justify-between text-gray-400">
-                        <span>100 pcs</span> <span class="font-black text-gray-900">$52</span>
-                    </button>
-                    <button onclick="selectItem(this, 'qty')" class="selectable-item justify-between text-gray-400">
-                        <span>Custom pcs</span> <span class="font-black text-gray-900"></span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="lg:sticky lg:top-24 h-fit">
-                <div class="bg-white p-8 border border-gray-100 rounded-[2.5rem] shadow-2xl">
-                    <h3 class="text-xl font-black mb-6 uppercase italic tracking-tighter">Your Order</h3>
-                    <div id="order-summary" class="bg-gray-50 p-5 rounded-2xl mb-8 border border-gray-100 text-[10px] font-black text-gray-500 uppercase leading-relaxed tracking-widest">
-                        Sticker / Contour Cut / Glossy / 2x2 in / 50 pcs
-                    </div>
-                    <div class="flex justify-between items-end mb-10 px-2">
-                        <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest">Total</span>
-                        <span id="final-price" class="text-4xl font-black italic tracking-tighter">$36.00</span>
-                    </div>
-
-                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileAndRedirect(this)">
-                    <button onclick="document.getElementById('file-input').click()" class="w-full bg-black hover:bg-red-600 text-white font-black py-5 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95">
-                        Upload & Edit ↓
-                    </button>
-                </div>
-            </div>
+    <footer class="bg-white border-t py-16 px-10 text-center w-full">
+        <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
+            <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
         </div>
-    </main>
-
-    <footer class="bg-white border-t py-12 px-10 text-center">
-        <div class="bg-black p-2 rounded-lg inline-block mb-4">
-            <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 w-auto">
-        </div>
-        <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">© 2026 Square Foot Printing - Las Vegas</p>
+        <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
     </footer>
 
+    <div id="cart-sidebar">
+        <div class="p-8 border-b flex justify-between items-center bg-white sticky top-0">
+            <div>
+                <h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Items</p>
+            </div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t space-y-6">
+            <div class="flex justify-between items-end">
+                <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1 italic">Subtotal</span>
+                <span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span>
+            </div>
+            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic hover:bg-red-600 transition-all">Checkout</button>
+        </div>
+    </div>
+    <div id="cart-overlay" onclick="toggleCart()"></div>
+
     <script>
+        lucide.createIcons();
+
+        // --- LÓGICA DEL CONFIGURADOR ---
         function toggleCustomControls(show) {
             const panel = document.getElementById('custom-size-panel');
             show ? panel.classList.add('open') : panel.classList.remove('open');
@@ -151,7 +187,7 @@
         }
 
         function selectItem(element, category) {
-            const items = document.querySelectorAll(`#${category}-options .selectable-item`);
+            const items = document.querySelectorAll(`#${category}-options .selectable-item, #${category}-options button`);
             items.forEach(item => item.classList.remove('item-active'));
             element.classList.add('item-active');
             updateSummary();
@@ -174,29 +210,65 @@
         function handleFileAndRedirect(input) {
             const file = input.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
-                const activeSize = document.querySelector('#size-options .item-active');
-                let w, h;
-
-                if (activeSize.innerText.includes('Custom')) {
-                    w = document.getElementById('custom-w').value;
-                    h = document.getElementById('custom-h').value;
-                } else {
-                    const dims = activeSize.innerText.split('x').map(n => n.replace('in','').trim());
-                    w = dims[0]; h = dims[1] || dims[0];
-                }
-
                 localStorage.setItem('tempStickerImage', e.target.result);
-                localStorage.setItem('selectedShape', document.querySelector('#shape-options .item-active span').innerText);
-                localStorage.setItem('initialW', w);
-                localStorage.setItem('initialH', h);
-                
                 window.open('editor.html', '_blank');
             };
             reader.readAsDataURL(file);
         }
+
+        // --- LÓGICA DEL CARRITO ---
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            if(sidebar.classList.contains('open')) renderCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('cart-items-container');
+            const dot = document.getElementById('cart-dot');
+            container.innerHTML = cart.length === 0 ? '<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Bag is empty</div>' : '';
+            
+            let total = 0;
+            cart.forEach((item, i) => {
+                const price = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
+                total += price;
+                container.innerHTML += `
+                    <div class="flex gap-6 border-b pb-6 text-black">
+                        <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border flex items-center justify-center p-2">
+                            <img src="${item.image}" class="max-h-full object-contain">
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between">
+                                <h4 class="text-sm font-black uppercase italic">${item.name}</h4>
+                                <button onclick="removeItem(${i})"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                            <p class="text-[9px] text-gray-400 font-bold uppercase mt-1">${item.specs || ""}</p>
+                            <div class="flex justify-between items-end mt-4">
+                                <span class="text-[10px] font-bold">Qty: ${item.quantity || 1}</span>
+                                <span class="text-xl font-black italic">$${price.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+            cart.length > 0 ? dot.classList.remove('hidden') : dot.classList.add('hidden');
+            lucide.createIcons();
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        window.onload = renderCart;
     </script>
 </body>
 </html>
