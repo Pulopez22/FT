@@ -18,24 +18,30 @@
         .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
         .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
         .custom-input:focus { border-color: #000; }
-        .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
-        .canvas-container { position: relative; display: inline-block; border: 1px solid #e5e7eb; border-radius: 1.5rem; overflow: hidden; background: #f9fafb; }
-        .measure-label { position: absolute; background: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; color: black; }
-        .measure-h { top: 50%; right: 8px; transform: translateY(-50%) rotate(90deg); }
-        .measure-w { bottom: 8px; left: 50%; transform: translateX(-50%); }
-        .thumb-img-btn { width: 80px; height: 80px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s; }
-        .thumb-active { border: 2px solid black !important; }
-        .info-tag { background: #f9fafb; border: 1px solid #e5e7eb; padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 12px; font-weight: 700; color: #374151; display: flex; align-items: center; gap: 8px; }
+        
+        .canvas-bg-grid {
+            background-color: #f3f4f6;
+            background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), 
+                              linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #e5e7eb 75%), 
+                              linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
         #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+        .thumb-img-btn { width: 80px; height: 80px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s; }
+        .thumb-active { border: 2px solid black !important; }
+        .info-tag { background: #f9fafb; border: 1px solid #e5e7eb; padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 12px; font-weight: 700; color: #374151; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
         <div class="flex items-center gap-8 text-black">
@@ -54,7 +60,7 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 text-black">
             <button onclick="toggleCart()" class="relative p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
@@ -77,20 +83,17 @@
             </ul>
         </aside>
 
-        <main class="main-content-scroll">
+        <main class="main-content-scroll text-black">
             <div class="p-12 flex-grow">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
-                    
                     <div class="space-y-8">
-                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative overflow-hidden">
-                            <img id="main-prod-img" src="../images/Banners/Pole-Banner-04.png" alt="Pole Banner" class="max-h-[400px] drop-shadow-2xl transition-all duration-300">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative">
+                            <img id="main-prod-img" src="../images/Banners/Pole-Banner-04.png" alt="Pole Banner" class="max-h-[400px] drop-shadow-2xl">
                         </div>
-                        
                         <div class="flex gap-3 justify-center flex-wrap" id="thumb-container">
                             <img src="../images/Banners/Pole-Banner-04.png" class="thumb-img-btn thumb-active" onclick="changeImage(this)">
                             <img src="../images/Banners/Pole-Banner-05.png" class="thumb-img-btn" onclick="changeImage(this)">
                         </div>
-
                         <div class="pt-8 border-t border-gray-100">
                             <h2 class="text-4xl heavy-italic mb-6">Pole Banners</h2>
                             <div class="text-[14px] text-gray-600 leading-[1.8] space-y-6 font-medium text-black">
@@ -111,9 +114,10 @@
                             <p class="text-1xl font-black text-gray-400 italic mt-6" id="prod-range">$39.34 – $171.66</p>
                         </header>
 
-                        <div class="space-y-6">
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Select Size</label>
+                        <div class="space-y-6 text-black">
+                            <div class="relative">
+                                <div id="limit-msg" class="hidden absolute -top-8 left-0 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest text-white">Size restrictions apply</div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Select Size</label>
                                 <select id="size-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                     <option value="39.34">18" x 36"</option><option value="65.56">18" x 60"</option><option value="78.67">18" x 72"</option><option value="91.78">18" x 84"</option><option value="104.89">18" x 96"</option>
                                     <option value="52.45">24" x 36"</option><option value="69.93">24" x 48"</option><option value="87.41">24" x 60"</option><option value="104.89">24" x 72"</option><option value="122.37">24" x 84"</option><option value="139.85">24" x 96"</option>
@@ -123,14 +127,14 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Material</label>
+                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Material</label>
                                     <select id="mat-select" class="custom-dropdown text-black">
                                         <option>18oz HD Matte Vinyl</option>
                                         <option>13oz Matte Vinyl</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Hardware</label>
+                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Hardware</label>
                                     <select id="hw-select" class="custom-dropdown text-black">
                                         <option>Full Set Included</option>
                                         <option>Graphic Only</option>
@@ -139,7 +143,7 @@
                             </div>
 
                             <div class="space-y-3">
-                                <label class="text-[10px] font-black uppercase text-gray-400 block italic tracking-widest">Included Finishing</label>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block italic tracking-widest text-black">Included Finishing</label>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
                                     <div class="info-tag"><i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i> Double Sided Print</div>
                                     <div class="info-tag"><i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i> 3" Pole Pockets (T/B)</div>
@@ -149,7 +153,7 @@
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Turnaround</label>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Turnaround</label>
                                 <select id="turn-select" class="custom-dropdown text-black">
                                     <option>Standard (3 - 5 Days)</option>
                                     <option>Expedited (2 Days)</option>
@@ -157,20 +161,30 @@
                             </div>
 
                             <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
+                                <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest text-black">Art Validation Required</label>
                                 <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">
                                     <span class="text-[11px] font-black text-gray-400 uppercase italic">Select Design File</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
                                 </div>
                                 <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6">
-                                    <div class="flex flex-col md:flex-row gap-8 items-center text-black">
-                                        <div class="canvas-container p-6">
-                                            <div id="measure-label" class="measure-label measure-w">18x36</div>
-                                            <img id="preview-thumb" class="max-h-[220px] object-contain drop-shadow-md">
+                                    <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing Artwork...</h4>
+                                    
+                                    <div class="relative w-full bg-gray-200 rounded-xl overflow-hidden canvas-bg-grid flex items-center justify-center border-2 border-gray-200" style="height: 300px;">
+                                        <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-2 py-0.5 rounded font-bold z-20 uppercase tracking-widest">Ordered: <span id="ordered-label">18"x36"</span></div>
+                                        <div id="art-container" class="relative bg-white shadow-2xl transition-all duration-500 flex items-center justify-center border border-gray-300 mx-auto" style="max-height: 90%; width: auto;">
+                                            <img id="preview-thumb" class="max-h-full max-w-full object-contain">
+                                            <div id="scale-badge" class="absolute bottom-2 right-2 bg-red-600 text-white text-[10px] px-2 py-1 rounded font-black italic">50% SCALE</div>
                                         </div>
-                                        <div class="flex-grow">
-                                            <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing...</h4>
-                                            <p id="validation-text" class="text-[11px] text-gray-400 mt-2 uppercase font-bold text-black italic">Scaling artwork to fit...</p>
+                                    </div>
+
+                                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
+                                        <div class="text-left text-black">
+                                            <p class="text-[10px] text-gray-400 uppercase font-black">Analysis:</p>
+                                            <p id="validation-text" class="text-sm font-black italic">Scaling to fit...</p>
+                                        </div>
+                                        <div class="text-right text-black">
+                                            <p class="text-[10px] text-gray-400 uppercase font-black">Status:</p>
+                                            <p id="dpi-info" class="text-sm font-black italic text-green-600 italic">Verifying...</p>
                                         </div>
                                     </div>
                                     <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
@@ -181,12 +195,12 @@
                                 </div>
                             </div>
 
-                            <div class="price-row border-none pt-8 text-black">
-                                <div class="flex flex-col">
-                                    <span class="text-[11px] font-black uppercase tracking-widest italic text-black">Estimated Total</span>
-                                    <span class="text-[10px] font-bold text-gray-400 uppercase">High Fidelity Print</span>
+                            <div class="flex justify-between items-center pt-8 border-t border-gray-100 relative text-black">
+                                <div class="flex flex-col text-black">
+                                    <span class="text-[11px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span>
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase mt-1">High Fidelity Print</span>
                                 </div>
-                                <span id="final-price" class="text-5xl heavy-italic italic text-black">$39.34</span>
+                                <span id="final-price" class="text-5xl heavy-italic italic text-black leading-none">$39.34</span>
                             </div>
 
                             <div class="flex gap-6">
@@ -207,15 +221,15 @@
         </main>
     </div>
 
-    <div id="cart-sidebar">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
+    <div id="cart-sidebar" class="text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
         <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Checkout</button>
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
@@ -236,8 +250,8 @@
             const total = base * qty;
             document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
             
-            if(document.getElementById('measure-label')) {
-                document.getElementById('measure-label').innerText = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex].text;
+            if(document.getElementById('ordered-label')) {
+                document.getElementById('ordered-label').innerText = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex].text;
             }
         }
 
@@ -250,8 +264,13 @@
                     uploadedImageData = e.target.result;
                     const img = new Image(); img.src = e.target.result;
                     img.onload = function() {
+                        const fileW = (this.width / 100); 
+                        const fileH = (this.height / 100);
                         document.getElementById('preview-thumb').src = e.target.result;
                         document.getElementById('status-title').innerText = "Analysis Complete";
+                        document.getElementById('dpi-info').innerText = "High Quality";
+                        document.getElementById('dpi-info').className = "text-sm font-black italic text-green-600 italic";
+                        document.getElementById('scale-badge').classList.add('hidden');
                         setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
                     };
                 };
@@ -271,9 +290,12 @@
             document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
             document.getElementById('file-input').value = "";
-            document.getElementById('add-to-cart-btn').disabled = true;
-            document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+            document.getElementById('upload-progress').style.width = '0%';
             uploadedImageData = null;
+            const btn = document.getElementById('add-to-cart-btn');
+            btn.disabled = true;
+            btn.classList.replace('bg-black', 'bg-gray-200');
+            btn.classList.add('cursor-not-allowed');
         }
 
         function toggleCart() {
@@ -283,12 +305,13 @@
         }
 
         function addToCart() {
+            const size = document.getElementById('size-select');
             const newItem = {
                 name: "Pole Banner",
                 image: uploadedImageData || document.getElementById('main-prod-img').src,
                 price: parseFloat(document.getElementById('final-price').innerText.replace('$', '')),
                 options: {
-                    "Size": document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex].text,
+                    "Size": size.options[size.selectedIndex].text,
                     "Material": document.getElementById('mat-select').value,
                     "Hardware": document.getElementById('hw-select').value,
                     "Included": "Double Sided | 3\" Pockets | Corner Grommets",
@@ -313,7 +336,7 @@
                 cart.forEach((item, i) => {
                     total += item.price;
                     const details = Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ');
-                    container.innerHTML += `<div class="flex gap-4 border-b pb-4 text-black"><img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg"><div class="flex-grow py-1"><h4 class="text-[11px] font-black uppercase italic">${item.name}</h4><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${details}</p><span class="text-lg font-black italic">$${item.price.toFixed(2)}</span></div><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button></div>`;
+                    container.innerHTML += `<div class="flex gap-4 border-b pb-4 text-black"><img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg"><div class="flex-grow py-1"><h4 class="text-[11px] font-black uppercase italic">${item.name}</h4><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 tracking-tighter text-black">${details}</p><span class="text-lg font-black italic">$${item.price.toFixed(2)}</span></div><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
