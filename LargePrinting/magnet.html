@@ -8,33 +8,32 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; color: #000; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
         .sidebar-item.active { border-right: 3px solid #000; }
         .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
-        .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
-        .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
-        .custom-input:focus { border-color: #000; }
-        .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
+        .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 13px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
+        .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 15px; text-align: center; outline: none; transition: border-color 0.3s; }
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
-        .progress-bar { width: 0%; height: 4px; background: #83D644; transition: width 0.6s ease; border-radius: 2px; }
-        .thumb-img { width: 64px; height: 64px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s; }
-        .thumb-active { border: 2px solid black !important; }
-
-        /* Cart Sidebar Styles */
+        .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
+        .canvas-bg-grid { background-color: #f3f4f6; background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%); background-size: 20px 20px; }
+        .measure-label { position: absolute; background: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; color: black; }
+        
         #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
-        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+        .thumb-img { width: 64px; height: 64px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s; }
+        .thumb-active { border: 2px solid black !important; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
-    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
@@ -44,26 +43,27 @@
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="../Displays/displays.html" class="hover:text-black transition-colors">Displays</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
-                <a href="#" class="hover:text-black transition-colors text-black">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors text-black">Stickers</a>
-                <a href="#" class="hover:text-black transition-colors text-black">Apparel</a>
-                <a href="#" class="hover:text-black transition-colors text-black">Marketing Materials</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
+                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <div class="flex items-center gap-4 text-black">
-            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black p-2 mr-2">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
-            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 text-black">Track My Order</button>
+            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5">Track Order</button>
         </div>
     </nav>
 
-    <div class="flex flex-row flex-grow w-full text-black">
-        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
+    <div class="flex flex-row flex-grow w-full">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
-            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+              <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
@@ -74,153 +74,153 @@
             </ul>
         </aside>
 
-        <main class="main-content-scroll text-black">
+        <main class="main-content-scroll">
             <div class="p-12 flex-grow">
-                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
-                    
-                    <div class="space-y-8">
-                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] relative">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-16">
+                    <div class="space-y-10">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[400px]">
                             <img id="main-prod-img" src="../images/Large Printing/Magnet-01.jpg" alt="Magnet" class="max-h-[300px] drop-shadow-2xl transition-all duration-300">
                         </div>
-                        
-                        <div class="flex gap-3 justify-center flex-wrap" id="thumb-container">
-                            <img src="../images/Large Printing/Magnet-01.jpg" class="thumb-img thumb-active border-2 border-black" onclick="changeImage(this)">
-                            <img src="../images/Large Printing/Magnet-02.png" class="thumb-img border border-gray-100" onclick="changeImage(this)">
-                            <img src="../images/Large Printing/AB-Vinyl-02.png" class="thumb-img border border-gray-100" onclick="changeImage(this)">
-                        </div>
 
-                        <div class="pt-8 border-t border-gray-100 italic">
-                            <h2 class="text-2xl font-light text-gray-500 mb-6 tracking-tight text-black">Description</h2>
-                            <h3 class="text-3xl font-normal text-gray-800 mb-6 italic">Vehicle & Surface Magnets</h3>
-                            <div class="text-[14px] text-gray-600 leading-[1.7] space-y-5 font-medium">
-                                <p>Our magnet sheet uses a **high quality 30 mil material** with a smooth surface for best color printing. Best suited for car door signage, it also serves as temporary signage for construction sites or other quick-changing work environments.</p>
-                                <p>**Note:** Please allow magnet to magnetize to your vehicle overnight before driving.</p>
-                                <div>
-                                    <h4 class="font-black text-gray-900 mb-3 tracking-wider text-xs uppercase underline">Features:</h4>
-                                    <ul class="list-disc pl-5 space-y-2 text-[12px]">
-                                        <li>Maximum Size: 39.5" Wide (Up to 48" Upon Request).</li>
-                                        <li>Resolution: High resolution digitally printed at 720 x 720.</li>
-                                        <li>Usage: Indoor or Outdoor; Waterproof and UV safe.</li>
-                                    </ul>
-                                </div>
+                        <div class="flex gap-3 justify-center" id="thumb-container">
+                            <img src="../images/Large Printing/Magnet-01.jpg" class="thumb-img thumb-active" onclick="changeImage(this)">
+                            <img src="../images/Large Printing/Magnet-02.png" class="thumb-img" onclick="changeImage(this)">
+                        </div>
+                        
+                        <div class="pt-8 border-t border-gray-100 space-y-6">
+                            <div>
+                                <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">Magnet</h2>
+                                <p class="text-[14px] text-gray-600 leading-relaxed font-medium">
+                                    Our magnet sheet uses a high quality 30 mil material with a smooth surface for best color printing. Best suited for car door signage, it also serves as temporary signage for construction sites or other quick-changing work environments.
+                                </p>
+                            </div>
+                            <div class="bg-amber-50 border-l-4 border-amber-400 p-4">
+                                <p class="text-[13px] font-bold italic text-amber-900">Note: Please allow magnet to magnetize to your vehicle overnight before driving. Your magnet may detach if you do not allow ample time for magnetization.</p>
+                            </div>
+                            <div class="space-y-4">
+                                <h4 class="text-[11px] font-black uppercase tracking-widest">Features:</h4>
+                                <ul class="text-[13px] text-gray-700 space-y-2 font-medium">
+                                    <li>• Maximum Size: 39.5" Wide (Up to 48" Upon Request)</li>
+                                    <li>• Resolution: High resolution digitally printed at 720 x 720. Printed on one side only.</li>
+                                    <li>• Usage: Indoor or Outdoor; Waterproof and UV safe that will last for years</li>
+                                </ul>
+                                <h4 class="text-[11px] font-black uppercase tracking-widest pt-2">Material Options:</h4>
+                                <ul class="text-[13px] text-gray-700 font-medium list-disc pl-5">
+                                    <li>30 mil. Matte Magnetic Sheeting</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
-                    <div class="space-y-10">
+                    <div class="space-y-8">
                         <header>
-                            <h1 id="prod-title" class="text-4xl heavy-italic text-gray-900 leading-none italic">Magnet</h1>
-                            <p class="text-1xl font-black text-gray-400 italic mt-6" id="prod-range">$5.50 – $11.25 sq/ft</p>
+                            <h1 class="text-4xl heavy-italic text-gray-900 leading-none italic">Magnet</h1>
+                            <p class="text-lg font-black text-gray-400 italic mt-4">$5.50 – $11.25 sq/ft</p>
                         </header>
 
-                        <div class="space-y-6">
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Finishing Options</label>
-                                <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown text-black">
-                                    <option value="0">Trim with Square Corners</option>
-                                    <option value="0">Trim with Round Corners</option>
-                                    <option value="1.00">Cut To Shape (Special Promo $6.50 sq/ft)</option>
-                                </select>
+                        <div class="space-y-5">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Finishing Options</label>
+                                    <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown">
+                                        <option value="0">Trim with Square Corners</option>
+                                        <option value="0">Trim with Round Corners</option>
+                                        <option value="1.00">Cut To Shape (Special Promo)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Lamination</label>
+                                    <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown">
+                                        <option value="0">No Lamination</option>
+                                        <option value="0.75">Gloss UV (+$.75)</option>
+                                        <option value="0.75">Matte UV (+$.75)</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Lamination</label>
-                                <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown text-black">
-                                    <option value="0">No Lamination</option>
-                                    <option value="0.75">Gloss UV Lamination (+$.75 sq/ft)</option>
-                                    <option value="0.75">Matte UV Lamination (+$.75 sq/ft)</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 tracking-[0.15em] block mb-3 ml-1 italic">Turnaround</label>
-                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black text-black">
-                                    <option value="0" selected>2-3 Days</option>
+                                <label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Turnaround</label>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="0">2-3 Business Days</option>
                                     <option value="50">Same Day Rush +$50.00</option>
                                 </select>
                             </div>
 
-                            <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-red-500 tracking-[0.15em] block ml-1 italic">Validation Status</label>
-                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">
-                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic text-center">Select Image File</span>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Width (Max 39.5")</label><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input"></div>
+                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Height (Max 1200")</label><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input"></div>
+                            </div>
+
+                            <div class="flex justify-between items-center pt-8 mt-6 border-t border-gray-100">
+                                <div class="flex flex-col"><span class="text-[10px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span><span class="text-[9px] font-bold text-gray-400 mt-1" id="area-display">4.000 sq ft</span></div>
+                                <span id="final-price" class="text-4xl font-black italic leading-none">$0.00</span>
+                            </div>
+
+                            <div class="space-y-3">
+                                <label class="text-[9px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
+                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-12 rounded-[2.5rem]">
+                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest italic text-center">Upload Artwork</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
                                 </div>
-                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-6 shadow-2xl space-y-5 text-black">
-                                    <div class="flex gap-5 items-center">
-                                        <div class="w-24 h-24 bg-gray-50 rounded-2xl border p-2 flex items-center justify-center overflow-hidden"><img id="preview-thumb" class="max-h-full max-w-full object-contain"></div>
-                                        <div class="flex-grow">
-                                            <h4 id="status-title" class="text-[14px] font-black uppercase text-red-600 italic tracking-tighter">ANALYZING...</h4>
-                                            <div id="validation-text" class="mt-1"></div>
+                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6">
+                                    <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing...</h4>
+                                    <div class="relative w-full bg-gray-200 rounded-xl overflow-hidden canvas-bg-grid flex items-center justify-center border-2 border-gray-200" style="height: 300px;">
+                                        <div id="measure-w-val" class="measure-label" style="bottom: 8px; left: 50%; transform: translateX(-50%);">24"</div>
+                                        <div id="measure-h-val" class="measure-label" style="top: 50%; right: 8px; transform: translateY(-50%) rotate(90deg);">24"</div>
+                                        <div id="art-container" class="relative bg-white shadow-2xl transition-all duration-500 flex items-center justify-center border border-gray-300 mx-auto" style="max-height: 90%; width: auto;">
+                                            <img id="preview-thumb" class="max-h-full max-w-full object-contain">
+                                            <div id="scale-badge" class="absolute bottom-2 right-2 bg-red-600 text-white text-[9px] px-2 py-1 rounded font-black italic hidden">50% SCALE</div>
                                         </div>
                                     </div>
-                                    <div class="w-full bg-gray-100 h-1 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
-                                    <div class="flex gap-3" id="action-buttons">
-                                        <button onclick="approveArt()" class="flex-grow bg-[#83D644] text-white text-[10px] font-black uppercase py-4 rounded-2xl hover:bg-black transition-all shadow-lg italic tracking-widest">APPROVE & CONTINUE</button>
-                                        <button onclick="resetUpload()" class="px-6 bg-gray-100 text-gray-400 text-[10px] font-black uppercase rounded-2xl italic">Discard</button>
+                                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
+                                        <div class="text-left"><p class="text-[9px] text-gray-400 uppercase font-black">Uploaded:</p><p id="file-dims" class="text-xs font-black italic">0" x 0"</p></div>
+                                        <div class="text-right"><p class="text-[9px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-xs font-black italic text-green-600">Ready to Print</p></div>
+                                    </div>
+                                    <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
+                                    <div class="flex gap-3">
+                                        <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-xl shadow-lg italic hover:bg-black transition-all">Approve design</button>
+                                        <button onclick="resetUpload()" class="px-6 bg-gray-100 text-gray-400 text-[12px] font-black uppercase rounded-xl italic">Discard</button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="bg-gray-50/50 p-10 rounded-[2.5rem] border border-gray-100 shadow-inner">
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Width (Max 39.5")</span><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input w-32 text-black"></div>
-                                <div class="price-row italic font-black uppercase text-gray-700 text-sm"><span>Height (Max 1200")</span><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input w-32 text-black"></div>
-                                <div class="price-row border-none pt-8 text-black">
-                                    <span class="text-[11px] font-black uppercase tracking-widest italic">Total Area: <span id="area-display">4.000 sq ft</span></span>
-                                    <span id="final-price" class="text-5xl heavy-italic italic">$26.00</span>
-                                </div>
-                            </div>
-
-                            <div class="flex gap-5 text-black">
-                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-5 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-black">
-                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-5 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md">Add to cart</button>
+                            <div class="flex gap-4">
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-4 border-2 border-gray-100 rounded-2xl font-black text-center text-lg">
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-4 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md">Add to Bag</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <footer class="bg-white border-t py-16 px-10 text-center w-full">
-                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl text-black"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto"></div>
-                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
-            </footer>
         </main>
     </div>
 
     <div id="cart-sidebar">
-        <div class="p-8 border-b flex justify-between items-center bg-white sticky top-0 text-black">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-6 bg-white text-black"></div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 italic">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-black">Checkout</button>
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script>
         lucide.createIcons();
+        let uploadedImageData = null;
+        let currentPriceValue = 0;
 
         function validateSize() {
             const w = document.getElementById('w-input');
             const h = document.getElementById('h-input');
             if (parseFloat(w.value) > 39.5) w.value = 39.5;
             if (parseFloat(h.value) > 1200) h.value = 1200;
+            document.getElementById('measure-w-val').innerText = w.value + '"';
+            document.getElementById('measure-h-val').innerText = h.value + '"';
             calculatePrice();
-        }
-
-        function toggleCart() {
-            const sidebar = document.getElementById('cart-sidebar');
-            const overlay = document.getElementById('cart-overlay');
-            if (sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open'); overlay.classList.remove('visible');
-                document.body.style.overflow = '';
-            } else {
-                sidebar.classList.add('open'); overlay.classList.add('visible');
-                document.body.style.overflow = 'hidden';
-                renderCart();
-            }
         }
 
         function calculatePrice() {
@@ -228,39 +228,50 @@
             const h = parseFloat(document.getElementById('h-input').value) || 0;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
             const rushFee = parseFloat(document.getElementById('turn-select').value) || 0;
-            const area = (w * h) / 144;
             const finishAdd = parseFloat(document.getElementById('finish-select').value) || 0;
             const lamAdd = parseFloat(document.getElementById('lam-select').value) || 0;
-            const finalTotal = (area * (5.50 + finishAdd + lamAdd) * qty) + rushFee;
+            
+            const area = (w * h) / 144;
+            currentPriceValue = (area * (5.50 + finishAdd + lamAdd) * qty) + rushFee;
+            
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
-            document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('final-price').innerText = `$${currentPriceValue.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
         function processFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                const w = document.getElementById('w-input').value;
-                const h = document.getElementById('h-input').value;
+                const orderedW = parseFloat(document.getElementById('w-input').value) || 1;
+                
                 document.getElementById('drop-zone').classList.add('hidden');
                 document.getElementById('validation-panel').classList.remove('hidden');
+
                 reader.onload = (e) => {
-                    document.getElementById('preview-thumb').src = e.target.result;
-                    setTimeout(() => { 
-                        document.getElementById('upload-progress').style.width = '100%'; 
-                        document.getElementById('status-title').innerText = "Analysis Complete";
-                        document.getElementById('status-title').className = "text-[14px] font-black uppercase text-blue-600 italic tracking-tighter text-black";
+                    uploadedImageData = e.target.result;
+                    const img = new Image();
+                    img.src = e.target.result;
+
+                    img.onload = function() {
+                        const fileW = (this.width / 72); 
+                        const fileH = (this.height / 72);
+                        const scalePercent = Math.round((fileW / orderedW) * 100);
+
+                        document.getElementById('preview-thumb').src = e.target.result;
+                        document.getElementById('file-dims').innerText = `${fileW.toFixed(1)}" x ${fileH.toFixed(1)}"`;
                         
-                        // ESTILO EXACTO DE BANNERS (requested dims con fondo gris y punto de advertencia)
-                        document.getElementById('validation-text').innerHTML = `
-                            <div class="bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 inline-block">
-                                <span class="text-[10px] font-black text-gray-500 uppercase">Requested: ${w}" x ${h}"</span>
-                            </div>
-                            <div class="mt-1.5 flex items-center gap-1.5 text-black">
-                                <div class="w-1.5 h-1.5 bg-black rounded-full"></div>
-                                <span class="text-[11px] font-bold italic underline">We will scale your artwork to fit.</span>
-                            </div>
-                        `;
-                    }, 800);
+                        const badge = document.getElementById('scale-badge');
+                        if (scalePercent < 95 || scalePercent > 105) {
+                            badge.innerText = `${scalePercent}% SCALE`;
+                            badge.classList.remove('hidden');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+
+                        document.getElementById('status-title').innerText = "Analysis Complete";
+                        setTimeout(() => { 
+                            document.getElementById('upload-progress').style.width = '100%';
+                        }, 100);
+                    };
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -268,41 +279,34 @@
 
         function approveArt() {
             const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
+            btn.disabled = false;
+            btn.classList.replace('bg-gray-200', 'bg-black');
             btn.classList.remove('cursor-not-allowed');
-            document.getElementById('action-buttons').classList.add('hidden');
-            document.getElementById('status-title').innerText = "Artwork Approved";
-            document.getElementById('status-title').className = "text-[14px] font-black uppercase text-green-600 italic text-black";
+            document.getElementById('status-title').innerText = "ARTWORK APPROVED";
         }
 
         function resetUpload() {
             document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
             document.getElementById('file-input').value = "";
+            uploadedImageData = null;
             const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = true; btn.classList.replace('bg-black', 'bg-gray-200');
+            btn.disabled = true;
+            btn.classList.replace('bg-black', 'bg-gray-200');
         }
 
         function addToCart() {
-            const finish = document.getElementById('finish-select');
-            const lam = document.getElementById('lam-select');
-            const turn = document.getElementById('turn-select');
-            const qty = parseInt(document.getElementById('qty-input').value);
-            const priceVal = document.getElementById('final-price').innerText.replace(/[$,]/g, '');
-
             const newItem = {
                 name: "Magnet",
+                image: uploadedImageData || document.getElementById('main-prod-img').src,
+                price: currentPriceValue,
                 options: {
                     "Size": `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
-                    "Finish": finish.options[finish.selectedIndex].text,
-                    "Lamination": lam.options[lam.selectedIndex].text,
-                    "Turnaround": turn.options[turn.selectedIndex].text,
-                    "Quantity": qty
-                },
-                price: parseFloat(priceVal),
-                image: document.getElementById('preview-thumb').src
+                    "Finish": document.getElementById('finish-select').options[document.getElementById('finish-select').selectedIndex].text,
+                    "Lamination": document.getElementById('lam-select').options[document.getElementById('lam-select').selectedIndex].text,
+                    "Quantity": document.getElementById('qty-input').value
+                }
             };
-
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             cart.push(newItem);
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
@@ -313,32 +317,47 @@
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('cart-items-container');
-            container.innerHTML = '';
-            let total = 0;
+            container.innerHTML = ''; let total = 0;
             if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Cart Empty</div>`;
+                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Bag Empty</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
             } else {
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    total += item.price;
-                    const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "";
-                    container.innerHTML += `<div class="flex gap-4 border-b pb-4 text-black"><img src="${item.image}" class="w-20 h-20 rounded-xl object-contain border p-1 text-black"><div class="flex-grow"><div class="flex justify-between font-black uppercase italic text-xs text-black"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-red-500 text-black"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 text-black">${details}</p><span class="text-lg font-black italic text-black">$${item.price.toFixed(2)}</span></div></div>`;
+                    total += parseFloat(item.price);
+                    const details = Object.entries(item.options).map(([k, v]) => `<span class="block">${k}: ${v}</span>`).join('');
+                    container.innerHTML += `<div class="flex gap-4 border-b pb-6"><img src="${item.image}" class="w-20 h-20 object-contain border rounded-lg bg-gray-50"><div class="flex-grow"><h4 class="text-[11px] font-black uppercase italic">${item.name}</h4><div class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight tracking-tight">${details}</div><div class="mt-2 text-lg font-black italic">$${parseFloat(item.price).toFixed(2)}</div></div><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
                 });
             }
-            lucide.createIcons();
             document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+            lucide.createIcons();
         }
 
         function removeItem(i) {
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
+            cart.splice(i, 1);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            if (sidebar.classList.contains('open')) {
+                document.body.style.overflow = 'hidden';
+                renderCart();
+            } else {
+                document.body.style.overflow = '';
+            }
         }
 
         function changeImage(el) {
             document.getElementById('main-prod-img').src = el.src;
-            document.querySelectorAll('.thumb-img').forEach(i => i.classList.remove('border-black', 'border-2', 'thumb-active'));
-            el.classList.add('border-black', 'border-2', 'thumb-active');
+            document.querySelectorAll('.thumb-img').forEach(i => i.classList.remove('thumb-active'));
+            el.classList.add('thumb-active');
         }
 
         window.onload = () => { calculatePrice(); renderCart(); };

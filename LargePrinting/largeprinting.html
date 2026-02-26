@@ -8,7 +8,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; }
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; color: #000; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         .sidebar-fixed { width: 320px; height: calc(100vh - 73px); position: sticky; top: 73px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; }
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
@@ -19,44 +19,45 @@
         .product-card { 
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             border: 1px solid #f3f4f6; 
-            border-radius: 2rem; 
+            border-radius: 2.5rem; 
+            background: #fff;
         }
-        .product-card:hover { transform: translateY(-5px); border-color: #000; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.05); }
-        .filter-btn { transition: all 0.3s ease; border: 1px solid #f3f4f6; color: #9ca3af; font-weight: 900; }
+        .product-card:hover { transform: translateY(-8px); border-color: #000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); }
+        .filter-btn { transition: all 0.3s ease; border: 1px solid #f3f4f6; color: #9ca3af; font-weight: 900; background: white; }
         .filter-btn.active { background-color: #000; color: #fff; border-color: #000; }
 
-        /* Cart Sidebar Styles */
         #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         #cart-sidebar.open { transform: translateX(0); }
-        #cart-overlay { transition: opacity 0.5s ease; pointer-events: none; }
+        #cart-overlay { transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen text-black">
 
-    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
-                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="../Displays/displays.html" class="hover:text-black transition-colors">Displays</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
                 <a href="#" class="hover:text-black transition-colors">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black font-bold transition-colors">Stickers</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
                 <a href="#" class="hover:text-black transition-colors">Apparel</a>
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
-                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+            <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
-            <button class="text-[10px] font-black uppercase text-black hover:text-red-600 border-b-2 border-black pb-0.5">Track My Order</button>
+            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5">Track Order</button>
         </div>
     </nav>
 
@@ -74,52 +75,54 @@
             </ul>
         </aside>
 
-        <main class="main-content-scroll text-black">
+        <main class="main-content-scroll">
             <div class="p-12 flex-grow">
-                <header class="mb-12 space-y-8">
-                    <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+                <header class="mb-16 space-y-10">
+                    <div class="flex flex-col md:flex-row justify-between items-end gap-8">
                         <div>
-                            <h1 class="text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter italic leading-none">Large Format</h1>
-                            <div class="h-2 w-24 bg-black rounded-full"></div>
+                            <h1 class="text-6xl heavy-italic text-black mb-4 tracking-tighter leading-none italic">Large Format</h1>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.3em] ml-1">Premium Substrates & Materials</p>
                         </div>
                         
-                        <div class="relative w-full md:w-80">
-                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"></i>
-                            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Search material..." class="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-black transition-all">
+                        <div class="relative w-full md:w-96">
+                            <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 w-5 h-5"></i>
+                            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Search material..." class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-[1.5rem] text-sm font-bold focus:ring-2 focus:ring-black transition-all outline-none">
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap gap-2 bg-white p-1.5 rounded-3xl border shadow-sm w-fit">
-                        <button onclick="filterBy('all', this)" class="filter-btn active px-6 py-2 rounded-full text-[9px] uppercase tracking-widest">All Items</button>
-                        <button onclick="filterBy('adhesive', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest">Adhesives</button>
-                        <button onclick="filterBy('paper', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest">Posters & Canvas</button>
-                        <button onclick="filterBy('specialty', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest">Specialty</button>
+                    <div class="flex flex-wrap gap-3 bg-gray-50 p-2 rounded-[2rem] border w-fit">
+                        <button onclick="filterBy('all', this)" class="filter-btn active px-8 py-3 rounded-full text-[10px] uppercase tracking-widest italic">All Materials</button>
+                        <button onclick="filterBy('adhesive', this)" class="filter-btn px-8 py-3 rounded-full text-[10px] uppercase tracking-widest italic">Adhesives</button>
+                        <button onclick="filterBy('paper', this)" class="filter-btn px-8 py-3 rounded-full text-[10px] uppercase tracking-widest italic">Posters & Canvas</button>
+                        <button onclick="filterBy('specialty', this)" class="filter-btn px-8 py-3 rounded-full text-[10px] uppercase tracking-widest italic">Specialty</button>
                     </div>
                 </header>
 
-                <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
-                </div>
+                <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-10">
+                    </div>
             </div>
 
             <footer class="bg-white border-t py-16 px-10 text-center w-full">
-                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto"></div>
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
+                </div>
                 <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
     </div>
 
-    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[100] flex flex-col text-black">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_60px_rgba(0,0,0,0.1)] z-[100] flex flex-col">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
         <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter text-black leading-none">$0.00</span></div>
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
             <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
         </div>
     </div>
-    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[90] opacity-0 hidden"></div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/40 backdrop-blur-md z-[90] opacity-0 hidden pointer-events-none"></div>
 
     <script>
         lucide.createIcons();
@@ -133,33 +136,31 @@
             { name: 'Poster', cat: 'paper', price: '$2.00 sq/ft', img: '../images/Large Printing/PaperPoster-01.png', desc: 'Indoor photo quality prints.', url: 'paper-poster.html' },
             { name: 'Gallery Canvas', cat: 'paper', price: '$29.34 – $125.73', img: '../images/Large Printing/GalleryCanvas-01.png', desc: '1.5" MDF stretcher frame gallery wrap.', url: 'gcanvas.html' },
             { name: 'PhotoTex', cat: 'specialty', price: '$2.50 sq/ft', img: '../images/Large Printing/PhotoTex-01.jpg', desc: 'Repositionable adhesive wallpaper.', url: 'phototex.html' },
-            { name: 'Table Cover', cat: 'specialty', price: '$105.75', img: '../images/Large Printing/AMS_TableThrow12.png', desc: 'Event branded table covers.', url: 'table-cover.html' },
-            { name: 'Glass Adhere™', cat: 'specialty', price: '$2.50 – $12.00 sq/ft', img: '../images/Large Printing/Glass-Adhere-01.jpg', desc: '30 mil high quality magnetic material.', url: 'glassadhere.html' },
+            { name: 'Table Cover', cat: 'specialty', price: '$105.75', img: '../images/Large Printing/AMS_TableThrow12.png', desc: 'Event branded table covers.', url: 'tablecover.html' },
+            { name: 'Glass Adhere™', cat: 'specialty', price: '$2.50 – $12.00 sq/ft', img: '../images/Large Printing/Glass-Adhere-01.jpg', desc: 'High visibility non-adhesive film.', url: 'glassadhere.html' },
             { name: 'Magnet', cat: 'specialty', price: '$5.50 – $11.25 sq/ft', img: '../images/Large Printing/Magnet-01.jpg', desc: '30 mil high quality magnetic material.', url: 'magnet.html' },
-            { name: 'Adhesive Vinyl', cat: 'specialty', price: '$3.00 - $7.75 sq/ft', img: '../images/Large Printing/AB-Vinyl-Backlit-01.png', desc: '30 mil high quality magnetic material.', url: 'adhesivevinyl.html' },
+            { name: 'Adhesive Vinyl', cat: 'adhesive', price: '$3.00 - $7.75 sq/ft', img: '../images/Large Printing/AB-Vinyl-Backlit-01.png', desc: 'Versatile vinyl for flat surfaces.', url: 'adhesivevinyl.html' },
             { name: 'Floor Graphics', cat: 'adhesive', price: '$4.00 – $4.75 sq/ft', img: '../images/Large Printing/FloorGraphics.png', desc: 'Non-slip texture for heavy traffic.', url: 'floorgraphics.html' },
             { name: 'Reflective Adhesive Vinyl', cat: 'specialty', price: '$6.00 – $6.75 sq/ft', img: '../images/Large Printing/ReflectiveABVinyl.png', desc: '4 mil high visibility night film.', url: 'reflecvinyl.html' },
-            { name: 'Polyester Back-lit Film', cat: 'adhesive', price: '$3.50 sq/ft', img: '../images/Large Printing/AB-Vinyl-BacklitFilm-01.png', desc: '10 mil heavy-duty translucent film.', url: 'polyesterfilm.html' },
+            { name: 'Polyester Back-lit Film', cat: 'specialty', price: '$3.50 sq/ft', img: '../images/Large Printing/AB-Vinyl-BacklitFilm-01.png', desc: '10 mil heavy-duty translucent film.', url: 'polyesterfilm.html' },
             { name: 'Heat Press T-Shirt Vinyl', cat: 'specialty', price: '$25.00 – $30.00 sq/ft', img: '../images/Large Printing/heat-transfer-vinyl-placement.jpg', desc: 'Full color t-shirt transfers.', url: 'tshirtvinyl.html' }
         ];
-
-        let currentFiltered = [...banners];
 
         function renderProducts(data) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = data.map(b => `
                 <div onclick="window.location.href='${b.url}'" class="product-card bg-white overflow-hidden cursor-pointer group shadow-sm border border-gray-100">
-                    <div class="h-64 p-8 flex items-center justify-center group-hover:bg-gray-50 transition-colors relative">
-                        ${b.tags ? `<span class="absolute top-4 left-4 bg-black text-white text-[7px] font-black px-2 py-1 rounded-full uppercase italic tracking-widest">${b.tags.join(' & ')}</span>` : ''}
-                        <img src="${b.img}" alt="${b.name}" class="object-contain h-full drop-shadow-xl transition-transform group-hover:scale-105">
+                    <div class="h-64 p-8 flex items-center justify-center group-hover:bg-gray-50 transition-all duration-500 relative">
+                        ${b.tags ? `<span class="absolute top-6 left-6 bg-black text-white text-[7px] font-black px-3 py-1 rounded-full uppercase italic tracking-[0.2em] z-10">${b.tags.join(' & ')}</span>` : ''}
+                        <img src="${b.img}" alt="${b.name}" class="object-contain h-full drop-shadow-2xl transition-transform duration-500 group-hover:scale-110">
                     </div>
-                    <div class="p-6 border-t">
-                        <h3 class="font-black text-xs text-gray-800 uppercase italic leading-tight h-8">${b.name}</h3>
-                        <p class="text-[9px] text-gray-400 font-bold mt-1 uppercase tracking-tight">${b.desc}</p>
-                        <div class="flex justify-between items-center mt-6">
-                            <p class="text-xl font-black text-gray-900 italic leading-none">${b.price}</p>
-                            <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center group-hover:bg-red-600 transition-colors shadow-lg">
-                                <i data-lucide="arrow-right" class="text-white w-4 h-4"></i>
+                    <div class="p-8 border-t border-gray-50">
+                        <h3 class="font-black text-sm text-gray-900 uppercase italic leading-tight h-10">${b.name}</h3>
+                        <p class="text-[10px] text-gray-400 font-bold mt-2 uppercase tracking-tight line-clamp-2">${b.desc}</p>
+                        <div class="flex justify-between items-center mt-8">
+                            <p class="text-2xl font-black text-black italic leading-none tracking-tighter">${b.price}</p>
+                            <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center group-hover:bg-red-600 transition-all shadow-xl group-hover:rotate-[-45deg]">
+                                <i data-lucide="arrow-right" class="text-white w-5 h-5"></i>
                             </div>
                         </div>
                     </div>
@@ -171,14 +172,12 @@
         function filterBy(cat, btn) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            currentFiltered = cat === 'all' 
-                ? banners 
-                : banners.filter(b => b.cat.toLowerCase() === cat.toLowerCase());
-            renderProducts(currentFiltered);
+            const filtered = cat === 'all' ? banners : banners.filter(b => b.cat === cat);
+            renderProducts(filtered);
         }
 
         function handleSearch(term) {
-            const searchResults = banners.filter(b => b.name.toLowerCase().includes(term.toLowerCase()));
+            const searchResults = banners.filter(b => b.name.toLowerCase().includes(term.toLowerCase()) || b.desc.toLowerCase().includes(term.toLowerCase()));
             renderProducts(searchResults);
         }
 
@@ -195,46 +194,36 @@
             }
         }
 
-        // LÓGICA DE RENDERIZADO DEL CARRITO ACTUALIZADA
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('cart-items-container');
-            container.innerHTML = '';
-            let total = 0;
+            container.innerHTML = ''; let total = 0;
             if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-300 italic py-20 uppercase font-black text-[11px]">Cart Empty</div>`;
+                container.innerHTML = `<div class="text-center text-gray-300 italic py-20 uppercase font-black text-[11px]">Bag Empty</div>`;
                 document.getElementById('cart-dot').classList.add('hidden');
             } else {
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
                     const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
                     total += priceNum;
-                    
-                    // Soporte para objetos options o texto specs antiguo
-                    const details = item.options ? 
-                        Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : 
-                        (item.specs || "");
-
+                    const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : (item.specs || "");
                     container.innerHTML += `
-                        <div class="flex gap-6 border-b border-gray-50 pb-6 last:border-0 text-black">
-                            <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div>
+                        <div class="flex gap-6 border-b border-gray-50 pb-6 text-black">
+                            <div class="w-20 h-20 bg-gray-50 rounded-2xl border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div>
                             <div class="flex flex-col justify-between flex-grow py-1">
-                                <div class="flex justify-between">
-                                    <h4 class="text-sm font-black uppercase italic tracking-tighter">${item.name}</h4>
+                                <div class="flex justify-between items-start">
+                                    <h4 class="text-[11px] font-black uppercase italic leading-tight">${item.name}</h4>
                                     <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                                 </div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${details}</p>
-                                <div class="flex justify-between items-end mt-4">
-                                    <span class="text-[10px] font-bold text-gray-400 uppercase">Qty: ${item.quantity || item.qty || 1}</span>
-                                    <span class="text-xl font-black italic">$${priceNum.toLocaleString('en-US', {minimumFractionDigits:2})}</span>
-                                </div>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight tracking-tighter">${details}</p>
+                                <span class="text-lg font-black italic mt-2">$${priceNum.toFixed(2)}</span>
                             </div>
                         </div>`;
                 });
             }
-            lucide.createIcons();
-            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+            lucide.createIcons();
         }
 
         function removeItem(i) {
