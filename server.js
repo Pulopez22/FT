@@ -17,51 +17,55 @@ app.use(express.json());
 
 // 1. CONEXIÓN A MONGODB ATLAS
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ Conectado a MongoDB Atlas'))
-  .catch(err => console.error('❌ Error de conexión:', err));
+  .then(() => console.log('✅ Connected to MongoDB Atlas'))
+  .catch(err => console.error('❌ Connection Error:', err));
 
-// 2. MODELO DE USUARIO
+// 2. MODELO DE USUARIO ACTUALIZADO PARA DESCUENTOS
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    isWholesale: { type: Boolean, default: false }, // <--- Campo para autorización de mayoreo
     createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
 
-// 3. RUTAS DE AUTENTICACIÓN (LOGIN/REGISTRO)
+// 3. RUTAS DE AUTENTICACIÓN
 
 // Registro de usuario
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
         
-        // Verificar si ya existe
         const userExists = await User.findOne({ email });
-        if (userExists) return res.status(400).json({ message: 'El usuario ya existe' });
+        if (userExists) return res.status(400).json({ message: 'User already exists' });
 
-        // Encriptar contraseña
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = new User({ name, email, password: hashedPassword });
         await newUser.save();
 
-        res.status(201).json({ success: true, message: 'Usuario creado correctamente' });
+        res.status(201).json({ success: true, message: 'User created successfully' });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// Login de usuario
+// Login de usuario (CORREGIDO Y CON SOPORTE PARA MAYOREO)
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ message: 'Credenciales inválidas' });
+        if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: 'Credenciales inválidas' });
+        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+
+        // Verificar que JWT_SECRET existe para evitar el Error 500
+        if (!process.env.JWT_SECRET) {
+            return res.status(500).json({ success: false, message: "Server Configuration Error: JWT_SECRET is missing." });
+        }
 
         // Crear Token JWT
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -69,15 +73,18 @@ app.post('/api/auth/login', async (req, res) => {
         res.json({
             success: true,
             token,
-            user: { name: user.name, email: user.email }
+            user: { 
+                name: user.name, 
+                email: user.email,
+                isWholesale: user.isWholesale // <--- Esto le dirá al frontend si aplicar descuento
+            }
         });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// 4. LÓGICA DE ÓRDENES Y CORREO (TU CÓDIGO ACTUAL MEJORADO)
-
+// 4. LÓGICA DE ÓRDENES Y CORREO
 const emailTemplate = (orderData) => `
 <!DOCTYPE html>
 <html>
