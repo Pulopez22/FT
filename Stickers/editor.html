@@ -3,318 +3,378 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Square Foot - Live Editor Ultra</title>
+    <title>Sticker Studio Pro - Premium Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-x: hidden; }
-        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; background-color: #f9fafb; color: #111827; overflow-x: hidden; }
+        body.theme-dark { background-color: #111827; color: white; }
+        .theme-dark aside { background-color: #1f2937; border-left-color: #374151; color: white; }
+        .theme-dark .option-card { background-color: #374151; border-color: #4b5563; color: white; }
+        .theme-dark input, .theme-dark select { background-color: #111827; border-color: #4b5563; color: white; }
+
+        .bg-grid { background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px); background-size: 30px 30px; }
+        .theme-dark .bg-grid { background-image: radial-gradient(#374151 1.5px, transparent 1.5px); }
         
-        /* Editor Styles */
-        .bg-grid {
-            background-color: #f9fafb;
-            background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px);
-            background-size: 30px 30px;
-        }
-
-        .preview-container {
-            display: flex; align-items: center; justify-content: center;
-            width: 100%; height: 100%; padding: 60px; position: relative;
-        }
-
-        .sticker-wrapper { position: relative; display: flex; align-items: center; justify-content: center; z-index: 10; }
-        .sticker-box {
-            position: relative; display: flex; align-items: center; justify-content: center;
-            background: white; transition: all 0.3s ease; overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-        }
-
-        .cut-line-overlay { position: absolute; inset: -1px; border: 1px solid #ff00ff; pointer-events: none; z-index: 30; }
-        #sticker-canvas { width: 100%; height: 100%; object-fit: contain; display: block; z-index: 20; }
-        .shape-contour { background: transparent !important; overflow: visible !important; box-shadow: none !important; }
+        #master-wrapper { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; perspective: 1200px; padding: 60px; }
+        #sticker-container { position: relative; display: flex; align-items: center; justify-content: center; transition: transform 0.1s ease-out, width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #sticker-canvas { width: 100%; height: 100%; z-index: 20; filter: url(#smart-contour-filter) drop-shadow(0 20px 40px rgba(0,0,0,0.2)); object-fit: contain; display: block; }
         
-        :root { --offset-size: 10px; }
-        .contour-filter {
-            filter: 
-                drop-shadow(var(--offset-size) 0 0 white) drop-shadow(calc(var(--offset-size) * -1) 0 0 white) 
-                drop-shadow(0 var(--offset-size) 0 white) drop-shadow(0 calc(var(--offset-size) * -1) 0 white)
-                drop-shadow(1px 0 0 #ff00ff) drop-shadow(-1px 0 0 #ff00ff) 
-                drop-shadow(0 1px 0 #ff00ff) drop-shadow(0 -1px 0 #ff00ff);
-        }
+        .effect-layer { position: absolute; z-index: 30; opacity: 0; transition: opacity 0.4s ease; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; mask-size: 100% 100%; -webkit-mask-size: 100% 100%; mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat; }
+        #layer-gloss { mix-blend-mode: overlay; background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%); background-size: 200% 200%; filter: brightness(1.2); }
+        .active-gloss #layer-gloss { opacity: 1; }
 
-        .measure-label {
-            position: absolute; background: #000; color: #fff; padding: 4px 10px;
-            font-size: 11px; font-weight: 900; border-radius: 6px; white-space: nowrap;
-            z-index: 100; text-transform: uppercase; italic;
-        }
-        .label-width { bottom: -40px; left: 50%; transform: translateX(-50%); }
-        .label-height { right: -80px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+        .measure-line { position: absolute; border: 1px solid #6366f1; opacity: 0.6; pointer-events: none; z-index: 10; }
+        .measure-text { position: absolute; font-size: 11px; font-weight: 800; color: #6366f1; background: #f9fafb; padding: 2px 8px; border-radius: 6px; border: 1px solid #e0e7ff; white-space: nowrap; }
 
-        /* Cart Styles */
+        .option-card { border: 2px solid #f3f4f6; transition: all 0.2s; cursor: pointer; background: white; }
+        .option-card.active { border-color: #6366f1; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1); }
+        
         #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
-<body class="bg-white text-black">
+<body class="theme-light flex flex-col min-h-screen">
 
-    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="smart-contour-filter" color-interpolation-filters="sRGB">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+            <feComponentTransfer in="blur" result="limit"><feFuncA type="discrete" tableValues="0 0 0 1 1" /></feComponentTransfer>
+            <feMorphology in="limit" operator="dilate" radius="20" result="border" />
+            <feFlood flood-color="white" result="white"/><feComposite in="white" in2="border" operator="in" result="final-border" />
+            <feMerge><feMergeNode in="final-border" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+    </svg>
+
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
-            <a href="index.html" class="flex items-center group">
-                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
-                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
-                </div>
-            </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
-                <span class="text-black border-b-2 border-black pb-1">Live Editor</span>
-                <a href="Stickers/stickers.html" class="hover:text-black transition-colors">Back to Configurator</a>
+            <div class="bg-black p-2 rounded-lg inline-block">
+                <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6">
             </div>
         </div>
-        <div class="flex gap-4 items-center">
-            <button onclick="toggleCart()" class="relative text-gray-400 hover:text-black transition-colors p-2 mr-2">
-                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+        <div class="flex items-center gap-4 text-black">
+            <button onclick="toggleCart()" class="relative p-2 mr-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
-            <button class="bg-black text-white px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest italic hover:bg-red-600 transition-all">Review Order</button>
         </div>
     </nav>
 
-    <div class="flex h-[calc(100vh-160px)]">
-        <main class="flex-grow bg-grid relative overflow-hidden flex items-center justify-center">
-            <div class="preview-container">
-                <div class="sticker-wrapper" id="master-wrapper">
-                    <div class="sticker-box" id="main-box">
-                        <div class="cut-line-overlay" id="geom-line"></div>
-                        <canvas id="sticker-canvas"></canvas>
+    <div class="flex flex-grow w-full overflow-hidden">
+        <main class="flex-grow bg-grid relative flex items-center justify-center overflow-hidden">
+            <div id="res-alert" class="absolute top-8 right-8 z-50 hidden">
+                <div class="bg-orange-50 border-2 border-orange-200 p-4 rounded-2xl flex items-start gap-3 shadow-xl max-w-xs relative">
+                    <i data-lucide="alert-triangle" class="text-orange-500 w-6 h-6 shrink-0"></i>
+                    <div class="pr-6">
+                        <p class="text-[10px] font-black uppercase text-orange-700">Image Quality</p>
+                        <p id="res-text" class="text-[9px] font-bold text-orange-600 leading-tight">Checking...</p>
                     </div>
-                    <div class="measure-label label-width"><span id="live-w">0</span> <span>in</span></div>
-                    <div class="measure-label label-height"><span id="live-h">0</span> <span>in</span></div>
+                    <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="absolute top-2 right-2 text-orange-400 hover:text-orange-600 transition-colors">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="absolute top-8 left-8 z-50">
+                <div class="relative bg-gray-200 dark:bg-gray-700 p-1 rounded-full flex w-44 shadow-inner cursor-pointer" onclick="toggleTheme()">
+                    <div id="pill-bg" class="absolute top-1 left-1 bottom-1 w-[calc(50%-4px)] bg-black rounded-full transition-all duration-300"></div>
+                    <button class="relative z-10 flex-1 py-2 text-[10px] font-900 uppercase italic tracking-widest text-white">Light</button>
+                    <button class="relative z-10 flex-1 py-2 text-[10px] font-900 uppercase italic tracking-widest text-gray-400">Dark</button>
+                </div>
+            </div>
+
+            <div id="master-wrapper">
+                <div id="sticker-container">
+                    <div id="measure-h" class="measure-line" style="width: 100%; top: -45px; left: 0; border-left: 1px solid #6366f1; border-right: 1px solid #6366f1; height: 10px; border-bottom: 0;">
+                        <span class="measure-text" id="text-h" style="top: -15px; left: 50%; transform: translateX(-50%);">1"</span>
+                    </div>
+                    <div id="measure-v" class="measure-line" style="height: 100%; left: -45px; top: 0; border-top: 1px solid #6366f1; border-bottom: 1px solid #6366f1; width: 10px; border-right: 0;">
+                        <span class="measure-text" id="text-v" style="left: -50px; top: 50%; transform: translateY(-50%) rotate(-90deg);">1"</span>
+                    </div>
+                    <canvas id="sticker-canvas"></canvas>
+                    <div id="layer-gloss" class="effect-layer"></div>
                 </div>
             </div>
         </main>
 
-        <aside class="w-96 bg-white border-l p-8 overflow-y-auto flex flex-col justify-between shadow-xl">
-            <div class="space-y-8">
-                <header>
-                    <h2 class="text-2xl heavy-italic tracking-tighter">Adjust Artwork</h2>
-                    <div class="h-1.5 w-16 bg-black rounded-full mt-2"></div>
-                </header>
-
-                <div class="space-y-3 bg-gray-50 p-5 rounded-3xl border border-gray-100 text-[10px] font-black italic uppercase text-gray-400">
-                    <div class="flex justify-between border-b border-gray-200 pb-2">
-                        <span>Shape</span> <span id="summary-shape" class="text-black">...</span>
-                    </div>
-                    <div class="flex justify-between border-b border-gray-200 pb-2">
-                        <span>Size</span> <span id="summary-size" class="text-black">0x0 IN</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Min. Price</span> <span class="text-black">$15.00</span>
-                    </div>
+        <aside class="w-[400px] bg-white border-l p-8 flex flex-col gap-6 shadow-2xl z-40 overflow-y-auto">
+            <header>
+                <h2 class="text-2xl font-[900] italic uppercase tracking-tighter text-black">Sticker Editor</h2>
+                <div class="flex gap-2 mt-2">
+                    <span id="badge-size" class="bg-black text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"></span>
+                    <span id="badge-shape" class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"></span>
                 </div>
+            </header>
 
-                <div id="offset-panel" class="hidden space-y-4 bg-gray-50 p-6 rounded-3xl border border-gray-100">
-                    <div class="flex justify-between uppercase text-[10px] font-black">
-                        <span>White Border Offset</span>
-                        <span id="val-offset" class="text-black">10px</span>
-                    </div>
-                    <input type="range" id="input-offset" min="0" max="30" step="1" value="10" class="w-full accent-black" oninput="updateOffset(this.value)">
+            <div class="grid grid-cols-2 gap-4 text-black">
+                <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Size (Max 11")</label>
+                    <div class="relative"><input type="number" id="input-size" value="1" min="1" max="11" step="0.1" oninput="validateSize(this)" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none focus:border-indigo-500 text-black"><span class="absolute right-3 top-3 text-[10px] font-bold text-gray-400 uppercase">in</span></div>
                 </div>
-
-                <div class="space-y-6">
-                    <div>
-                        <div class="flex justify-between mb-2 uppercase text-[10px] font-bold text-gray-400">
-                            <label>Scale Width</label>
-                            <span class="text-black font-black" id="val-w">0</span>
-                        </div>
-                        <input type="range" id="input-w-range" min="1" max="12" step="0.1" class="w-full accent-black cursor-pointer" oninput="updateDimensions()">
-                    </div>
-                    <div>
-                        <div class="flex justify-between mb-2 uppercase text-[10px] font-bold text-gray-400">
-                            <label>Scale Height</label>
-                            <span class="text-black font-black" id="val-h">0</span>
-                        </div>
-                        <input type="range" id="input-h-range" min="1" max="12" step="0.1" class="w-full accent-black cursor-pointer" oninput="updateDimensions()">
-                    </div>
-                    <button onclick="resetDimensions()" class="w-full py-3 border border-gray-200 rounded-xl font-black text-[9px] uppercase hover:bg-gray-50 transition-all tracking-widest">Reset Original Size</button>
+                <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Cut Type</label>
+                    <select id="select-shape" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none focus:border-indigo-500 cursor-pointer text-black">
+                        <option value="contour cut">Contour Cut</option><option value="circle">Circle Cut</option><option value="square">Square Cut</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="pt-8 border-t border-gray-100">
-                <div class="flex justify-between items-end mb-6">
-                    <span class="text-[10px] font-black uppercase text-gray-400 italic">Total Est.</span>
-                    <p id="price-display" class="text-4xl heavy-italic tracking-tighter leading-none">$0.00</p>
-                </div>
-                <button onclick="addToCartAndStay()" class="w-full bg-black hover:bg-red-600 text-white py-5 rounded-[2rem] font-black uppercase text-xs tracking-[0.2em] italic shadow-2xl transition-all">
-                    Add to Cart & Continue
-                </button>
+            <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Quantity</label>
+                <select id="select-qty" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none focus:border-indigo-500 cursor-pointer text-black">
+                    <option value="50">50 pcs</option>
+                    <option value="100">100 pcs</option>
+                    <option value="250">250 pcs</option>
+                    <option value="500">500 pcs</option>
+                </select>
             </div>
+
+            <div class="space-y-3">
+                <p class="text-[10px] font-black uppercase text-indigo-500 tracking-widest italic">Material Finish</p>
+                <div class="grid gap-2">
+                    <button id="btn-matte" onclick="applyMaterial('matte', this)" class="option-card p-4 rounded-xl flex items-center gap-4 text-black"><div class="w-6 h-6 bg-gray-200 rounded-full border"></div><span class="text-[10px] font-black uppercase italic">Matte White</span></button>
+                    <button id="btn-gloss" onclick="applyMaterial('gloss', this)" class="option-card p-4 rounded-xl flex items-center gap-4 text-black"><div class="w-6 h-6 bg-gradient-to-tr from-white to-gray-300 rounded-full border"></div><span class="text-[10px] font-black uppercase italic">Glossy Finish</span></button>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-6 border-t flex justify-between items-baseline mb-4 text-black">
+                <span class="text-[10px] font-bold text-gray-400 italic uppercase">TOTAL</span>
+                <span id="price-display" class="text-4xl font-black italic tracking-tighter text-indigo-600">$0.00</span>
+            </div>
+            <button onclick="addToCart()" class="w-full bg-black text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest italic hover:bg-indigo-600 transition-all shadow-xl active:scale-[0.98]">
+                Add to Bag
+            </button>
         </aside>
     </div>
 
-    <footer class="bg-white border-t py-8 px-10 text-center w-full">
-        <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Production Environment</p>
-    </footer>
-
     <div id="cart-sidebar">
-        <div class="p-8 border-b flex justify-between items-center bg-white sticky top-0">
-            <div>
-                <h3 class="text-2xl heavy-italic tracking-tighter">Your Bag</h3>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Items</p>
-            </div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
-        <div class="p-8 bg-gray-50 border-t space-y-6">
-            <div class="flex justify-between items-end">
-                <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1 italic">Total</span>
-                <span id="cart-total-price" class="text-4xl heavy-italic tracking-tighter leading-none">$0.00</span>
-            </div>
-            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic hover:bg-red-600 transition-all">Checkout Now</button>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script>
         lucide.createIcons();
-
-        const canvas = document.getElementById('sticker-canvas');
-        const ctx = canvas.getContext('2d');
-        const mainBox = document.getElementById('main-box');
-        const geomLine = document.getElementById('geom-line');
-        const offsetPanel = document.getElementById('offset-panel');
+        const canvas = document.getElementById('sticker-canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const master = document.getElementById('master-wrapper'), container = document.getElementById('sticker-container');
         let originalImg = new Image();
-        let initialW = 3, initialH = 3, selectedShape = "Contour Cut";
+        let currentMaterial = "Matte White";
 
         window.onload = function() {
-            const imageData = localStorage.getItem('tempStickerImage');
-            selectedShape = localStorage.getItem('selectedShape') || "Contour Cut";
-            initialW = parseFloat(localStorage.getItem('initialW')) || 3;
-            initialH = parseFloat(localStorage.getItem('initialH')) || 3;
+            originalImg.crossOrigin = "anonymous";
+            originalImg.src = localStorage.getItem('tempStickerImage') || '';
+            
+            const config = JSON.parse(localStorage.getItem('tempStickerConfig') || '{}');
+            const params = new URLSearchParams(window.location.search);
+            
+            const finalSize = params.get('size') || config.size || 2;
+            const finalQty = params.get('qty') || config.qty || 50;
+            const finalShape = params.get('shape') || config.shape || 'contour cut';
+            const finalFinish = params.get('finish') || config.finish || 'matte';
 
-            document.getElementById('summary-shape').innerText = selectedShape;
+            document.getElementById('input-size').value = finalSize;
+            document.getElementById('select-qty').value = finalQty;
+            document.getElementById('select-shape').value = finalShape.toLowerCase();
+            
+            if(finalFinish.includes('gloss')) applyMaterial('gloss', document.getElementById('btn-gloss'));
+            else applyMaterial('matte', document.getElementById('btn-matte'));
 
-            if (imageData) {
-                originalImg.onload = function() {
-                    canvas.width = originalImg.width; canvas.height = originalImg.height;
-                    ctx.drawImage(originalImg, 0, 0);
-                    
-                    if (selectedShape === "Contour Cut") {
-                        mainBox.className = "sticker-box shape-contour";
-                        canvas.className = "contour-filter";
-                        offsetPanel.classList.remove('hidden');
-                        geomLine.style.display = "none";
-                    } else {
-                        geomLine.style.display = "block";
-                        if(selectedShape === "Circle") {
-                            mainBox.style.borderRadius = "9999px";
-                            geomLine.style.borderRadius = "9999px";
-                        }
-                    }
-                    
-                    document.getElementById('input-w-range').value = initialW;
-                    document.getElementById('input-h-range').value = initialH;
-                    updateDimensions();
-                    renderCart();
-                };
-                originalImg.src = imageData;
-            }
+            originalImg.onload = renderAll;
+            renderCart();
         };
 
-        function updateOffset(value) {
-            document.getElementById('val-offset').innerText = value + 'px';
-            document.documentElement.style.setProperty('--offset-size', value + 'px');
+        function calculatePrice(size, qty) {
+            const prices = { "50": 36.00, "100": 52.00, "250": 95.00, "500": 160.00 };
+            let base = prices[qty] || 36.00;
+            let sizeSurcharge = size > 2 ? 1 + ((size - 2) * 0.15) : 1;
+            return base * sizeSurcharge;
         }
 
-        function updateDimensions() {
-            const w = parseFloat(document.getElementById('input-w-range').value);
-            const h = parseFloat(document.getElementById('input-h-range').value);
-
-            document.getElementById('live-w').innerText = w; 
-            document.getElementById('live-h').innerText = h;
-            document.getElementById('val-w').innerText = w; 
-            document.getElementById('val-h').innerText = h;
-            document.getElementById('summary-size').innerText = `${w}x${h} IN`;
-
-            const baseScale = 100; 
-            mainBox.style.width = (w * baseScale) + "px";
-            mainBox.style.height = (h * baseScale) + "px";
-
-            const price = (w * h * 0.18 * 50).toFixed(2);
-            document.getElementById('price-display').innerText = `$${price < 15 ? "15.00" : price}`;
+        function validateSize(input) {
+            if (parseFloat(input.value) > 11) input.value = 11;
+            renderAll();
         }
 
-        function resetDimensions() {
-            document.getElementById('input-w-range').value = initialW;
-            document.getElementById('input-h-range').value = initialH;
-            updateDimensions();
+        function renderAll() {
+            if (!originalImg.width) return;
+            let size = parseFloat(document.getElementById('input-size').value) || 1;
+            let shape = document.getElementById('select-shape').value;
+            let qty = document.getElementById('select-qty').value;
+
+            // 1. QUALITY LOGIC (DPI)
+            const dpi = Math.round(originalImg.width / size);
+            const alertBox = document.getElementById('res-alert');
+            const resText = document.getElementById('res-text');
+            if (dpi < 150) {
+                alertBox.classList.remove('hidden');
+                resText.innerHTML = `<b class="text-red-600">CRITICAL: ${dpi} DPI</b><br>Image will look blurry and pixelated.`;
+            } else if (dpi < 300) {
+                alertBox.classList.remove('hidden');
+                resText.innerHTML = `<b class="text-orange-500">LOW QUALITY: ${dpi} DPI</b><br>Good for small stickers, but might not be sharp.`;
+            } else { alertBox.classList.add('hidden'); }
+
+            // 2. PRICING & BADGES
+            let finalPrice = calculatePrice(size, qty);
+            document.getElementById('price-display').innerText = `$${finalPrice.toFixed(2)}`;
+            document.getElementById('badge-size').innerText = `${size}x${size} IN`;
+            document.getElementById('badge-shape').innerText = shape.toUpperCase();
+            document.getElementById('text-h').innerText = document.getElementById('text-v').innerText = `${size}"`;
+
+            // 3. VISUAL SCALE
+            const availableSpace = Math.min(window.innerWidth - 450, window.innerHeight - 200);
+            const currentPx = (availableSpace * 0.40) + ((size - 1) / 10) * (availableSpace * 0.55);
+            container.style.width = container.style.height = currentPx + 'px';
+
+            // 4. CANVAS DRAWING
+            const padding = 120;
+            const targetSide = Math.max(originalImg.width, originalImg.height);
+            canvas.width = targetSide + padding;
+            canvas.height = targetSide + padding;
+            const cx = canvas.width/2, cy = canvas.height/2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            if (shape === 'circle') {
+                ctx.beginPath(); ctx.arc(cx, cy, targetSide/2, 0, Math.PI*2); ctx.clip();
+                drawCoverImage(ctx, originalImg, cx - targetSide/2, cy - targetSide/2, targetSide, targetSide);
+            } else if (shape === 'square') {
+                ctx.beginPath(); ctx.rect(cx - targetSide/2, cy - targetSide/2, targetSide, targetSide); ctx.clip();
+                drawCoverImage(ctx, originalImg, cx - targetSide/2, cy - targetSide/2, targetSide, targetSide);
+            } else {
+                canvas.width = originalImg.width + padding;
+                canvas.height = originalImg.height + padding;
+                ctx.drawImage(originalImg, padding/2, padding/2);
+            }
+            ctx.restore();
+            setTimeout(syncLayers, 80);
         }
 
-        // --- LÓGICA DEL CARRITO ---
+        function drawCoverImage(ctx, img, x, y, w, h) {
+            const imgRatio = img.width / img.height;
+            const targetRatio = w / h;
+            let sx, sy, sw, sh;
+            if (imgRatio > targetRatio) { sh = img.height; sw = img.height * targetRatio; sx = (img.width - sw) / 2; sy = 0; }
+            else { sw = img.width; sh = img.width / targetRatio; sx = 0; sy = (img.height - sh) / 2; }
+            ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+        }
+
+        function applyMaterial(type, btn) {
+            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            currentMaterial = btn.innerText;
+            container.classList.toggle('active-gloss', type === 'gloss');
+            syncLayers();
+        }
+
+        function syncLayers() {
+            const dataUrl = canvas.toDataURL();
+            const gloss = document.getElementById('layer-gloss');
+            gloss.style.maskImage = gloss.style.webkitMaskImage = `url(${dataUrl})`;
+        }
+
         function toggleCart() {
             document.getElementById('cart-sidebar').classList.toggle('open');
             document.getElementById('cart-overlay').classList.toggle('visible');
+            renderCart();
+        }
+
+        function addToCart() {
+            const size = document.getElementById('input-size').value;
+            const shape = document.getElementById('select-shape').value;
+            const qty = document.getElementById('select-qty').value;
+            const finalPrice = parseFloat(document.getElementById('price-display').innerText.replace('$', ''));
+            
+            // GENERATE EDIT URL
+            const editUrl = new URL(window.location.href);
+            editUrl.searchParams.set('size', size);
+            editUrl.searchParams.set('shape', shape);
+            editUrl.searchParams.set('qty', qty);
+            editUrl.searchParams.set('finish', currentMaterial.toLowerCase().includes('gloss') ? 'glossy' : 'matte');
+
+            const item = {
+                name: "Custom Sticker",
+                image: canvas.toDataURL('image/png', 0.5),
+                price: finalPrice,
+                url: editUrl.toString(),
+                options: {
+                    "Size": `${size}" x ${size}"`,
+                    "Cut": shape.toUpperCase(),
+                    "Finish": currentMaterial,
+                    "Quantity": `${qty} pcs`
+                }
+            };
+
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(item);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            toggleCart();
         }
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const container = document.getElementById('cart-items-container');
-            const dot = document.getElementById('cart-dot');
-            container.innerHTML = cart.length === 0 ? '<div class="text-center py-10 text-gray-300 font-black uppercase italic text-[10px]">Empty</div>' : '';
+            const cont = document.getElementById('cart-items-container');
+            cont.innerHTML = ''; let total = 0;
             
-            let total = 0;
-            cart.forEach((item, i) => {
-                const price = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
-                total += price;
-                container.innerHTML += `
-                    <div class="flex gap-4 border-b pb-4">
-                        <div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center p-1">
-                            <img src="${item.image}" class="max-h-full object-contain">
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-start">
-                                <h4 class="text-[11px] font-black uppercase italic">${item.name}</h4>
-                                <button onclick="removeItem(${i})"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+            if (cart.length === 0) {
+                cont.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Bag Empty</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
+            } else {
+                document.getElementById('cart-dot').classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += item.price;
+                    const details = Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ');
+                    cont.innerHTML += `
+                        <div class="flex gap-4 border-b pb-4 text-black">
+                            <a href="${item.url || '#'}">
+                                <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg bg-gray-50 shadow-sm hover:opacity-80 transition-all">
+                            </a>
+                            <div class="flex-grow py-1">
+                                <a href="${item.url || '#'}" class="hover:underline">
+                                    <h4 class="text-[11px] font-black uppercase italic tracking-tighter">${item.name}</h4>
+                                </a>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${details}</p>
+                                <span class="text-lg font-black italic mt-1 block">$${item.price.toFixed(2)}</span>
                             </div>
-                            <p class="text-[8px] text-gray-400 font-bold uppercase">${item.specs || ""}</p>
-                            <div class="flex justify-between items-end mt-2">
-                                <span class="text-xs font-black italic">$${price.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </div>`;
-            });
+                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4 text-black"></i>
+                            </button>
+                        </div>`;
+                });
+            }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
-            cart.length > 0 ? dot.classList.remove('hidden') : dot.classList.add('hidden');
+            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
             lucide.createIcons();
         }
 
         function removeItem(i) {
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1);
-            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart));
             renderCart();
         }
 
-        function addToCartAndStay() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const w = document.getElementById('live-w').innerText;
-            const h = document.getElementById('live-h').innerText;
-            const price = document.getElementById('price-display').innerText;
-
-            cart.push({
-                name: "Custom Sticker",
-                image: originalImg.src,
-                price: price,
-                specs: `${selectedShape} | ${w}x${h} in`,
-                quantity: 50
-            });
-
-            localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            renderCart();
-            toggleCart();
+        function toggleTheme() {
+            document.body.classList.toggle('theme-dark');
+            document.getElementById('pill-bg').style.transform = document.body.classList.contains('theme-dark') ? 'translateX(100%)' : 'translateX(0%)';
         }
+
+        master.addEventListener('mousemove', (e) => {
+            const rect = master.getBoundingClientRect();
+            const x = (e.clientX - (rect.left + rect.width/2)) / (rect.width/2);
+            const y = (e.clientY - (rect.top + rect.height/2)) / (rect.height/2);
+            container.style.transform = `rotateX(${y * -10}deg) rotateY(${x * 10}deg) scale(1.02)`;
+            document.getElementById('layer-gloss').style.backgroundPosition = `${x * 100}% ${y * 100}%`;
+        });
+        master.addEventListener('mouseleave', () => container.style.transform = 'none');
     </script>
 </body>
 </html>

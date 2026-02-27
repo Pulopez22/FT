@@ -10,19 +10,16 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-x: hidden; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
-        
-        /* Estilos de Configuración */
         .options-container { border-radius: 20px; overflow: hidden; border: 1px solid #f3f4f6; background-color: white; }
         .selectable-item { padding: 16px; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; width: 100%; text-align: left; font-size: 13px; font-weight: 600; }
         .selectable-item:last-child { border-bottom: none; }
         .item-active { background-color: #f9fafb !important; font-weight: 900 !important; color: #000 !important; border-left: 4px solid #000; }
         .icon-box { width: 32px; height: 32px; margin-right: 12px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background-color: #f3f4f6; font-size: 14px; }
-        
         #custom-size-panel { transition: all 0.3s ease; max-height: 0; overflow: hidden; opacity: 0; }
         #custom-size-panel.open { max-height: 400px; opacity: 1; border-top: 1px solid #f3f4f6; padding: 20px; }
-
-        /* Estilos del Menú Lateral y Carrito */
         .sidebar-item:hover { color: #000; padding-left: 6px; transition: all 0.2s ease; }
+        
+        /* Estilos del Carrito */
         #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
@@ -57,15 +54,15 @@
     </nav>
 
     <div class="flex">
-        <aside class="w-72 border-r h-[calc(100vh-73px)] sticky top-[73px] p-8 hidden lg:block bg-white overflow-y-auto">
-            <h3 class="text-[10px] font-black uppercase mb-8 text-gray-400 tracking-widest border-b pb-2">Product Categories</h3>
+        <aside class="sidebar-fixed p-10 hidden lg:block text-black w-64 border-r">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer "><a href="advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
-                <li class="sidebar-item cursor-pointer text-black font-black"><a href="stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer active text-black"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
@@ -81,19 +78,13 @@
                     <section>
                         <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4">1. Shape & Finish</h3>
                         <div id="shape-options" class="options-container shadow-sm mb-4">
-                            <button onclick="selectItem(this, 'shape')" class="selectable-item item-active">
-                                <div class="icon-box">🐱</div> <span>Contour Cut</span>
-                            </button>
-                            <button onclick="selectItem(this, 'shape')" class="selectable-item">
-                                <div class="icon-box">⬜</div> <span>Square</span>
-                            </button>
-                            <button onclick="selectItem(this, 'shape')" class="selectable-item">
-                                <div class="icon-box">◯</div> <span>Circle</span>
-                            </button>
+                            <button onclick="selectItem(this, 'shape')" class="selectable-item item-active"><div class="icon-box">🐱</div> <span>Contour Cut</span></button>
+                            <button onclick="selectItem(this, 'shape')" class="selectable-item"><div class="icon-box">⬜</div> <span>Square</span></button>
+                            <button onclick="selectItem(this, 'shape')" class="selectable-item"><div class="icon-box">◯</div> <span>Circle</span></button>
                         </div>
                         <select id="finish-select" onchange="updateSummary()" class="w-full p-4 border border-gray-100 rounded-2xl bg-white font-black text-xs uppercase outline-none focus:border-black transition-all">
-                            <option>Glossy Finish</option>
-                            <option>Matte Finish</option>
+                            <option value="glossy">Glossy Finish</option>
+                            <option value="matte">Matte Finish</option>
                         </select>
                     </section>
                 </div>
@@ -104,23 +95,21 @@
                         <div id="size-options" class="options-container shadow-sm mb-6">
                             <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item item-active">2 x 2 in</button>
                             <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">4 x 4 in</button>
-                            <button onclick="toggleCustomControls(true); selectItem(this, 'size')" class="selectable-item text-red-600">Custom Size</button>
+                            <button onclick="toggleCustomControls(true); selectItem(this, 'size')" class="selectable-item text-red-600">Custom Size (MAX 11")</button>
                             
                             <div id="custom-size-panel" class="bg-gray-50">
                                 <div class="grid grid-cols-2 gap-4 mb-2">
-                                    <input type="number" id="custom-w" value="3.0" step="0.1" oninput="validateLimits(this); updateSummary();" class="p-3 border rounded-xl font-black text-center outline-none">
-                                    <input type="number" id="custom-h" value="3.0" step="0.1" oninput="validateLimits(this); updateSummary();" class="p-3 border rounded-xl font-black text-center outline-none">
+                                    <input type="number" id="custom-w" value="3.0" step="0.1" oninput="validateInputLimit(this)" class="p-3 border rounded-xl font-black text-center outline-none">
+                                    <input type="number" id="custom-h" value="3.0" step="0.1" oninput="validateInputLimit(this)" class="p-3 border rounded-xl font-black text-center outline-none">
                                 </div>
                             </div>
                         </div>
 
                         <div id="qty-options" class="options-container shadow-sm">
-                            <button onclick="selectItem(this, 'qty')" class="selectable-item item-active justify-between">
-                                <span>50 pcs</span> <span class="font-black">$36</span>
-                            </button>
-                            <button onclick="selectItem(this, 'qty')" class="selectable-item justify-between">
-                                <span>100 pcs</span> <span class="font-black">$52</span>
-                            </button>
+                            <button onclick="selectItem(this, 'qty')" class="selectable-item item-active justify-between"><span>50 pcs</span> <span class="font-black">$36</span></button>
+                            <button onclick="selectItem(this, 'qty')" class="selectable-item justify-between"><span>100 pcs</span> <span class="font-black">$52</span></button>
+                            <button onclick="selectItem(this, 'qty')" class="selectable-item justify-between"><span>250 pcs</span> <span class="font-black">$95</span></button>
+                            <button onclick="selectItem(this, 'qty')" class="selectable-item justify-between"><span>500 pcs</span> <span class="font-black">$160</span></button>
                         </div>
                     </section>
                 </div>
@@ -135,9 +124,8 @@
                             <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest">Total</span>
                             <span id="final-price" class="text-4xl font-black italic tracking-tighter">$36.00</span>
                         </div>
-
                         <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileAndRedirect(this)">
-                        <button onclick="document.getElementById('file-input').click()" class="w-full bg-black hover:bg-red-600 text-white font-black py-6 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl transition-all">
+                        <button id="main-upload-btn" onclick="document.getElementById('file-input').click()" class="w-full bg-black hover:bg-red-600 text-white font-black py-6 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl transition-all text-center">
                             Upload & Edit ↓
                         </button>
                     </div>
@@ -154,20 +142,14 @@
     </footer>
 
     <div id="cart-sidebar">
-        <div class="p-8 border-b flex justify-between items-center bg-white sticky top-0">
-            <div>
-                <h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 Items</p>
-            </div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
         </div>
         <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
-        <div class="p-8 bg-gray-50 border-t space-y-6">
-            <div class="flex justify-between items-end">
-                <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1 italic">Subtotal</span>
-                <span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span>
-            </div>
-            <button class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic hover:bg-red-600 transition-all">Checkout</button>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
@@ -175,19 +157,78 @@
     <script>
         lucide.createIcons();
 
-        // --- LÓGICA DEL CONFIGURADOR ---
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            if(params.has('qty')) {
+                updateSummary();
+            }
+            renderCart();
+        };
+
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('open');
+            document.getElementById('cart-overlay').classList.toggle('visible');
+            renderCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const cont = document.getElementById('cart-items-container');
+            const dot = document.getElementById('cart-dot');
+            cont.innerHTML = ''; 
+            let total = 0;
+            
+            if (cart.length === 0) {
+                cont.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Bag is Empty</div>`;
+                if(dot) dot.classList.add('hidden');
+            } else {
+                if(dot) dot.classList.remove('hidden');
+                cart.forEach((item, i) => {
+                    total += parseFloat(item.price);
+                    const details = Object.entries(item.options || {}).map(([k, v]) => `${k}: ${v}`).join(' | ');
+                    cont.innerHTML += `
+                        <div class="flex gap-4 border-b pb-4 text-black">
+                            <a href="${item.url || '#'}" class="shrink-0">
+                                <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg bg-gray-50 shadow-sm hover:ring-2 ring-indigo-500 transition-all">
+                            </a>
+                            <div class="flex-grow py-1">
+                                <a href="${item.url || '#'}" class="hover:text-indigo-600">
+                                    <h4 class="text-[11px] font-black uppercase italic tracking-tighter">${item.name}</h4>
+                                </a>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight tracking-tighter">${details}</p>
+                                <span class="text-lg font-black italic mt-1 block">$${parseFloat(item.price).toFixed(2)}</span>
+                            </div>
+                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4 text-black"></i>
+                            </button>
+                        </div>`;
+                });
+            }
+            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
+            lucide.createIcons();
+        }
+
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function validateInputLimit(input) {
+            if (parseFloat(input.value) > 11) input.value = 11;
+            updateSummary();
+        }
+
         function toggleCustomControls(show) {
             const panel = document.getElementById('custom-size-panel');
             show ? panel.classList.add('open') : panel.classList.remove('open');
             updateSummary();
         }
 
-        function validateLimits(input) {
-            if (parseFloat(input.value) > 12) input.value = 12;
-        }
-
         function selectItem(element, category) {
-            const items = document.querySelectorAll(`#${category}-options .selectable-item, #${category}-options button`);
+            const items = document.querySelectorAll(`#${category}-options .selectable-item`);
             items.forEach(item => item.classList.remove('item-active'));
             element.classList.add('item-active');
             updateSummary();
@@ -195,7 +236,7 @@
 
         function updateSummary() {
             const shape = document.querySelector('#shape-options .item-active span').innerText;
-            const finish = document.getElementById('finish-select').value;
+            const finish = document.getElementById('finish-select').options[document.getElementById('finish-select').selectedIndex].text;
             const activeSize = document.querySelector('#size-options .item-active');
             const qtyItem = document.querySelector('#qty-options .item-active');
             
@@ -210,65 +251,32 @@
         function handleFileAndRedirect(input) {
             const file = input.files[0];
             if (!file) return;
+
+            const shape = document.querySelector('#shape-options .item-active span').innerText;
+            const finish = document.getElementById('finish-select').value;
+            const activeSize = document.querySelector('#size-options .item-active');
+            const qtyItem = document.querySelector('#qty-options .item-active');
+            
+            let sizeValue = activeSize.innerText.includes('Custom') 
+                ? parseFloat(document.getElementById('custom-w').value)
+                : parseFloat(activeSize.innerText.split('x')[0]);
+
+            const qtyValue = parseInt(qtyItem.querySelector('span').innerText);
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 localStorage.setItem('tempStickerImage', e.target.result);
-                window.open('editor.html', '_blank');
+                localStorage.setItem('tempStickerConfig', JSON.stringify({
+                    shape: shape,
+                    finish: finish,
+                    size: sizeValue,
+                    qty: qtyValue,
+                    price: document.getElementById('final-price').innerText
+                }));
+                window.location.href = 'editor.html';
             };
             reader.readAsDataURL(file);
         }
-
-        // --- LÓGICA DEL CARRITO ---
-        function toggleCart() {
-            const sidebar = document.getElementById('cart-sidebar');
-            const overlay = document.getElementById('cart-overlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('visible');
-            if(sidebar.classList.contains('open')) renderCart();
-        }
-
-        function renderCart() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const container = document.getElementById('cart-items-container');
-            const dot = document.getElementById('cart-dot');
-            container.innerHTML = cart.length === 0 ? '<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Bag is empty</div>' : '';
-            
-            let total = 0;
-            cart.forEach((item, i) => {
-                const price = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
-                total += price;
-                container.innerHTML += `
-                    <div class="flex gap-6 border-b pb-6 text-black">
-                        <div class="w-24 h-24 bg-gray-50 rounded-[1.5rem] border flex items-center justify-center p-2">
-                            <img src="${item.image}" class="max-h-full object-contain">
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex justify-between">
-                                <h4 class="text-sm font-black uppercase italic">${item.name}</h4>
-                                <button onclick="removeItem(${i})"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </div>
-                            <p class="text-[9px] text-gray-400 font-bold uppercase mt-1">${item.specs || ""}</p>
-                            <div class="flex justify-between items-end mt-4">
-                                <span class="text-[10px] font-bold">Qty: ${item.quantity || 1}</span>
-                                <span class="text-xl font-black italic">$${price.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
-            cart.length > 0 ? dot.classList.remove('hidden') : dot.classList.add('hidden');
-            lucide.createIcons();
-        }
-
-        function removeItem(i) {
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1);
-            localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            renderCart();
-        }
-
-        window.onload = renderCart;
     </script>
 </body>
 </html>
