@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro | Square Foot Printing</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; margin: 0; }
+        .register-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .register-card h2 { text-align: center; text-transform: uppercase; font-style: italic; font-weight: 900; margin-bottom: 20px; }
+        label { font-size: 14px; font-weight: bold; display: block; margin-top: 10px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 14px; background: black; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 20px; transition: 0.3s; }
+        button:hover { background: #333; }
+        .message { padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 15px; display: none; font-size: 14px; }
+        .error { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+        .success { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+    </style>
+</head>
+<body>
+
+<div class="register-card">
+    <h2>Crear Cuenta</h2>
+    
+    <div id="statusMessage" class="message"></div>
+
+    <form id="registerForm">
+        <label>Nombre Completo</label>
+        <input type="text" id="name" placeholder="Ej: Juan Pérez" required>
+
+        <label>Correo Electrónico</label>
+        <input type="email" id="email" placeholder="correo@ejemplo.com" required>
+
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="Mínimo 6 caracteres" minlength="6" required>
+
+        <button type="submit" id="btnRegister">REGISTRARSE</button>
+    </form>
+
+    <p style="text-align: center; font-size: 14px; margin-top: 20px;">
+        ¿Ya tienes cuenta? <a href="login.html" style="color: black; font-weight: bold;">Inicia sesión aquí</a>
+    </p>
+</div>
+
+<script>
+    // IMPORTANTE: Cambia esta URL por la dirección real de tu backend en Render
+    const API_URL = "https://ft-f34l.onrender.com";
+
+    const registerForm = document.getElementById('registerForm');
+    const statusMessage = document.getElementById('statusMessage');
+    const btnRegister = document.getElementById('btnRegister');
+
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Bloquear botón para evitar múltiples clics
+        btnRegister.disabled = true;
+        btnRegister.innerText = "PROCESANDO...";
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Éxito
+                statusMessage.className = "message success";
+                statusMessage.innerText = "¡Cuenta creada! Redirigiendo al login...";
+                statusMessage.style.display = "block";
+                
+                // Redirigir al login después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 2000);
+            } else {
+                // Error del servidor (ej: usuario ya existe)
+                statusMessage.className = "message error";
+                statusMessage.innerText = data.message || "Error al registrarse";
+                statusMessage.style.display = "block";
+                btnRegister.disabled = false;
+                btnRegister.innerText = "REGISTRARSE";
+            }
+        } catch (err) {
+            console.error("Error:", err);
+            statusMessage.className = "message error";
+            statusMessage.innerText = "No se pudo conectar con el servidor.";
+            statusMessage.style.display = "block";
+            btnRegister.disabled = false;
+            btnRegister.innerText = "REGISTRARSE";
+        }
+    });
+</script>
+
+</body>
+</html>

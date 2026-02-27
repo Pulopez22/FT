@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Square Foot Printing</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; margin: 0; }
+        .login-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .login-card h2 { text-align: center; text-transform: uppercase; font-style: italic; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: black; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #333; }
+        .error { color: red; font-size: 14px; text-align: center; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>Login de Usuarios</h2>
+    <p id="errorMessage" class="error">Credenciales incorrectas</p>
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Correo electrónico" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
+        <button type="submit">ENTRAR</button>
+    </form>
+    <p style="text-align: center; font-size: 14px; margin-top: 1rem;">
+        ¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a>
+    </p>
+</div>
+
+<script>
+    // CAMBIA ESTA URL POR LA DE TU BACKEND EN RENDER
+    const API_URL = "https://tu-app-en-render.onrender.com/api/auth/login";
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMsg = document.getElementById('errorMessage');
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // GUARDAMOS EL TOKEN Y DATOS DEL USUARIO
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userName', data.user.name);
+                
+                // REDIRIGIR A LA PÁGINA DE PEDIDOS
+                window.location.href = "order.html"; 
+            } else {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = data.message || "Error al iniciar sesión";
+            }
+        } catch (err) {
+            console.error("Error:", err);
+            alert("No se pudo conectar con el servidor.");
+        }
+    });
+</script>
+
+</body>
+</html>
