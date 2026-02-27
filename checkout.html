@@ -20,6 +20,7 @@
         .select-button { cursor: pointer; transition: all 0.3s ease; border: 2px solid #f3f4f6; background-color: #f9fafb; color: #000; }
         .select-button.active { border-color: #000; background-color: #000 !important; color: #fff !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         #cardNumberDisplay { font-family: monospace; letter-spacing: 2px; font-size: 16px; }
+        .logout-btn { font-size: 8px; color: #ef4444; cursor: pointer; margin-left: 5px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -38,7 +39,13 @@
         </div>
         <div class="flex items-center gap-4">
             <button onclick="window.location.href='index.html'" class="relative p-2"><i data-lucide="shopping-bag"></i></button>
-            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Track My Order</button>
+            
+            <div id="auth-container" class="flex items-center">
+                <button id="login-nav-btn" onclick="window.location.href='login.html'" class="flex items-center gap-2 text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">
+                    <i data-lucide="user" class="w-3 h-3"></i>
+                    Login
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -150,6 +157,33 @@
     <script>
         if (window.lucide) { lucide.createIcons(); }
 
+        // --- AUTHENTICATION LOGIC ---
+        function checkAuth() {
+            const userName = localStorage.getItem('userName');
+            const authContainer = document.getElementById('auth-container');
+            
+            if (userName) {
+                // Logged In: Show User Icon + Name
+                authContainer.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="flex items-center gap-1.5 text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">
+                            <i data-lucide="user-check" class="w-3 h-3 text-red-600"></i> 
+                            HI, ${userName.toUpperCase()}
+                        </span>
+                        <button onclick="logout()" class="logout-btn font-bold uppercase underline italic text-[8px] ml-2">Logout</button>
+                    </div>
+                `;
+                // Refresh Lucide Icons for the new injected elements
+                if (window.lucide) { lucide.createIcons(); }
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userName');
+            window.location.reload();
+        }
+
         let currentMethod = 'pickup', currentPayment = '';
 
         function setMethod(type) {
@@ -173,9 +207,9 @@
             if (val.length > 2) el.value = val.substring(0, 2) + '/' + val.substring(2, 4); else el.value = val;
         }
 
-        // --- FUNCIONES PARA EDITAR / BORRAR PRODUCTOS ---
-
         function loadCheckoutData() {
+            checkAuth(); // Check user session on load
+
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('order-items-list');
             const itemCountLabel = document.getElementById('item-count');
@@ -243,8 +277,6 @@
                 window.location.href = item.url;
             }
         }
-
-        // --- FINALIZAR COMPRA ---
 
         async function imageUrlToFile(url, filename) {
             try {

@@ -1,51 +1,215 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro | Square Foot Printing</title>
+    <title>Register | Square Foot Wrap & Print</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; margin: 0; }
-        .register-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        .register-card h2 { text-align: center; text-transform: uppercase; font-style: italic; font-weight: 900; margin-bottom: 20px; }
-        label { font-size: 14px; font-weight: bold; display: block; margin-top: 10px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 14px; background: black; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 20px; transition: 0.3s; }
-        button:hover { background: #333; }
-        .message { padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 15px; display: none; font-size: 14px; }
-        .error { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
-        .success { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), 
+                        url('https://images.unsplash.com/photo-1611310263916-5bc314962271?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            border-radius: 32px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .logo-container {
+            width: auto;
+            max-width: 200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 25px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-group {
+            text-align: left;
+        }
+
+        label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
+            margin-left: 10px;
+            margin-bottom: 4px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        input {
+            width: 100%;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 0 20px;
+            font-size: 16px;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: #fff;
+        }
+
+        .btn-register {
+            width: 100%;
+            height: 54px;
+            background-color: #fff;
+            color: #000;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s ease, background 0.3s;
+        }
+
+        .btn-register:hover {
+            background-color: #f5f5f5;
+            transform: translateY(-2px);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .error {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .success {
+            background: rgba(46, 213, 115, 0.15);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
-<div class="register-card">
-    <h2>Crear Cuenta</h2>
+<div class="glass-card">
+    <div class="logo-container">
+        <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo">
+    </div>
+    
+    <h2>Create Account</h2>
+    <p class="subtitle">Join the Square Foot Wrap community</p>
     
     <div id="statusMessage" class="message"></div>
 
     <form id="registerForm">
-        <label>Nombre Completo</label>
-        <input type="text" id="name" placeholder="Ej: Juan Pérez" required>
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="John Doe" required>
+        </div>
 
-        <label>Correo Electrónico</label>
-        <input type="email" id="email" placeholder="correo@ejemplo.com" required>
+        <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="email@example.com" required>
+        </div>
 
-        <label>Contraseña</label>
-        <input type="password" id="password" placeholder="Mínimo 6 caracteres" minlength="6" required>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Min. 6 characters" minlength="6" required>
+        </div>
 
-        <button type="submit" id="btnRegister">REGISTRARSE</button>
+        <button type="submit" id="btnRegister" class="btn-register">REGISTER</button>
     </form>
 
-    <p style="text-align: center; font-size: 14px; margin-top: 20px;">
-        ¿Ya tienes cuenta? <a href="login.html" style="color: black; font-weight: bold;">Inicia sesión aquí</a>
-    </p>
+    <div class="footer">
+        Already have an account? <a href="checkout.html">Login here</a>
+    </div>
 </div>
 
 <script>
-    // IMPORTANTE: Cambia esta URL por la dirección real de tu backend en Render
-
-const API_URL = "https://ft-f34l.onrender.com/api/auth/register";
+    const API_URL = "https://ft-f34l.onrender.com/api/auth/register";
 
     const registerForm = document.getElementById('registerForm');
     const statusMessage = document.getElementById('statusMessage');
@@ -54,9 +218,9 @@ const API_URL = "https://ft-f34l.onrender.com/api/auth/register";
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Bloquear botón para evitar múltiples clics
         btnRegister.disabled = true;
-        btnRegister.innerText = "PROCESANDO...";
+        btnRegister.innerText = "PROCESSING...";
+        statusMessage.style.display = "none";
 
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
@@ -72,30 +236,27 @@ const API_URL = "https://ft-f34l.onrender.com/api/auth/register";
             const data = await response.json();
 
             if (data.success) {
-                // Éxito
                 statusMessage.className = "message success";
-                statusMessage.innerText = "¡Cuenta creada! Redirigiendo al login...";
+                statusMessage.innerText = "Account created! Redirecting to checkout...";
                 statusMessage.style.display = "block";
                 
-                // Redirigir al login después de 2 segundos
                 setTimeout(() => {
-                    window.location.href = "login.html";
+                    window.location.href = "checkout.html";
                 }, 2000);
             } else {
-                // Error del servidor (ej: usuario ya existe)
                 statusMessage.className = "message error";
-                statusMessage.innerText = data.message || "Error al registrarse";
+                statusMessage.innerText = data.message || "Registration failed";
                 statusMessage.style.display = "block";
                 btnRegister.disabled = false;
-                btnRegister.innerText = "REGISTRARSE";
+                btnRegister.innerText = "REGISTER";
             }
         } catch (err) {
             console.error("Error:", err);
             statusMessage.className = "message error";
-            statusMessage.innerText = "No se pudo conectar con el servidor.";
+            statusMessage.innerText = "Connection error. Please try again.";
             statusMessage.style.display = "block";
             btnRegister.disabled = false;
-            btnRegister.innerText = "REGISTRARSE";
+            btnRegister.innerText = "REGISTER";
         }
     });
 </script>
