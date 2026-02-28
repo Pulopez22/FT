@@ -41,8 +41,7 @@
             <button onclick="window.location.href='index.html'" class="relative p-2"><i data-lucide="shopping-bag"></i></button>
             <div id="auth-container" class="flex items-center">
                 <button id="login-nav-btn" onclick="window.location.href='login.html'" class="flex items-center gap-2 text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">
-                    <i data-lucide="user" class="w-3 h-3"></i>
-                    Login
+                    <i data-lucide="user" class="w-3 h-3"></i> Login
                 </button>
             </div>
         </div>
@@ -93,7 +92,7 @@
                             <div id="pickup-box" class="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 space-y-6">
                                 <p class="text-sm font-bold uppercase">6155 S Edmond St, Las Vegas, NV 89118</p>
                                 <div class="w-full h-48 rounded-2xl overflow-hidden border border-gray-200">
-                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.2255!2d-115.1912!3d36.0772" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.582855140889!2d-115.19504492419515!3d36.08291417242144!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c8c68a4e320509%3A0x89903e6f98a3c86c!2s6155%20S%20Edmond%20St%2C%20Las%20Vegas%2C%20NV%2089118!5e0!3m2!1ses-419!2sus!4v1700000000000" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                                 </div>
                             </div>
                             <div id="shipping-box" class="hidden space-y-6">
@@ -131,9 +130,7 @@
                                 <h2 class="heavy-italic text-xl">Order Summary</h2>
                                 <span id="item-count" class="bg-black text-white text-[10px] px-2 py-1 rounded-full font-black italic">0 ITEMS</span>
                             </div>
-                            
                             <div id="order-items-list" class="p-8 space-y-6 max-h-[400px] overflow-y-auto"></div>
-
                             <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
                                 <div class="flex justify-between items-end">
                                     <span class="text-[10px] font-black uppercase text-gray-400 italic">Total Amount</span>
@@ -156,42 +153,37 @@
     <script>
         if (window.lucide) { lucide.createIcons(); }
 
-        // --- AUTHENTICATION LOGIC (ACTUALIZADA) ---
+        let currentMethod = 'pickup', currentPayment = '';
+
+        // --- AUTH LOGIC ---
         function checkAuth() {
             const userName = localStorage.getItem('userName');
-            const userEmail = localStorage.getItem('userEmail'); // Recuperar email
+            const userEmail = localStorage.getItem('userEmail');
             const authContainer = document.getElementById('auth-container');
             
             if (userName) {
-                // 1. AUTO-RELLENAR CAMPOS DEL FORMULARIO
                 const nameInput = document.getElementById('fullName');
                 const emailInput = document.getElementById('emailAddress');
                 if (nameInput) nameInput.value = userName;
                 if (emailInput) emailInput.value = userEmail || "";
 
-                // 2. MOSTRAR BOTÓN DE LOGOUT Y SALUDO
                 authContainer.innerHTML = `
                     <div class="flex items-center gap-2">
                         <span class="flex items-center gap-1.5 text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">
-                            <i data-lucide="user-check" class="w-3 h-3 text-red-600"></i> 
-                            HI, ${userName.toUpperCase()}
+                            <i data-lucide="user-check" class="w-3 h-3 text-red-600"></i> HI, ${userName.toUpperCase()}
                         </span>
                         <button onclick="logout()" class="logout-btn font-bold uppercase underline italic text-[8px] ml-2">Logout</button>
-                    </div>
-                `;
+                    </div>`;
                 if (window.lucide) { lucide.createIcons(); }
             }
         }
 
         function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userEmail'); // Limpiar email al salir
+            localStorage.clear();
             window.location.reload();
         }
 
-        let currentMethod = 'pickup', currentPayment = '';
-
+        // --- UI HANDLERS ---
         function setMethod(type) {
             currentMethod = type;
             document.getElementById('pickup-box').classList.toggle('hidden', type === 'shipping');
@@ -213,9 +205,84 @@
             if (val.length > 2) el.value = val.substring(0, 2) + '/' + val.substring(2, 4); else el.value = val;
         }
 
-        function loadCheckoutData() {
-            checkAuth(); // Verifica auth y rellena campos al cargar
+        // --- CORE LOGIC (SENDING TO RENDER) ---
+        async function imageUrlToFile(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                return new File([blob], filename, { type: blob.type });
+            } catch (e) { return null; }
+        }
 
+        async function validateAndPlaceOrder() {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            if (cart.length === 0) { alert("Your cart is empty!"); return; }
+
+            const btn = document.getElementById('place-order-btn');
+            const fields = ['fullName', 'emailAddress', 'phoneNumber'];
+            if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
+            if (currentPayment === 'card') fields.push('cardExpiry', 'cardCVC');
+            
+            let isValid = true;
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && !el.value.trim()) { el.classList.add('input-error'); isValid = false; }
+                else if (el) { el.classList.remove('input-error'); }
+            });
+
+            if (!isValid || !currentPayment) { alert("Please complete all required fields."); return; }
+
+            btn.innerText = "SENDING ORDER...";
+            btn.disabled = true;
+
+            const orderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+            const dateStr = new Date().toLocaleString();
+
+            let itemsSummary = cart.map((i, index) => {
+                let optionsText = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : "Standard";
+                return `${index + 1}. ${i.name.toUpperCase()} [${optionsText}, Qty: ${i.quantity || 1}] - $${parseFloat(i.price).toFixed(2)}`;
+            }).join('\n');
+
+            const orderInfo = {
+                order_id: orderNumber,
+                order_date: dateStr,
+                customer_name: document.getElementById('fullName').value,
+                customer_email: document.getElementById('emailAddress').value,
+                customer_phone: document.getElementById('phoneNumber').value,
+                total_price: document.getElementById('final-price-display').innerText,
+                delivery_method: currentMethod,
+                payment_method: currentPayment,
+                order_items: itemsSummary
+            };
+
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(orderInfo));
+
+            // Proceso de adjuntar imágenes del carrito
+            for (let i = 0; i < cart.length; i++) {
+                if (cart[i].image) {
+                    const productName = cart[i].name.replace(/\s+/g, '-').toLowerCase();
+                    const fileName = `${productName}-${orderNumber}-${i+1}.png`;
+                    const file = await imageUrlToFile(cart[i].image, fileName);
+                    if (file) formData.append('files', file); 
+                }
+            }
+
+            try {
+                const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { method: 'POST', body: formData });
+                if (res.ok) {
+                    localStorage.removeItem('sqft_cart');
+                    window.location.href = `order.html?id=${orderNumber}`;
+                } else { alert("Server error. Please try again later."); }
+            } catch (e) { alert("Connection failed. Check your internet."); } 
+            finally {
+                btn.innerText = "Place Order Now";
+                btn.disabled = false;
+            }
+        }
+
+        function loadCheckoutData() {
+            checkAuth();
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('order-items-list');
             const itemCountLabel = document.getElementById('item-count');
@@ -229,7 +296,7 @@
                 return;
             }
 
-            container.innerHTML = cart.map((item, index) => {
+            container.innerHTML = cart.map((item) => {
                 total += parseFloat(item.price);
                 let opts = item.options ? Object.entries(item.options).map(([k,v]) => `<span class="block text-[9px] uppercase text-gray-500">${k}: ${v}</span>`).join('') : "";
                 return `
@@ -249,37 +316,6 @@
 
             document.getElementById('final-price-display').innerText = `$${total.toFixed(2)}`;
             if (window.lucide) { lucide.createIcons(); }
-        }
-
-        async function validateAndPlaceOrder() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            if (cart.length === 0) { alert("Your cart is empty!"); return; }
-
-            const btn = document.getElementById('place-order-btn');
-            const fields = ['fullName', 'emailAddress', 'phoneNumber'];
-            if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
-            
-            let isValid = true;
-            fields.forEach(id => {
-                const el = document.getElementById(id);
-                if (el && !el.value.trim()) { el.classList.add('input-error'); isValid = false; }
-                else if (el) { el.classList.remove('input-error'); }
-            });
-
-            if (!isValid || !currentPayment) { alert("Please complete all required fields."); return; }
-
-            btn.innerText = "SENDING ORDER...";
-            btn.disabled = true;
-
-            const orderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-            
-            // Lógica de envío a API (FormData)...
-            // (He simplificado esto para no alargar el código, mantén tu lógica de fetch original)
-            setTimeout(() => {
-                alert("Order placed successfully!");
-                localStorage.removeItem('sqft_cart');
-                window.location.href = "index.html";
-            }, 2000);
         }
 
         window.onload = loadCheckoutData;
