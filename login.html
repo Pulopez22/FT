@@ -17,7 +17,6 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* Background image with a dark overlay to make text pop */
             background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), 
                         url('https://images.unsplash.com/photo-1611310263916-5bc314962271?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
@@ -25,7 +24,6 @@
             background-attachment: fixed;
         }
 
-        /* Card with glassmorphism effect */
         .glass-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(15px);
@@ -39,10 +37,9 @@
             text-align: center;
         }
 
-        /* --- PLACE YOUR LOGO HERE --- */
         .logo-container {
             width: auto;
-            max-width: 200px; /* Adjust this based on your logo shape */
+            max-width: 200px;
             margin: 0 auto 25px;
             display: flex;
             justify-content: center;
@@ -52,10 +49,8 @@
         .logo-container img {
             max-width: 100%;
             height: auto;
-            /* Added a subtle shadow to separate from background */
             filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
         }
-        /* ----------------------------- */
 
         h2 {
             font-size: 28px;
@@ -135,10 +130,6 @@
             transform: translateY(-2px);
         }
 
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
         .error {
             color: #ff6b6b;
             font-size: 13px;
@@ -161,10 +152,6 @@
             text-decoration: none;
             font-weight: 700;
         }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -174,7 +161,7 @@
         <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Square Foot Wrap & Print Logo">
     </div>
     
-    <h2>Design your Ideas </h2>
+    <h2>Design your Ideas</h2>
     <p class="subtitle">Log in to manage your custom wrap orders</p>
     
     <div id="errorMessage" class="error">Incorrect credentials. Please try again.</div>
@@ -208,7 +195,6 @@
         const errorMsg = document.getElementById('errorMessage');
         const submitBtn = e.target.querySelector('.btn-login');
 
-        // Loading state
         submitBtn.innerText = "VERIFYING...";
         submitBtn.style.opacity = "0.7";
         submitBtn.disabled = true;
@@ -223,13 +209,17 @@
             const data = await response.json();
 
             if (data.success) {
+                // Guardamos los datos necesarios para el Checkout y Dashboard
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('userName', data.user.name);
+                localStorage.setItem('userEmail', data.user.email);
+                // Guardamos el estatus de mayoreo que envía el servidor
+                localStorage.setItem('isWholesale', data.user.isWholesale);
+                
                 window.location.href = "checkout.html"; 
             } else {
                 errorMsg.style.display = 'block';
                 errorMsg.innerText = data.message || "Invalid email or password.";
-                // Reset button state
                 submitBtn.innerText = "LOGIN TO PANEL";
                 submitBtn.style.opacity = "1";
                 submitBtn.disabled = false;
@@ -238,7 +228,6 @@
             console.error("Error:", err);
             errorMsg.style.display = 'block';
             errorMsg.innerText = "Could not connect to the workshop. Please try again later.";
-            // Reset button state
             submitBtn.innerText = "LOGIN TO PANEL";
             submitBtn.style.opacity = "1";
             submitBtn.disabled = false;

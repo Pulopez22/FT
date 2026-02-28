@@ -239,6 +239,9 @@
                 statusMessage.className = "message success";
                 statusMessage.innerText = "Account created! Redirecting to checkout...";
                 statusMessage.style.display = "block";
+
+localStorage.setItem('userName', name);
+localStorage.setItem('userEmail', email); // Añade esta línea
                 
                 setTimeout(() => {
                     window.location.href = "checkout.html";
