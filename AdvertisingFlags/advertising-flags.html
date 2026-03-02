@@ -11,13 +11,11 @@
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; color: #000; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         
-        /* SIDEBAR DESKTOP */
         .sidebar-fixed { 
             width: 300px; height: calc(100vh - 73px); position: sticky; top: 73px; 
             background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; 
         }
 
-        /* MENU MOVIL */
         #mobile-menu {
             position: fixed; inset: 0; background: white; z-index: 100;
             transform: translateX(-100%); transition: transform 0.3s ease-in-out;
@@ -29,51 +27,38 @@
             .nav-links-desktop { display: none; }
         }
 
-        .product-card { transition: all 0.3s ease; border: 1px solid #f3f4f6; border-radius: 2rem; }
+        .product-card { transition: all 0.3s ease; border: 1px solid #f3f4f6; border-radius: 2rem; overflow: hidden; background: #fff; }
         .product-card:hover { transform: translateY(-5px); border-color: #000; }
         
-        .filter-btn { transition: all 0.3s ease; border: 1px solid #f3f4f6; color: #9ca3af; font-weight: 900; }
-        .filter-btn.active { background-color: #000; color: #fff; border-color: #000; }
-
-        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; z-index: 110; transform: translateX(100%); transition: transform 0.4s ease; }
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; z-index: 110; transform: translateX(100%); transition: transform 0.4s ease; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
-        
-        /* Quitar scrollbar estético */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-3 px-4 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-4">
-            <button onclick="toggleMobileMenu()" class="xl:hidden p-1">
-                <i data-lucide="menu" class="w-6 h-6"></i>
-            </button>
-            
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1"><i data-lucide="menu" class="w-6 h-6"></i></button>
             <a href="../index.html" class="bg-black p-1.5 rounded-lg shadow-lg">
                 <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 md:h-8 w-auto">
             </a>
-
             <div class="nav-links-desktop hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 italic tracking-widest">
-                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
-                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
-                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
-                <a href="#" class="hover:text-black transition-colors">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
-                <a href="#" class="hover:text-black transition-colors">Apparel</a>
-                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
+                <a href="../index.html" class="hover:text-black">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black">Banners</a>
+                <a href="#" class="hover:text-black">Trade Show</a>
+                <a href="#" class="hover:text-black">Decals</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black">Stickers</a>
+                <a href="#" class="hover:text-black">Apparel</a>
+                <a href="#" class="hover:text-black">Marketing Materials</a>
             </div>
         </div>
-        
         <div class="flex items-center gap-2 md:gap-4">
             <div id="auth-container" class="flex items-center"></div>
-            
-            <button onclick="toggleCart()" class="relative p-2 text-black">
+            <button onclick="toggleCart()" class="relative text-black p-2">
                 <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full border border-white hidden"></span>
             </button>
-            
             <button class="hidden sm:block text-[9px] font-black uppercase border-b-2 border-black pb-0.5">Track Order</button>
         </div>
     </nav>
@@ -91,7 +76,6 @@
             <li><a href="../Displays/displays.html">Displays</a></li>
             <li><a href="../LargePrinting/largeprinting.html">Large Format</a></li>
             <li><a href="../Rigid Signs/rigidsigns.html">Rigid Signs</a></li>
-            <li class="pt-4 border-t"><a href="#">Marketing Materials</a></li>
         </ul>
     </div>
 
@@ -102,8 +86,7 @@
                 <li class="sidebar-item active text-black italic">Advertising Flags</li>
                 <li class="sidebar-item hover:text-black"><a href="../Banners/banners.html">Banners</a></li>
                 <li class="sidebar-item hover:text-black"><a href="../Displays/displays.html">Displays</a></li>
-                <li class="sidebar-item hover:text-black"><a href="../LargePrinting/largeprinting.html">Large Format Printing</a></li>
-                <li class="sidebar-item hover:text-black"><a href="../PrintedFabric/printed-fabric.html">Printed Fabric</a></li>
+                <li class="sidebar-item hover:text-black"><a href="../LargePrinting/largeprinting.html">Large Format</a></li>
                 <li class="sidebar-item hover:text-black"><a href="../Stickers/stickers.html">Stickers</a></li>
                 <li class="sidebar-item hover:text-black"><a href="../Rigid Signs/rigidsigns.html">Rigid Signs</a></li>
             </ul>
@@ -111,22 +94,9 @@
 
         <main class="flex-grow w-full flex flex-col">
             <div class="p-5 md:p-12 flex-grow">
-                <header class="mb-10 space-y-6">
-                    <div>
-                        <h1 class="text-4xl md:text-6xl heavy-italic text-gray-900 leading-tight">Advertising Flags</h1>
-                        <div id="price-tier-badge" class="mt-4 text-[9px] font-black uppercase px-4 py-2 rounded-full w-fit italic bg-gray-100"></div>
-                    </div>
-
-                    <div class="relative w-full md:w-80">
-                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"></i>
-                        <input type="text" oninput="handleSearch(this.value)" placeholder="Search flags..." class="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-black">
-                    </div>
-
-                    <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                        <button onclick="filterBy('all', this)" class="filter-btn active px-6 py-2.5 rounded-full text-[9px] uppercase italic whitespace-nowrap">All Flags</button>
-                        <button onclick="filterBy('heavy', this)" class="filter-btn px-6 py-2.5 rounded-full text-[9px] uppercase italic whitespace-nowrap">Heavy Duty</button>
-                        <button onclick="filterBy('econo', this)" class="filter-btn px-6 py-2.5 rounded-full text-[9px] uppercase italic whitespace-nowrap">Value / Econo</button>
-                    </div>
+                <header class="mb-10">
+                    <h1 class="text-4xl md:text-6xl heavy-italic text-gray-900 leading-tight">Advertising Flags</h1>
+                    <div id="price-tier-badge" class="mt-4 text-[9px] font-black uppercase px-4 py-2 rounded-full w-fit italic bg-gray-100"></div>
                 </header>
 
                 <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"></div>
@@ -141,9 +111,9 @@
         </main>
     </div>
 
-    <div id="cart-sidebar" class="shadow-2xl flex flex-col">
+    <div id="cart-sidebar">
         <div class="p-8 border-b flex justify-between items-center bg-white sticky top-0">
-            <h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3>
+            <h3 class="text-2xl font-black uppercase italic">Your Bag</h3>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-100 rounded-2xl"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
         <div id="cart-items-container" class="flex-grow overflow-y-auto p-8"></div>
@@ -158,10 +128,10 @@
         lucide.createIcons();
 
         const products = [
-            { name: 'Custom Pole Flag', cat: 'heavy', basePrice: 10.00, img: '../images/Advertising Flags/Custom-Pole-Flag-02-1.png', url: 'pole-flag.html', unit: 'sq/ft' },
-            { name: 'Tear Drop Flag', cat: 'heavy', basePrice: 19.17, img: '../images/Advertising Flags/TearDropFlags-Main.png', url: 'teardropflag.html', unit: '' },
-            { name: 'Feather Angled Flag', cat: 'heavy', basePrice: 19.17, img: '../images/Advertising Flags/FeatherAngledFlags-Main.png', url: 'featherangledflag.html', unit: '' },
-            { name: 'Econo Feather Flag', cat: 'econo', basePrice: 33.32, img: '../images/Advertising Flags/Econo-Feather-Flag-Main-1.png', url: 'econoflag.html', unit: '' }
+            { name: 'Custom Pole Flag', basePrice: 10.00, img: '../images/Advertising Flags/Custom-Pole-Flag-02-1.png', url: 'pole-flag.html', unit: 'sq/ft' },
+            { name: 'Tear Drop Flag', basePrice: 19.17, img: '../images/Advertising Flags/TearDropFlags-Main.png', url: 'teardropflag.html', unit: '' },
+            { name: 'Feather Angled Flag', basePrice: 19.17, img: '../images/Advertising Flags/FeatherAngledFlags-Main.png', url: 'featherangledflag.html', unit: '' },
+            { name: 'Econo Feather Flag', basePrice: 33.32, img: '../images/Advertising Flags/Econo-Feather-Flag-Main-1.png', url: 'econoflag.html', unit: '' }
         ];
 
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
@@ -178,8 +148,8 @@
 
             if (userName) {
                 authContainer.innerHTML = `
-                    <div class="flex items-center">
-                        <span class="text-[9px] md:text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5 whitespace-nowrap">HI, ${userName.split(' ')[0]}</span>
+                    <div class="flex items-center whitespace-nowrap">
+                        <span class="text-[9px] md:text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span>
                         <span onclick="logout()" class="logout-btn italic">LOGOUT</span>
                     </div>`;
                 badge.innerText = isWholesale ? "✓ Wholesale pricing enabled" : "Retail Pricing";
@@ -191,15 +161,15 @@
             renderProducts(isWholesale);
         }
 
-        function renderProducts(isWholesale, data = products) {
+        function renderProducts(isWholesale) {
             const grid = document.getElementById('product-grid');
-            grid.innerHTML = data.map(b => {
+            grid.innerHTML = products.map(b => {
                 const finalPrice = isWholesale ? b.basePrice : (b.basePrice * 2);
                 return `
-                <div onclick="window.location.href='${b.url}'" class="product-card bg-white shadow-sm overflow-hidden cursor-pointer group">
+                <div onclick="window.location.href='${b.url}'" class="product-card cursor-pointer group">
                     <div class="h-64 p-8 flex items-center justify-center relative">
                         <img src="${b.img}" class="object-contain h-full transition-transform duration-500 group-hover:scale-110">
-                        ${!isWholesale ? '<span class="absolute top-4 right-4 bg-red-600 text-white text-[7px] font-black px-2 py-1 rounded-full uppercase italic">Retail</span>' : ''}
+                        ${!isWholesale ? '<span class="absolute top-4 right-4 bg-red-600 text-white text-[7px] font-black px-2 py-1 rounded-full uppercase italic shadow-lg">Retail</span>' : ''}
                     </div>
                     <div class="p-6 border-t">
                         <h3 class="font-black text-xs uppercase italic h-8 line-clamp-2">${b.name}</h3>
@@ -213,20 +183,7 @@
             lucide.createIcons();
         }
 
-        function filterBy(cat, btn) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const filtered = cat === 'all' ? products : products.filter(b => b.cat === cat);
-            renderProducts(localStorage.getItem('userTier') === 'wholesale', filtered);
-        }
-
-        function handleSearch(term) {
-            const filtered = products.filter(b => b.name.toLowerCase().includes(term.toLowerCase()));
-            renderProducts(localStorage.getItem('userTier') === 'wholesale', filtered);
-        }
-
         function logout() { localStorage.clear(); window.location.reload(); }
-
         window.onload = checkAuth;
     </script>
 </body>
