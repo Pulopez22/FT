@@ -30,6 +30,17 @@
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+
+        /* Animación para ocultar el banner suavemente */
+        .fade-out {
+            opacity: 0 !important;
+            max-height: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            overflow: hidden;
+            transition: all 0.8s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-white text-black">
@@ -76,10 +87,26 @@
         <main class="flex-grow p-12 text-black">
             <header class="mb-12">
                 <h1 class="text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter">Featured Products</h1>
-                <div class="h-2 w-24 bg-black rounded-full text-black"></div>
-            </header>
-            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 text-black">
+                <div class="h-2 w-24 bg-black rounded-full mb-8"></div>
+                
+                <div id="min-order-banner" class="relative bg-red-50 border-l-4 border-red-600 p-6 rounded-r-3xl shadow-sm max-w-4xl transition-all duration-700">
+                    <button onclick="closeBanner()" class="absolute top-4 right-4 text-red-300 hover:text-red-600 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                    <div class="flex items-center gap-4 pr-8">
+                        <i data-lucide="info" class="text-red-600 w-8 h-8"></i>
+                        <div>
+                            <h4 class="text-sm font-black uppercase italic text-red-600">Minimum Production Order: $50.00</h4>
+                            <p class="text-[11px] font-bold text-gray-500 uppercase tracking-tight mt-1">
+                                Each custom item must reach a $50 minimum for material efficiency. 
+                                <span class="text-black">Prices shown are wholesale rates.</span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
+            </header>
+
+            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 text-black"></div>
         </main>
     </div>
 
@@ -129,21 +156,21 @@
         function renderProducts() {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = products.map(p => `
-                <div onclick="window.location.href='${p.url}'" class="product-card bg-white rounded-[2rem] overflow-hidden cursor-pointer group border border-gray-100 shadow-sm text-black">
+                <div onclick="window.location.href='${p.url}'" class="product-card bg-white rounded-[2rem] overflow-hidden cursor-pointer group border border-gray-100 shadow-sm text-black relative">
                     <div class="h-80 p-10 flex items-center justify-center group-hover:bg-gray-50 transition-colors">
                         <img src="${p.img}" alt="${p.name}" class="object-contain h-full drop-shadow-2xl transition-transform duration-500 group-hover:scale-110">
                     </div>
                     <div class="p-8 border-t text-black">
                         <h3 class="font-black text-xl text-gray-800 uppercase italic leading-none">${p.name}</h3>
                         <p class="text-[11px] text-gray-400 font-bold mt-2 uppercase tracking-tighter">${p.desc}</p>
-                        <div class="flex justify-end mt-8">
+                        <div class="flex justify-between items-center mt-8">
+                             <span class="text-[9px] font-black text-red-600 uppercase italic">Wholesale Rates</span>
                             <div class="bg-black text-white px-6 py-3 rounded-full group-hover:bg-red-600 transition-all italic text-[10px] uppercase font-black tracking-widest shadow-lg">See Category</div>
                         </div>
                     </div>
                 </div>`).join('');
         }
 
-        // LÓGICA DEL CARRITO UNIFICADA
         function toggleCart() {
             const sidebar = document.getElementById('cart-sidebar');
             const overlay = document.getElementById('cart-overlay');
@@ -187,7 +214,7 @@
                                     <h4 class="text-sm font-black uppercase italic tracking-tighter">${item.name}</h4>
                                     <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button>
                                 </div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black text-black">${details}</p>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black">${details}</p>
                                 <div class="flex justify-between items-end mt-4">
                                     <span class="text-[10px] font-bold text-gray-400 uppercase">Qty: ${item.quantity || 1}</span>
                                     <span class="text-xl font-black italic">$${priceNum.toFixed(2)}</span>
@@ -208,9 +235,32 @@
             renderCart();
         }
 
+        // --- LÓGICA DEL BANNER ---
+        
+        let hideTimeout; // Variable para manejar el temporizador
+
+        function closeBanner() {
+            const banner = document.getElementById('min-order-banner');
+            if (banner) {
+                banner.classList.add('fade-out');
+                clearTimeout(hideTimeout); // Cancela el temporizador automático si se cierra manual
+                setTimeout(() => banner.style.display = 'none', 800);
+            }
+        }
+
+        function startAutoHide() {
+            const banner = document.getElementById('min-order-banner');
+            if (banner) {
+                hideTimeout = setTimeout(() => {
+                    closeBanner();
+                }, 6000); // 6 segundos
+            }
+        }
+
         window.onload = function() {
             renderProducts();
             renderCart();
+            startAutoHide();
         };
     </script>
 </body>

@@ -13,7 +13,6 @@
         .input-field { width: 100%; padding: 1rem; border-radius: 1.25rem; border: 1px solid #e5e7eb; outline: none; transition: all 0.3s; font-size: 14px; font-weight: 600; background-color: #f9fafb; color: #000; }
         .input-field:focus { border-color: #000; background-color: #fff; box-shadow: 0 0 0 4px rgba(0,0,0,0.05); }
         .input-error { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
-        .input-error::placeholder { color: #ef4444 !important; font-weight: 700; }
         label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.1em; margin-bottom: 0.6rem; display: block; margin-left: 0.5rem; }
         .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
         .sidebar-item:hover { color: #000; padding-left: 4px; }
@@ -37,38 +36,38 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 text-black">
             <button onclick="window.location.href='index.html'" class="relative p-2"><i data-lucide="shopping-bag"></i></button>
             <div id="auth-container" class="flex items-center">
-                <button id="login-nav-btn" onclick="window.location.href='login.html'" class="flex items-center gap-2 text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">
-                    <i data-lucide="user" class="w-3 h-3"></i> Login
+                <button id="login-nav-btn" onclick="window.location.href='login.html'" class="flex items-center gap-2 text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic text-black">
+                    <i data-lucide="user" class="w-3 h-3 text-black"></i> Login
                 </button>
             </div>
         </div>
     </nav>
 
     <div class="flex flex-row flex-grow w-full text-black">
-        <aside class="w-72 border-r p-10 hidden lg:block bg-white sticky top-[73px] h-[calc(100vh-73px)] text-black">
+        <aside class="w-72 border-r p-10 hidden lg:block bg-white sticky top-[73px] h-[calc(100vh-73px)]">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Categories</h3>
-            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase text-black">
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer text-black"><a href="AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer text-black"><a href="Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer text-black"><a href="Displays/displays.html" class="block w-full">Displays</a></li>
                 <li class="sidebar-item cursor-pointer text-black"><a href="LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
                 <li class="sidebar-item cursor-pointer text-black"><a href="PrintedFabric/printed-fabric.html" class="block w-full text-black">Printed Fabric</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="Stickers/stickers.html" class="block w-full">Stickers</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Stickers/stickers.html" class="block w-full text-black">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Rigid Signs/rigidsigns.html" class="block w-full text-black">Rigid Signs</a></li>
             </ul>
         </aside>
 
         <main class="flex-grow bg-white p-6 md:p-12 overflow-y-auto">
             <div class="max-w-6xl mx-auto text-black">
                 <header class="mb-12">
-                    <h1 class="text-5xl heavy-italic italic tracking-tighter leading-none">Review Your Order</h1>
+                    <h1 class="text-5xl heavy-italic italic tracking-tighter leading-none text-black">Review Your Order</h1>
                     <div class="h-2 w-24 bg-red-600 rounded-full mt-4"></div>
                 </header>
 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 text-black">
                     <div class="lg:col-span-7 space-y-12">
                         <section>
                             <h2 class="heavy-italic text-2xl mb-8 flex items-center gap-3"><i data-lucide="user" class="text-red-600"></i> Contact Information</h2>
@@ -83,30 +82,30 @@
                             <h2 class="heavy-italic text-2xl mb-2 flex items-center gap-3"><i data-lucide="truck" class="text-red-600"></i> Delivery Method</h2>
                             <div class="flex gap-4">
                                 <button onclick="setMethod('pickup')" id="method-pickup" class="select-button active flex-1 p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
-                                    <i data-lucide="package"></i><span class="heavy-italic text-sm">Local Pickup</span>
+                                    <i data-lucide="package"></i><span class="heavy-italic text-sm">Local Pickup ($0)</span>
                                 </button>
                                 <button onclick="setMethod('shipping')" id="method-shipping" class="select-button flex-1 p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
-                                    <i data-lucide="send"></i><span class="heavy-italic text-sm">Shipping</span>
+                                    <i data-lucide="send"></i><span class="heavy-italic text-sm">UPS Shipping</span>
                                 </button>
                             </div>
                             <div id="pickup-box" class="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 space-y-6">
-                                <p class="text-sm font-bold uppercase">6155 S Edmond St, Las Vegas, NV 89118</p>
+                                <p class="text-sm font-bold uppercase text-black text-black">6155 S Edmond St, Las Vegas, NV 89118</p>
                                 <div class="w-full h-48 rounded-2xl overflow-hidden border border-gray-200">
-                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.582855140889!2d-115.19504492419515!3d36.08291417242144!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c8c68a4e320509%3A0x89903e6f98a3c86c!2s6155%20S%20Edmond%20St%2C%20Las%20Vegas%2C%20NV%2089118!5e0!3m2!1ses-419!2sus!4v1700000000000" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3224.58!2d-115.19!" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                                 </div>
                             </div>
                             <div id="shipping-box" class="hidden space-y-6">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="md:col-span-2"><label>Street Address</label><input type="text" id="streetAddress" placeholder="123 Printing Way" class="input-field"></div>
                                     <div><label>City</label><input type="text" id="city" placeholder="Las Vegas" class="input-field"></div>
-                                    <div><label>State / ZIP</label><div class="flex gap-2"><input type="text" placeholder="NV" class="input-field w-1/4 text-center"><input type="text" id="stateZip" placeholder="89101" class="input-field flex-grow"></div></div>
+                                    <div><label>State / ZIP</label><div class="flex gap-2"><input type="text" id="state" placeholder="NV" class="input-field w-1/4 text-center text-black"><input type="text" id="stateZip" placeholder="89101" class="input-field flex-grow text-black"></div></div>
                                 </div>
                             </div>
                         </section>
 
                         <section class="space-y-8">
                             <h2 class="heavy-italic text-2xl mb-2 flex items-center gap-3"><i data-lucide="credit-card" class="text-red-600"></i> Payment Method</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
                                 <div onclick="selectPayment('card')" id="pay-card" class="select-button p-6 rounded-[1.5rem] flex items-center gap-4">
                                     <i data-lucide="credit-card"></i><span class="heavy-italic text-sm">Credit Card</span>
                                 </div>
@@ -126,17 +125,29 @@
 
                     <div class="lg:col-span-5 text-black">
                         <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl overflow-hidden sticky top-6">
-                            <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center text-black">
+                            <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center text-black text-black">
                                 <h2 class="heavy-italic text-xl">Order Summary</h2>
                                 <span id="item-count" class="bg-black text-white text-[10px] px-2 py-1 rounded-full font-black italic">0 ITEMS</span>
                             </div>
+
                             <div id="order-items-list" class="p-8 space-y-6 max-h-[400px] overflow-y-auto"></div>
-                            <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
-                                <div class="flex justify-between items-end">
+                            
+                            <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-4">
+                                <div class="flex justify-between text-[10px] font-black uppercase text-gray-400 italic">
+                                    <span>Subtotal</span>
+                                    <span id="subtotal-display">$0.00</span>
+                                </div>
+                                <div id="shipping-row" class="flex justify-between text-[10px] font-black uppercase text-red-600 italic hidden">
+                                    <span>UPS Shipping (Consolidated)</span>
+                                    <span id="shipping-fee-text">+$15.00</span>
+                                </div>
+                                <div class="flex justify-between items-end pt-2 border-t border-gray-200 text-black">
                                     <span class="text-[10px] font-black uppercase text-gray-400 italic">Total Amount</span>
                                     <span id="final-price-display" class="text-5xl heavy-italic italic">$0.00</span>
                                 </div>
-                                <button onclick="validateAndPlaceOrder()" id="place-order-btn" class="w-full bg-red-600 hover:bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic transition-all shadow-xl">Place Order Now</button>
+                                <button onclick="validateAndPlaceOrder()" id="place-order-btn" class="w-full bg-red-600 hover:bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic transition-all shadow-xl">
+                                    Place Order Now
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -154,50 +165,46 @@
         if (window.lucide) { lucide.createIcons(); }
 
         let currentMethod = 'pickup', currentPayment = '';
+        const UPS_SHIPPING_FEE = 15.00; 
 
-        // --- AUTH LOGIC ---
+        // LÓGICA DE AUTENTICACIÓN
         function checkAuth() {
             const userName = localStorage.getItem('userName');
-            const userEmail = localStorage.getItem('userEmail');
             const authContainer = document.getElementById('auth-container');
-            
             if (userName) {
-                const nameInput = document.getElementById('fullName');
-                const emailInput = document.getElementById('emailAddress');
-                if (nameInput) nameInput.value = userName;
-                if (emailInput) emailInput.value = userEmail || "";
+                const nInput = document.getElementById('fullName');
+                const eInput = document.getElementById('emailAddress');
+                if(nInput) nInput.value = userName;
+                if(eInput) eInput.value = localStorage.getItem('userEmail') || "";
 
                 authContainer.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <span class="flex items-center gap-1.5 text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">
+                        <span class="flex items-center gap-1.5 text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5 text-black">
                             <i data-lucide="user-check" class="w-3 h-3 text-red-600"></i> HI, ${userName.toUpperCase()}
                         </span>
                         <button onclick="logout()" class="logout-btn font-bold uppercase underline italic text-[8px] ml-2">Logout</button>
                     </div>`;
-                if (window.lucide) { lucide.createIcons(); }
+                if (window.lucide) lucide.createIcons();
             }
         }
 
-        function logout() {
-            localStorage.clear();
-            window.location.reload();
-        }
+        function logout() { localStorage.clear(); window.location.reload(); }
 
-        // --- UI HANDLERS ---
         function setMethod(type) {
             currentMethod = type;
             document.getElementById('pickup-box').classList.toggle('hidden', type === 'shipping');
             document.getElementById('shipping-box').classList.toggle('hidden', type === 'pickup');
             document.getElementById('method-pickup').classList.toggle('active', type === 'pickup');
             document.getElementById('method-shipping').classList.toggle('active', type === 'shipping');
+            document.getElementById('shipping-row').classList.toggle('hidden', type === 'pickup');
+            loadCheckoutData();
         }
 
         function selectPayment(method) {
             currentPayment = method;
-            const isCard = method === 'card';
-            document.getElementById('pay-card').classList.toggle('active', isCard);
-            document.getElementById('pay-zelle').classList.toggle('active', !isCard);
-            document.getElementById('card-details').classList.toggle('hidden', !isCard);
+            document.getElementById('pay-card').classList.toggle('active', method === 'card');
+            document.getElementById('pay-zelle').classList.toggle('active', method === 'zelle');
+            document.getElementById('card-details').classList.toggle('hidden', method !== 'card');
         }
 
         function formatExpiry(el) {
@@ -205,117 +212,110 @@
             if (val.length > 2) el.value = val.substring(0, 2) + '/' + val.substring(2, 4); else el.value = val;
         }
 
-        // --- CORE LOGIC (SENDING TO RENDER) ---
-        async function imageUrlToFile(url, filename) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                return new File([blob], filename, { type: blob.type });
-            } catch (e) { return null; }
+        function removeItem(i) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.splice(i, 1);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            loadCheckoutData();
+        }
+
+        function confirmAdjustment(index) {
+            let cart = JSON.parse(localStorage.getItem('sqft_cart'));
+            cart[index].price = 50.00;
+            cart[index].isMinimumApplied = true;
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            loadCheckoutData();
+        }
+
+        // CARGA DE DATOS Y RENDERIZADO
+        function loadCheckoutData() {
+            checkAuth();
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const container = document.getElementById('order-items-list');
+            let subtotal = 0;
+
+            document.getElementById('item-count').innerText = `${cart.length} ITEMS`;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-gray-300 font-black uppercase italic text-[11px]">Bag is empty</div>`;
+                document.getElementById('final-price-display').innerText = `$0.00`;
+                return;
+            }
+
+            container.innerHTML = cart.map((item, index) => {
+                let pNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
+                const isTooLow = pNum < 50 && !item.isMinimumApplied;
+                const displayPrice = isTooLow ? 50.00 : pNum;
+                subtotal += displayPrice;
+
+                let opts = item.options ? Object.entries(item.options).map(([k,v]) => `<span class="block text-[9px] uppercase text-gray-500">${k}: ${v}</span>`).join('') : "";
+
+                return `
+                    <div class="border-b border-gray-100 pb-4 last:border-0 mb-4">
+                        <div class="flex gap-4 items-center">
+                            <div class="w-14 h-14 bg-white border rounded-xl overflow-hidden shrink-0">
+                                <img src="${item.image}" class="object-cover w-full h-full">
+                            </div>
+                            <div class="flex-grow">
+                                <div class="font-black text-[10px] uppercase text-black">${item.name}</div>
+                                ${opts}
+                                <div class="font-black text-sm ${isTooLow ? 'text-red-600' : 'text-black'}">$${displayPrice.toFixed(2)}</div>
+                            </div>
+                            <button onclick="removeItem(${index})" class="text-gray-300 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button>
+                        </div>
+                        ${isTooLow ? `
+                        <div class="bg-red-50 border border-red-100 p-3 rounded-xl space-y-2 mt-2">
+                            <p class="text-[8px] font-black uppercase text-red-600 leading-tight">⚠️ Small Order Adjustment: Item must be $50.00 minimum.</p>
+                            <div class="flex gap-2">
+                                <button onclick="confirmAdjustment(${index})" class="flex-1 bg-black text-white text-[7px] font-black uppercase py-1.5 rounded-lg italic">Accept $50</button>
+                                <button onclick="window.location.href='index.html'" class="flex-1 border border-black text-black text-[7px] font-black uppercase py-1.5 rounded-lg italic text-black">Increase Size</button>
+                            </div>
+                        </div>` : ''}
+                    </div>`;
+            }).join('');
+
+            const finalTotal = currentMethod === 'shipping' ? (subtotal + UPS_SHIPPING_FEE) : subtotal;
+            document.getElementById('subtotal-display').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('final-price-display').innerText = `$${finalTotal.toFixed(2)}`;
+            if (window.lucide) { lucide.createIcons(); }
         }
 
         async function validateAndPlaceOrder() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            if (cart.length === 0) { alert("Your cart is empty!"); return; }
-
-            const btn = document.getElementById('place-order-btn');
-            const fields = ['fullName', 'emailAddress', 'phoneNumber'];
-            if (currentMethod === 'shipping') fields.push('streetAddress', 'city', 'stateZip');
-            if (currentPayment === 'card') fields.push('cardExpiry', 'cardCVC');
+            if (cart.some(i => parseFloat(i.price) < 50 && !i.isMinimumApplied)) {
+                alert("Please Accept the $50 minimum adjustment before ordering.");
+                return;
+            }
+            if (!currentPayment) { alert("Please select a payment method."); return; }
             
-            let isValid = true;
-            fields.forEach(id => {
-                const el = document.getElementById(id);
-                if (el && !el.value.trim()) { el.classList.add('input-error'); isValid = false; }
-                else if (el) { el.classList.remove('input-error'); }
-            });
-
-            if (!isValid || !currentPayment) { alert("Please complete all required fields."); return; }
-
+            const btn = document.getElementById('place-order-btn');
             btn.innerText = "SENDING ORDER...";
             btn.disabled = true;
 
-            const orderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-            const dateStr = new Date().toLocaleString();
-
-            let itemsSummary = cart.map((i, index) => {
-                let optionsText = i.options ? Object.entries(i.options).map(([k, v]) => `${k}: ${v}`).join(', ') : "Standard";
-                return `${index + 1}. ${i.name.toUpperCase()} [${optionsText}, Qty: ${i.quantity || 1}] - $${parseFloat(i.price).toFixed(2)}`;
-            }).join('\n');
-
-            const orderInfo = {
-                order_id: orderNumber,
-                order_date: dateStr,
+            const oNum = 'ORD-' + Math.floor(Math.random() * 900000);
+            const oInfo = {
+                order_id: oNum,
                 customer_name: document.getElementById('fullName').value,
                 customer_email: document.getElementById('emailAddress').value,
-                customer_phone: document.getElementById('phoneNumber').value,
                 total_price: document.getElementById('final-price-display').innerText,
                 delivery_method: currentMethod,
-                payment_method: currentPayment,
-                order_items: itemsSummary
+                payment_method: currentPayment
             };
 
             const formData = new FormData();
-            formData.append('data', JSON.stringify(orderInfo));
-
-            // Proceso de adjuntar imágenes del carrito
-            for (let i = 0; i < cart.length; i++) {
-                if (cart[i].image) {
-                    const productName = cart[i].name.replace(/\s+/g, '-').toLowerCase();
-                    const fileName = `${productName}-${orderNumber}-${i+1}.png`;
-                    const file = await imageUrlToFile(cart[i].image, fileName);
-                    if (file) formData.append('files', file); 
-                }
-            }
+            formData.append('data', JSON.stringify(oInfo));
 
             try {
                 const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { method: 'POST', body: formData });
                 if (res.ok) {
                     localStorage.removeItem('sqft_cart');
-                    window.location.href = `order.html?id=${orderNumber}`;
-                } else { alert("Server error. Please try again later."); }
-            } catch (e) { alert("Connection failed. Check your internet."); } 
+                    window.location.href = `order.html?id=${oNum}`;
+                } else { alert("Server error."); }
+            } catch (e) { alert("Connection failed."); } 
             finally {
                 btn.innerText = "Place Order Now";
                 btn.disabled = false;
             }
-        }
-
-        function loadCheckoutData() {
-            checkAuth();
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const container = document.getElementById('order-items-list');
-            const itemCountLabel = document.getElementById('item-count');
-            let total = 0;
-
-            itemCountLabel.innerText = `${cart.length} ITEMS`;
-
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-10"><p class="text-gray-400 font-bold uppercase text-[10px]">Your cart is empty</p></div>`;
-                document.getElementById('final-price-display').innerText = `$0.00`;
-                return;
-            }
-
-            container.innerHTML = cart.map((item) => {
-                total += parseFloat(item.price);
-                let opts = item.options ? Object.entries(item.options).map(([k,v]) => `<span class="block text-[9px] uppercase text-gray-500">${k}: ${v}</span>`).join('') : "";
-                return `
-                    <div class="flex gap-4 border-b border-gray-100 pb-4">
-                        <div class="w-16 h-16 bg-white border rounded-xl flex items-center justify-center overflow-hidden shrink-0">
-                            <img src="${item.image}" class="object-cover w-full h-full">
-                        </div>
-                        <div class="flex-grow">
-                            <div class="font-black text-[11px] uppercase text-black">${item.name}</div>
-                            ${opts}
-                        </div>
-                        <div class="text-right shrink-0">
-                            <div class="font-bold text-sm text-black">$${parseFloat(item.price).toFixed(2)}</div>
-                        </div>
-                    </div>`;
-            }).join('');
-
-            document.getElementById('final-price-display').innerText = `$${total.toFixed(2)}`;
-            if (window.lucide) { lucide.createIcons(); }
         }
 
         window.onload = loadCheckoutData;
