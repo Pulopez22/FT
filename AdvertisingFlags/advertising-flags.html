@@ -11,51 +11,51 @@
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; color: #000; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         
-        /* 4. RESPONSIVIDAD: Sidebar se oculta en móviles y el contenido se expande */
+        /* SIDEBAR DESKTOP */
         .sidebar-fixed { 
-            width: 320px; 
-            height: calc(100vh - 73px); 
-            position: sticky; 
-            top: 73px; 
-            background: white; 
-            border-right: 1px solid #e5e7eb; 
-            flex-shrink: 0; 
-            overflow-y: auto; 
-        }
-        
-        @media (max-width: 1024px) {
-            .sidebar-fixed { display: none; } 
-            .main-content-scroll { width: 100%; }
+            width: 300px; height: calc(100vh - 73px); position: sticky; top: 73px; 
+            background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; 
         }
 
-        .sidebar-item { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #9ca3af; transition: all 0.2s; cursor: pointer; letter-spacing: 0.05em; }
-        .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
-        .sidebar-item.active { border-right: 3px solid #000; }
-        .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
+        /* MENU MOVIL */
+        #mobile-menu {
+            position: fixed; inset: 0; background: white; z-index: 100;
+            transform: translateX(-100%); transition: transform 0.3s ease-in-out;
+        }
+        #mobile-menu.open { transform: translateX(0); }
+
+        @media (max-width: 1280px) {
+            .sidebar-fixed { display: none; }
+            .nav-links-desktop { display: none; }
+        }
+
+        .product-card { transition: all 0.3s ease; border: 1px solid #f3f4f6; border-radius: 2rem; }
+        .product-card:hover { transform: translateY(-5px); border-color: #000; }
         
-        .product-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f3f4f6; border-radius: 2rem; }
-        .product-card:hover { transform: translateY(-5px); border-color: #000; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.05); }
         .filter-btn { transition: all 0.3s ease; border: 1px solid #f3f4f6; color: #9ca3af; font-weight: 900; }
         .filter-btn.active { background-color: #000; color: #fff; border-color: #000; }
 
-        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; z-index: 110; transform: translateX(100%); transition: transform 0.4s ease; }
         #cart-sidebar.open { transform: translateX(0); }
-        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
-        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
-
-        .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; border-bottom: 1px solid #ef4444; margin-left: 10px; text-transform: uppercase; }
+        .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
+        
+        /* Quitar scrollbar estético */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
-    <nav class="border-b py-4 px-4 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
-        <div class="flex items-center gap-8">
-            <a href="../index.html" class="flex items-center group">
-                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
-                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
-                </div>
+    <nav class="border-b py-3 px-4 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+            
+            <a href="../index.html" class="bg-black p-1.5 rounded-lg shadow-lg">
+                <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 md:h-8 w-auto">
             </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+
+            <div class="nav-links-desktop hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 italic tracking-widest">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
@@ -68,55 +68,71 @@
         
         <div class="flex items-center gap-2 md:gap-4">
             <div id="auth-container" class="flex items-center"></div>
-
-            <button onclick="toggleCart()" class="relative text-black p-2">
-                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
+            
+            <button onclick="toggleCart()" class="relative p-2 text-black">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                <span id="cart-dot" class="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full border border-white hidden"></span>
             </button>
-            <button class="text-[9px] md:text-[10px] font-black uppercase border-b-2 border-black pb-0.5 text-black hover:text-red-600 transition-colors">Track Order</button>
+            
+            <button class="hidden sm:block text-[9px] font-black uppercase border-b-2 border-black pb-0.5">Track Order</button>
         </div>
     </nav>
 
-    <div class="flex flex-row flex-grow w-full text-black">
-        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
-            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black">Product Categories</h3>
-            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer active"><a href="advertising-flags.html" class="block w-full">Advertising Flags</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto">
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+        </div>
+        <ul class="space-y-6 text-sm font-black uppercase italic">
+            <li><a href="../index.html">Wall Art</a></li>
+            <li><a href="../Banners/banners.html">Banners</a></li>
+            <li><a href="advertising-flags.html" class="text-red-600">Advertising Flags</a></li>
+            <li><a href="../Stickers/stickers.html">Stickers</a></li>
+            <li><a href="../Displays/displays.html">Displays</a></li>
+            <li><a href="../LargePrinting/largeprinting.html">Large Format</a></li>
+            <li><a href="../Rigid Signs/rigidsigns.html">Rigid Signs</a></li>
+            <li class="pt-4 border-t"><a href="#">Marketing Materials</a></li>
+        </ul>
+    </div>
+
+    <div class="flex flex-row flex-grow w-full">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
+            <h3 class="text-[10px] font-black uppercase mb-8 text-gray-400 border-b pb-2 tracking-widest">Categories</h3>
+            <ul class="space-y-4 text-[11px] font-bold text-gray-500 uppercase">
+                <li class="sidebar-item active text-black italic">Advertising Flags</li>
+                <li class="sidebar-item hover:text-black"><a href="../Banners/banners.html">Banners</a></li>
+                <li class="sidebar-item hover:text-black"><a href="../Displays/displays.html">Displays</a></li>
+                <li class="sidebar-item hover:text-black"><a href="../LargePrinting/largeprinting.html">Large Format Printing</a></li>
+                <li class="sidebar-item hover:text-black"><a href="../PrintedFabric/printed-fabric.html">Printed Fabric</a></li>
+                <li class="sidebar-item hover:text-black"><a href="../Stickers/stickers.html">Stickers</a></li>
+                <li class="sidebar-item hover:text-black"><a href="../Rigid Signs/rigidsigns.html">Rigid Signs</a></li>
             </ul>
         </aside>
 
-        <main class="main-content-scroll text-black">
-            <div class="p-6 md:p-12 flex-grow text-black">
-                <header class="mb-12 space-y-8 text-black">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 text-black">
-                        <div>
-                            <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter italic leading-none uppercase">Advertising Flags</h1>
-                            <div id="price-tier-badge" class="text-[9px] font-black uppercase px-3 py-1 bg-gray-100 rounded-full w-fit italic text-gray-400"></div>
-                        </div>
-                        
-                        <div class="relative w-full md:w-80 text-black">
-                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"></i>
-                            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Search flags..." class="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-black outline-none">
-                        </div>
+        <main class="flex-grow w-full flex flex-col">
+            <div class="p-5 md:p-12 flex-grow">
+                <header class="mb-10 space-y-6">
+                    <div>
+                        <h1 class="text-4xl md:text-6xl heavy-italic text-gray-900 leading-tight">Advertising Flags</h1>
+                        <div id="price-tier-badge" class="mt-4 text-[9px] font-black uppercase px-4 py-2 rounded-full w-fit italic bg-gray-100"></div>
                     </div>
 
-                    <div class="flex flex-wrap gap-2 bg-white p-1.5 rounded-3xl border shadow-sm w-fit">
-                        <button onclick="filterBy('all', this)" class="filter-btn active px-6 py-2 rounded-full text-[9px] uppercase tracking-widest italic">All Flags</button>
-                        <button onclick="filterBy('heavy', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest italic">Heavy Duty</button>
+                    <div class="relative w-full md:w-80">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"></i>
+                        <input type="text" oninput="handleSearch(this.value)" placeholder="Search flags..." class="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-black">
+                    </div>
+
+                    <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                        <button onclick="filterBy('all', this)" class="filter-btn active px-6 py-2.5 rounded-full text-[9px] uppercase italic whitespace-nowrap">All Flags</button>
+                        <button onclick="filterBy('heavy', this)" class="filter-btn px-6 py-2.5 rounded-full text-[9px] uppercase italic whitespace-nowrap">Heavy Duty</button>
+                        <button onclick="filterBy('econo', this)" class="filter-btn px-6 py-2.5 rounded-full text-[9px] uppercase italic whitespace-nowrap">Value / Econo</button>
                     </div>
                 </header>
 
-                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8 text-black">
-                </div>
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"></div>
             </div>
 
-            <footer class="bg-white border-t py-16 px-10 text-center w-full">
+            <footer class="bg-white border-t py-16 px-10 text-center w-full mt-auto">
                 <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto">
                 </div>
@@ -125,23 +141,22 @@
         </main>
     </div>
 
-    <div id="cart-sidebar">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
-            <div><h3 class="text-2xl font-black uppercase italic">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase mt-1" id="cart-count-text">0 items</p></div>
+    <div id="cart-sidebar" class="shadow-2xl flex flex-col">
+        <div class="p-8 border-b flex justify-between items-center bg-white sticky top-0">
+            <h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-100 rounded-2xl"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-6"></div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8"></div>
         <div class="p-8 bg-gray-50 border-t space-y-6">
-            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 italic">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic">$0.00</span></div>
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic">$0.00</span></div>
             <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic hover:bg-red-600 transition-all">Checkout</button>
         </div>
     </div>
-    <div id="cart-overlay" onclick="toggleCart()"></div>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/40 z-[105] hidden"></div>
 
     <script>
         lucide.createIcons();
 
-        // 3. PRODUCTOS: basePrice es el de mayoreo (original)
         const products = [
             { name: 'Custom Pole Flag', cat: 'heavy', basePrice: 10.00, img: '../images/Advertising Flags/Custom-Pole-Flag-02-1.png', url: 'pole-flag.html', unit: 'sq/ft' },
             { name: 'Tear Drop Flag', cat: 'heavy', basePrice: 19.17, img: '../images/Advertising Flags/TearDropFlags-Main.png', url: 'teardropflag.html', unit: '' },
@@ -149,126 +164,70 @@
             { name: 'Econo Feather Flag', cat: 'econo', basePrice: 33.32, img: '../images/Advertising Flags/Econo-Feather-Flag-Main-1.png', url: 'econoflag.html', unit: '' }
         ];
 
-        // 1, 2, 5. AUTORIZACIÓN Y DETECCIÓN
-        function checkAuthAndRender() {
-            const userName = localStorage.getItem('userName');
-            const userTier = localStorage.getItem('userTier'); 
-            const isWholesale = (userTier === 'wholesale'); 
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
+        function toggleCart() { 
+            document.getElementById('cart-sidebar').classList.toggle('open');
+            document.getElementById('cart-overlay').classList.toggle('hidden');
+        }
 
+        function checkAuth() {
+            const userName = localStorage.getItem('userName');
+            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
             const authContainer = document.getElementById('auth-container');
             const badge = document.getElementById('price-tier-badge');
 
             if (userName) {
                 authContainer.innerHTML = `
-                    <div class="flex items-center gap-1">
-                        <span class="text-[9px] md:text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5 whitespace-nowrap">
-                            HI, ${userName.split(' ')[0].toUpperCase()}
-                        </span>
-                        <button onclick="logout()" class="logout-btn">Logout</button>
+                    <div class="flex items-center">
+                        <span class="text-[9px] md:text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5 whitespace-nowrap">HI, ${userName.split(' ')[0]}</span>
+                        <span onclick="logout()" class="logout-btn italic">LOGOUT</span>
                     </div>`;
-                
-                badge.innerText = isWholesale ? "✓ Wholesale pricing enabled" : "Retail pricing (Normal Account)";
-                badge.className = isWholesale ? "text-[9px] font-black uppercase px-3 py-1 bg-green-50 text-green-600 rounded-full w-fit italic" : "text-[9px] font-black uppercase px-3 py-1 bg-gray-100 text-gray-400 rounded-full w-fit italic";
+                badge.innerText = isWholesale ? "✓ Wholesale pricing enabled" : "Retail Pricing";
+                badge.className = isWholesale ? "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-green-50 text-green-600 rounded-full w-fit italic" : "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic";
             } else {
-                authContainer.innerHTML = `
-                    <button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 hover:text-red-600 transition-colors italic">
-                        Login
-                    </button>`;
-                badge.innerText = "Public Retail Prices (Log in for wholesale)";
+                authContainer.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`;
+                badge.innerText = "Public Retail Prices";
             }
-
             renderProducts(isWholesale);
-            lucide.createIcons();
         }
 
         function renderProducts(isWholesale, data = products) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = data.map(b => {
                 const finalPrice = isWholesale ? b.basePrice : (b.basePrice * 2);
-                const priceDisplay = b.unit ? `$${finalPrice.toFixed(2)} ${b.unit}` : `$${finalPrice.toFixed(2)}`;
-
                 return `
-                <div onclick="window.location.href='${b.url}'" class="product-card bg-white overflow-hidden cursor-pointer group shadow-sm">
+                <div onclick="window.location.href='${b.url}'" class="product-card bg-white shadow-sm overflow-hidden cursor-pointer group">
                     <div class="h-64 p-8 flex items-center justify-center relative">
-                        <img src="${b.img}" class="object-contain h-full transition-transform group-hover:scale-105">
+                        <img src="${b.img}" class="object-contain h-full transition-transform duration-500 group-hover:scale-110">
                         ${!isWholesale ? '<span class="absolute top-4 right-4 bg-red-600 text-white text-[7px] font-black px-2 py-1 rounded-full uppercase italic">Retail</span>' : ''}
                     </div>
                     <div class="p-6 border-t">
-                        <h3 class="font-black text-xs text-gray-800 uppercase italic h-8">${b.name}</h3>
+                        <h3 class="font-black text-xs uppercase italic h-8 line-clamp-2">${b.name}</h3>
                         <div class="flex justify-between items-center mt-6">
-                            <p class="text-xl font-black text-gray-900 italic leading-none">${priceDisplay}</p>
-                            <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center group-hover:bg-red-600 transition-colors text-white">
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </div>
+                            <p class="text-xl font-black text-gray-900 italic leading-none">$${finalPrice.toFixed(2)} ${b.unit || ''}</p>
+                            <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white transition-colors group-hover:bg-red-600"><i data-lucide="arrow-right" class="w-4 h-4"></i></div>
                         </div>
                     </div>
                 </div>`;
             }).join('');
+            lucide.createIcons();
         }
 
         function filterBy(cat, btn) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             const filtered = cat === 'all' ? products : products.filter(b => b.cat === cat);
-            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
-            renderProducts(isWholesale, filtered);
+            renderProducts(localStorage.getItem('userTier') === 'wholesale', filtered);
         }
 
         function handleSearch(term) {
             const filtered = products.filter(b => b.name.toLowerCase().includes(term.toLowerCase()));
-            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
-            renderProducts(isWholesale, filtered);
+            renderProducts(localStorage.getItem('userTier') === 'wholesale', filtered);
         }
 
         function logout() { localStorage.clear(); window.location.reload(); }
-        function toggleCart() { 
-            document.getElementById('cart-sidebar').classList.toggle('open'); 
-            document.getElementById('cart-overlay').classList.toggle('visible');
-            if (document.getElementById('cart-sidebar').classList.contains('open')) renderCart();
-        }
 
-        function renderCart() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const container = document.getElementById('cart-items-container');
-            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
-            container.innerHTML = '';
-            let total = 0;
-
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-400 font-black italic text-[11px]">Bag Empty</div>`;
-                document.getElementById('cart-dot').classList.add('hidden');
-            } else {
-                document.getElementById('cart-dot').classList.remove('hidden');
-                cart.forEach((item, i) => {
-                    let pNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
-                    const itemFinalPrice = isWholesale ? pNum : (pNum * 2);
-                    total += itemFinalPrice;
-                    container.innerHTML += `
-                        <div class="flex gap-4 border-b pb-4 mb-4">
-                            <img src="${item.image}" class="w-16 h-16 rounded-xl border object-contain">
-                            <div class="flex-grow">
-                                <div class="flex justify-between font-black uppercase italic text-[10px]">
-                                    <span>${item.name}</span>
-                                    <button onclick="removeItem(${i})" class="text-red-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                                </div>
-                                <span class="text-sm font-black italic">$${itemFinalPrice.toFixed(2)}</span>
-                            </div>
-                        </div>`;
-                });
-            }
-            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
-            lucide.createIcons();
-        }
-
-        function removeItem(i) {
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1);
-            localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            renderCart();
-        }
-
-        window.onload = () => { checkAuthAndRender(); renderCart(); };
+        window.onload = checkAuth;
     </script>
 </body>
 </html>
