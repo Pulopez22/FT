@@ -20,22 +20,21 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch(err => console.error('❌ Connection Error:', err));
 
-// 2. MODELO DE USUARIO ACTUALIZADO PARA DESCUENTOS
+// 2. MODELO DE USUARIO
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    isWholesale: { type: Boolean, default: false }, // <--- Campo para autorización de mayoreo
+    isWholesale: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
 
 // 3. RUTAS DE AUTENTICACIÓN
 
-// Registro de usuario (ACTUALIZADO CON CÓDIGO DE MAYOREO)
+// Registro de usuario
 app.post('/api/auth/register', async (req, res) => {
     try {
-        // Recibimos inviteCode desde el frontend
         const { name, email, password, inviteCode } = req.body; 
         
         const userExists = await User.findOne({ email });
@@ -44,21 +43,22 @@ app.post('/api/auth/register', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Lógica de validación: Si el inviteCode es "sight2026", se asigna isWholesale: true, de lo contrario, se queda como false
-        // Cambia esta línea en tu servidor:
-        const shouldBeWholesale = (inviteCode && inviteCode.toLowerCase().trim() === "sight2026");
+        // CORRECCIÓN CRÍTICA: Limpieza de espacios y minúsculas
+        const cleanCode = inviteCode ? String(inviteCode).trim().toLowerCase() : "";
+        const shouldBeWholesale = (cleanCode === "sight2026");
 
         const newUser = new User({ 
             name, 
             email, 
             password: hashedPassword,
-            isWholesale: shouldBeWholesale // <--- Se asigna automáticamente aquí
+            isWholesale: shouldBeWholesale 
         });
 
         await newUser.save();
 
         res.status(201).json({ 
             success: true, 
+            isWholesale: shouldBeWholesale,
             message: shouldBeWholesale 
                 ? 'Wholesale account created successfully!' 
                 : 'Standard account created successfully' 
@@ -68,7 +68,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// Login de usuario (CORREGIDO Y CON SOPORTE PARA MAYOREO)
+// Login de usuario
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -78,12 +78,10 @@ app.post('/api/auth/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-        // Verificar que JWT_SECRET existe para evitar el Error 500
         if (!process.env.JWT_SECRET) {
             return res.status(500).json({ success: false, message: "Server Configuration Error: JWT_SECRET is missing." });
         }
 
-        // Crear Token JWT
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         res.json({
@@ -92,7 +90,7 @@ app.post('/api/auth/login', async (req, res) => {
             user: { 
                 name: user.name, 
                 email: user.email,
-                isWholesale: user.isWholesale // <--- Esto le dirá al frontend si aplicar descuento
+                isWholesale: user.isWholesale 
             }
         });
     } catch (error) {
@@ -190,7 +188,6 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
     }
 });
 
-// 5. INICIO DEL SERVIDOR
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server ready on port ${PORT}`);

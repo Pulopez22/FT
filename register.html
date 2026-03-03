@@ -230,13 +230,12 @@
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const inviteCode = document.getElementById('inviteCode').value; // Capturamos el código nuevo
+        const inviteCode = document.getElementById('inviteCode').value.trim(); // Limpiamos espacios aquí también
 
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Enviamos todos los campos, incluyendo inviteCode
                 body: JSON.stringify({ name, email, password, inviteCode }) 
             });
 
@@ -247,8 +246,10 @@
                 statusMessage.innerText = "Account created! Redirecting to checkout...";
                 statusMessage.style.display = "block";
 
+                // Guardamos en LocalStorage para usarlo en el Checkout
                 localStorage.setItem('userName', name);
                 localStorage.setItem('userEmail', email);
+                localStorage.setItem('isWholesale', data.isWholesale); // Importante
                 
                 setTimeout(() => {
                     window.location.href = "checkout.html";
