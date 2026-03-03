@@ -49,32 +49,29 @@
         </div>
     </nav>
 
-    <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden text-black">
+     <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden">
         <div class="flex justify-between items-center border-b pb-4">
-            <span class="heavy-italic text-xl italic">Navigation</span>
+            <span class="heavy-italic text-xl italic text-black">Navigation</span>
             <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
         </div>
-        <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+        <ul class="space-y-6 text-sm font-black uppercase italic text-black">
+            <li><a href="../index.html">Wall Art</a></li>
+            <li><a href="../Banners/banners.html">Banners</a></li>
+            <li><a href="advertising-flags.html" class="text-red-600">Advertising Flags</a></li>
+            <li><a href="../Stickers/stickers.html">Stickers</a></li>
+        </ul>
+    </div>
+
+   <div class="flex flex-row flex-grow w-full">
+        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black">Product Categories</h3>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer active"><a href="advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="largeprinting.html" class="block w-full">Large Format Printing</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
-            </ul>
-    </div>
-
-    <div class="flex flex-row flex-grow w-full">
-        <aside class="sidebar-fixed p-10 hidden lg:block">
-            <h3 class="text-[10px] font-black uppercase mb-8 text-gray-400 border-b pb-2 tracking-widest">Categories</h3>
-            <ul class="space-y-4 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item active text-black italic">Advertising Flags</li>
-                <li class="sidebar-item hover:text-black"><a href="../Banners/banners.html">Banners</a></li>
-                <li class="sidebar-item hover:text-black"><a href="../Displays/displays.html">Displays</a></li>
-                <li class="sidebar-item hover:text-black"><a href="../LargePrinting/largeprinting.html">Large Format</a></li>
-                <li class="sidebar-item hover:text-black"><a href="../Stickers/stickers.html">Stickers</a></li>
-                <li class="sidebar-item hover:text-black"><a href="../Rigid Signs/rigidsigns.html">Rigid Signs</a></li>
             </ul>
         </aside>
 
@@ -86,6 +83,13 @@
                 </header>
                 <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"></div>
             </div>
+
+            <footer class="bg-white border-t py-12 px-10 text-center w-full mt-auto">
+                <div class="bg-black p-2 rounded-xl inline-block mb-6 shadow-2xl">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 md:h-8 w-auto">
+                </div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
         </main>
     </div>
 
