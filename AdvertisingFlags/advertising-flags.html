@@ -45,7 +45,6 @@
                 <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full border border-white hidden"></span>
             </button>
-            <button class="hidden sm:block text-[9px] font-black uppercase border-b-2 border-black pb-0.5">Track Order</button>
         </div>
     </nav>
 
@@ -138,8 +137,8 @@
                         <span onclick="logout()" class="logout-btn italic">LOGOUT</span>
                     </div>`;
                 badge.innerText = isWholesale ? "✓ Wholesale pricing enabled" : "Retail Pricing";
-                badge.className = isWholesale ? "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-green-50 text-green-600 rounded-full w-fit italic" : "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic";
-            } else {
+                badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-green-50 text-green-600 rounded-full w-fit italic";
+             } else {
                 authContainer.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic text-black">Login</button>`;
                 badge.innerText = "Public Retail Prices";
                 badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic";

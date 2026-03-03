@@ -15,26 +15,24 @@
         .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
         .sidebar-item.active { border-right: 3px solid #000; }
         .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
-        
-        .product-card { 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            border: 1px solid #f3f4f6; 
-            border-radius: 2rem; 
-        }
-        .product-card:hover { transform: translateY(-5px); border-color: #000; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.05); }
+        .product-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f3f4f6; border-radius: 2.5rem; }
+        .product-card:hover { transform: scale(1.02) translateY(-5px); box-shadow: 0 25px 30px -10px rgb(0 0 0 / 0.1); border-color: #000; }
         .filter-btn { transition: all 0.3s ease; border: 1px solid #f3f4f6; color: #9ca3af; font-weight: 900; }
         .filter-btn.active { background-color: #000; color: #fff; border-color: #000; }
-
-        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
+        #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        #mobile-menu.open { transform: translateX(0); }
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 110; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+        .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
@@ -43,7 +41,6 @@
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
-                <a href="displays.html" class="text-black border-b-2 border-black pb-1">Displays</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
                 <a href="#" class="hover:text-black transition-colors">Decals</a>
                 <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
@@ -52,17 +49,30 @@
             </div>
         </div>
         <div class="flex items-center gap-4">
+            <div id="auth-container" class="flex items-center"></div>
             <button onclick="toggleCart()" class="relative p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
-            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 hover:text-red-600 transition-colors">Track Order</button>
         </div>
     </nav>
 
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden text-black">
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic text-black">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+        </div>
+        <ul class="space-y-6 text-sm font-black uppercase italic text-black">
+            <li><a href="../index.html">Wall Art</a></li>
+            <li><a href="../Banners/banners.html">Banners</a></li>
+            <li><a href="displays.html" class="text-red-600">Displays</a></li>
+            <li><a href="../Stickers/stickers.html">Stickers</a></li>
+        </ul>
+    </div>
+
     <div class="flex flex-row flex-grow w-full">
         <aside class="sidebar-fixed p-10 hidden lg:block">
-            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black text-black">Product Categories</h3>
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
@@ -75,30 +85,28 @@
         </aside>
 
         <main class="main-content-scroll">
-            <div class="p-12 flex-grow">
+            <div class="p-6 md:p-12 flex-grow">
                 <header class="mb-12 space-y-8">
                     <div class="flex flex-col md:flex-row justify-between items-end gap-6">
                         <div>
-                            <h1 class="text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter leading-none">Display Signs</h1>
-                            <div class="h-2 w-24 bg-black rounded-full"></div>
+                            <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter leading-none italic uppercase">Display Signs</h1>
+                            <div id="price-tier-badge" class="mt-4 text-[9px] font-black uppercase px-4 py-2 rounded-full w-fit italic"></div>
                         </div>
-                        
                         <div class="relative w-full md:w-80">
                             <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4"></i>
-                            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Search display..." class="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-black transition-all">
+                            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Search display..." class="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-black">
                         </div>
                     </div>
 
                     <div class="flex flex-wrap gap-2 bg-white p-1.5 rounded-3xl border shadow-sm w-fit">
                         <button onclick="filterBy('all', this)" class="filter-btn active px-6 py-2 rounded-full text-[9px] uppercase tracking-widest italic text-black">All Signs</button>
-                        <button onclick="filterBy('foam', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest italic text-black text-black">Foam & Lightweight</button>
-                        <button onclick="filterBy('metal', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest italic text-black">Metal & Heavy Duty</button>
-                        <button onclick="filterBy('plastic', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest italic text-black">Plastic & PVC</button>
+                        <button onclick="filterBy('foam', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest italic text-black">Foam</button>
+                        <button onclick="filterBy('metal', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest italic text-black">Metal</button>
+                        <button onclick="filterBy('plastic', this)" class="filter-btn px-6 py-2 rounded-full text-[9px] uppercase tracking-widest italic text-black">Plastic</button>
                     </div>
                 </header>
 
-                <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
-                    </div>
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 md:gap-8"></div>
             </div>
 
             <footer class="bg-white border-t py-16 px-10 text-center w-full">
@@ -112,7 +120,7 @@
 
     <div id="cart-sidebar" class="text-black">
         <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
         </div>
         <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-6 bg-white"></div>
@@ -123,52 +131,83 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
+    <script src="pricing-displays.js"></script>
     <script>
         lucide.createIcons();
 
         const products = [
-            { name: 'Gallery Canvas', cat: 'paper', price: '$29.34 – $125.73', img: '../images/Large Printing/GalleryCanvas-01.png', desc: '1.5" MDF stretcher frame gallery wrap.', url: '../LargePrinting/gcanvas.html' },
-            { name: 'X-Stand Banner', cat: 'plastic', price: '$55.50 – $166.50 unit', img: '../images/Displays/SQFT-X-Stand-01_1200.png', desc: 'Durable plastic for long-term indoor/outdoor use.', url: 'xstand.html' },
-            { name: 'Standard Retractable Banner', cat: 'foam', price: '$3.50 - $8.50 sq/ft', img: '../images/Displays/Retractable-banner.png', desc: 'Lightweight foam core for presentations and events.', url: 'retractablebanner.html' },
-            { name: 'Table Cover', cat: 'plastic', price: '$3.50 - $8.50 sq/ft', img: '../images/Displays/AMS_TableThrow12.png', desc: 'Fluted plastic perfect for yard and site signs.', url: '../LargePrinting/tablecover.html' },
-            { name: 'Step & Repeat Back Drop – Large Tube', cat: 'plastic', price: '$3.50 – $6.00 sq/ft', img: '../images/Displays/SQFT-Step-Repeat-Back-Drop-–-Large-Tube-01_1200.png', desc: 'Thin, flexible plastic for frame inserts.', url: 'backdrop.html' },
-            { name: 'EZ Tube Tension Fabric Stand', cat: 'metal', price: '$4.50 - $14.00 sq/ft', img: '../images/Displays/SQFT-120-EZ-Tube-Tension-Fabric-Stand-01_1200.png', desc: 'Aluminum composite for permanent outdoor signage.', url: 'tensionstand.html' },
-            { name: 'Stretch Table Cover', cat: 'plastic', price: '$10.00 - $28.00 sq/ft', img: '../images/Displays/SQFT-6ft-Stretch-Table-Throw-01.png', desc: 'High-impact polycarbonate for durable signage.', url: 'stretchtable.html' },
-            { name: 'Event Tent', cat: 'specialty', price: '$25.00 – $35.00 sq/ft', img: '../images/Displays/UV-Tent-10FT-Full-Color-Print_2.png', desc: 'High-end photo prints on acrylic panels.', url: 'eventtent.html' },
-            { name: 'A-Frame', cat: 'specialty', price: '$95.67 – $230.20 unit', img: '../images/Rigid Signs/A-frame5.png', desc: 'Portable sidewalk signage with inserts.', url: '../Rigid Signs/aframe.html' }
+            { id: 'gallery-canvas', name: 'Gallery Canvas', cat: 'paper', basePrice: 29.34, img: '../images/Large Printing/GalleryCanvas-01.png', desc: '1.5" MDF stretcher frame gallery wrap.', url: '../LargePrinting/gcanvas.html' },
+            { id: 'x-stand', name: 'X-Stand Banner', cat: 'plastic', basePrice: 55.50, img: '../images/Displays/SQFT-X-Stand-01_1200.png', desc: 'Durable plastic for long-term indoor/outdoor use.', url: 'xstand.html' },
+            { id: 'retractable', name: 'Standard Retractable Banner', cat: 'foam', basePrice: 85.00, img: '../images/Displays/Retractable-banner.png', desc: 'Lightweight foam core for presentations and events.', url: 'retractablebanner.html' },
+            { id: 'table-cover', name: 'Table Cover', cat: 'plastic', basePrice: 120.00, img: '../images/Displays/AMS_TableThrow12.png', desc: 'Fluted plastic perfect for yard and site signs.', url: '../LargePrinting/tablecover.html' },
+            { id: 'backdrop', name: 'Step & Repeat Back Drop – Large Tube', cat: 'plastic', basePrice: 218.00, img: '../images/Displays/SQFT-Step-Repeat-Back-Drop-–-Large-Tube-01_1200.png', desc: 'Thin, flexible plastic for frame inserts.', url: 'backdrop.html' },
+            { id: 'tensionstand', name: 'EZ Tube Tension Fabric Stand', cat: 'metal', basePrice: 180.00, img: '../images/Displays/SQFT-120-EZ-Tube-Tension-Fabric-Stand-01_1200.png', desc: 'Aluminum composite for permanent outdoor signage.', url: 'tensionstand.html' },
+            { id: 'stretchtable', name: 'Stretch Table Cover', cat: 'plastic', basePrice: 140.00, img: '../images/Displays/SQFT-6ft-Stretch-Table-Throw-01.png', desc: 'High-impact polycarbonate for durable signage.', url: 'stretchtable.html' },
+            { id: 'eventtent', name: 'Event Tent', cat: 'specialty', basePrice: 450.00, img: '../images/Displays/UV-Tent-10FT-Full-Color-Print_2.png', desc: 'High-end photo prints on acrylic panels.', url: 'eventtent.html' },
+            { id: 'aframe', name: 'A-Frame', cat: 'specialty', basePrice: 95.67, img: '../images/Rigid Signs/A-frame5.png', desc: 'Portable sidewalk signage with inserts.', url: '../Rigid Signs/aframe.html' }
         ];
+
+        function getProductPrice(p) {
+            // Llama a la función global de tu nuevo JS
+            if (typeof window.getBannerTotalUnit === 'function') {
+                const res = window.getBannerTotalUnit(p.id, "none", "0");
+                return res.pricePerSqFt; // Esta ya incluye el multiplicador Wholesale/Retail
+            }
+            // Fallback si falla el JS
+            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+            return isWholesale ? p.basePrice : p.basePrice * 2;
+        }
+
+        function checkAuth() {
+            const userName = localStorage.getItem('userName');
+            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+            const authContainer = document.getElementById('auth-container');
+            const badge = document.getElementById('price-tier-badge');
+
+            if (userName) {
+                authContainer.innerHTML = `<div class="flex items-center whitespace-nowrap"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span></div>`;
+                badge.innerText = isWholesale ? "✓ Wholesale pricing enabled" : "Retail Pricing";
+                badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-green-50 text-green-600 rounded-full w-fit italic";
+            } else {
+                authContainer.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`;
+                badge.innerText = "Public Retail Prices";
+                badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic";
+            }
+            renderProducts(products);
+            renderCart();
+        }
 
         function renderProducts(data) {
             const grid = document.getElementById('product-grid');
-            grid.innerHTML = data.map(b => `
+            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+            grid.innerHTML = data.map(b => {
+                const price = getProductPrice(b);
+                return `
                 <div onclick="window.location.href='${b.url}'" class="product-card bg-white overflow-hidden cursor-pointer group shadow-sm border border-gray-100">
                     <div class="h-64 p-8 flex items-center justify-center group-hover:bg-gray-50 transition-colors relative">
                         <img src="${b.img}" alt="${b.name}" class="object-contain h-full drop-shadow-xl transition-transform group-hover:scale-105">
+                        ${!isWholesale ? '<span class="absolute top-4 right-4 bg-red-600 text-white text-[7px] font-black px-2 py-1 rounded-full uppercase italic shadow-lg">Retail</span>' : ''}
                     </div>
                     <div class="p-6 border-t">
                         <h3 class="font-black text-xs text-gray-800 uppercase italic leading-tight h-8">${b.name}</h3>
                         <p class="text-[9px] text-gray-400 font-bold mt-1 uppercase tracking-tight">${b.desc}</p>
                         <div class="flex justify-between items-center mt-6">
-                            <p class="text-xl font-black text-gray-900 italic leading-none">${b.price}</p>
+                            <p class="text-xl font-black text-gray-900 italic leading-none">$${price.toFixed(2)}</p>
                             <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center group-hover:bg-red-600 transition-colors shadow-lg">
                                 <i data-lucide="arrow-right" class="text-white w-4 h-4"></i>
                             </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
             lucide.createIcons();
         }
 
-        function toggleCart() {
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
+        function toggleCart() { 
             document.getElementById('cart-sidebar').classList.toggle('open');
             document.getElementById('cart-overlay').classList.toggle('visible');
-            if (document.getElementById('cart-sidebar').classList.contains('open')) {
-                document.body.style.overflow = 'hidden';
-                renderCart();
-            } else {
-                document.body.style.overflow = '';
-            }
+            renderCart();
         }
 
         function renderCart() {
@@ -183,26 +222,12 @@
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
                     total += item.price;
-                    const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : (item.specs || "");
-                    container.innerHTML += `
-                        <div class="flex gap-4 border-b border-gray-50 pb-6 last:border-0">
-                            <div class="w-20 h-20 bg-gray-50 rounded-xl border overflow-hidden p-1 flex items-center justify-center">
-                                <img src="${item.image}" class="max-h-full max-w-full object-contain">
-                            </div>
-                            <div class="flex-grow py-1">
-                                <div class="flex justify-between font-black uppercase italic text-xs">
-                                    <span>${item.name}</span>
-                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button>
-                                </div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${details}</p>
-                                <span class="text-lg font-black italic">$${item.price.toFixed(2)}</span>
-                            </div>
-                        </div>`;
+                    container.innerHTML += `<div class="flex gap-4 border-b border-gray-50 pb-6 last:border-0"><img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg"><div class="flex-grow"><div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-lg font-black italic">$${item.price.toFixed(2)}</p></div></div>`;
                 });
             }
-            lucide.createIcons();
             document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
+            lucide.createIcons();
         }
 
         function removeItem(i) {
@@ -222,7 +247,8 @@
             renderProducts(searchResults);
         }
 
-        window.onload = () => { renderProducts(products); renderCart(); };
+        function logout() { localStorage.clear(); window.location.reload(); }
+        window.onload = checkAuth;
     </script>
 </body>
 </html>
