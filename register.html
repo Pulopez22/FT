@@ -200,6 +200,11 @@
             <input type="password" id="password" placeholder="Min. 6 characters" minlength="6" required>
         </div>
 
+        <div class="input-group">
+            <label>Wholesale Code (Optional)</label>
+            <input type="text" id="inviteCode" placeholder="Enter code for special pricing">
+        </div>
+
         <button type="submit" id="btnRegister" class="btn-register">REGISTER</button>
     </form>
 
@@ -225,12 +230,14 @@
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        const inviteCode = document.getElementById('inviteCode').value; // Capturamos el código nuevo
 
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password })
+                // Enviamos todos los campos, incluyendo inviteCode
+                body: JSON.stringify({ name, email, password, inviteCode }) 
             });
 
             const data = await response.json();
@@ -240,8 +247,8 @@
                 statusMessage.innerText = "Account created! Redirecting to checkout...";
                 statusMessage.style.display = "block";
 
-localStorage.setItem('userName', name);
-localStorage.setItem('userEmail', email); // Añade esta línea
+                localStorage.setItem('userName', name);
+                localStorage.setItem('userEmail', email);
                 
                 setTimeout(() => {
                     window.location.href = "checkout.html";

@@ -32,10 +32,11 @@ const User = mongoose.model('User', userSchema);
 
 // 3. RUTAS DE AUTENTICACIÓN
 
-// Registro de usuario
+// Registro de usuario (ACTUALIZADO CON CÓDIGO DE MAYOREO)
 app.post('/api/auth/register', async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        // Recibimos inviteCode desde el frontend
+        const { name, email, password, inviteCode } = req.body; 
         
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: 'User already exists' });
@@ -43,10 +44,25 @@ app.post('/api/auth/register', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({ name, email, password: hashedPassword });
+        // Lógica de validación: Si el inviteCode es "sight2026", se asigna isWholesale: true, de lo contrario, se queda como false
+        // Cambia esta línea en tu servidor:
+        const shouldBeWholesale = (inviteCode && inviteCode.toLowerCase().trim() === "sight2026");
+
+        const newUser = new User({ 
+            name, 
+            email, 
+            password: hashedPassword,
+            isWholesale: shouldBeWholesale // <--- Se asigna automáticamente aquí
+        });
+
         await newUser.save();
 
-        res.status(201).json({ success: true, message: 'User created successfully' });
+        res.status(201).json({ 
+            success: true, 
+            message: shouldBeWholesale 
+                ? 'Wholesale account created successfully!' 
+                : 'Standard account created successfully' 
+        });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
