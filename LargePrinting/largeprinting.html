@@ -15,27 +15,24 @@
         .sidebar-item:hover, .sidebar-item.active { color: #000; padding-left: 4px; }
         .sidebar-item.active { border-right: 3px solid #000; }
         .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
-        
-        .product-card { 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            border: 1px solid #f3f4f6; 
-            border-radius: 2.5rem; 
-            background: #fff;
-        }
+        .product-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f3f4f6; border-radius: 2.5rem; background: #fff; }
         .product-card:hover { transform: translateY(-8px); border-color: #000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); }
         .filter-btn { transition: all 0.3s ease; border: 1px solid #f3f4f6; color: #9ca3af; font-weight: 900; background: white; }
         .filter-btn.active { background-color: #000; color: #fff; border-color: #000; }
-
-        #cart-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 110; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
-        #cart-overlay { transition: opacity 0.5s ease; }
+        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+        #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        #mobile-menu.open { transform: translateX(0); }
+        .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
@@ -53,15 +50,28 @@
             </div>
         </div>
         <div class="flex items-center gap-4">
+            <div id="auth-container" class="flex items-center"></div>
             <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
-            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5">Track Order</button>
         </div>
     </nav>
 
-    <div class="flex flex-row flex-grow w-full">
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 lg:hidden">
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+        </div>
+        <ul class="space-y-6 text-sm font-black uppercase italic">
+            <li><a href="../index.html">Wall Art</a></li>
+            <li><a href="../Banners/banners.html">Banners</a></li>
+            <li><a href="../Displays/displays.html">Displays</a></li>
+            <li><a href="largeprinting.html" class="text-red-600">Large Format</a></li>
+        </ul>
+    </div>
+
+    <div class="flex flex-row flex-grow w-full text-black">
         <aside class="sidebar-fixed p-10 hidden lg:block">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
@@ -81,12 +91,11 @@
                     <div class="flex flex-col md:flex-row justify-between items-end gap-8">
                         <div>
                             <h1 class="text-6xl heavy-italic text-black mb-4 tracking-tighter leading-none italic">Large Format</h1>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.3em] ml-1">Premium Substrates & Materials</p>
+                            <div id="price-tier-badge" class="mt-4 text-[9px] font-black uppercase px-4 py-2 rounded-full w-fit italic border"></div>
                         </div>
-                        
                         <div class="relative w-full md:w-96">
                             <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 w-5 h-5"></i>
-                            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Search material..." class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-[1.5rem] text-sm font-bold focus:ring-2 focus:ring-black transition-all outline-none">
+                            <input type="text" id="product-search" oninput="handleSearch(this.value)" placeholder="Search material..." class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-[1.5rem] text-sm font-bold focus:ring-2 focus:ring-black outline-none">
                         </div>
                     </div>
 
@@ -98,8 +107,7 @@
                     </div>
                 </header>
 
-                <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-10">
-                    </div>
+                <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-10"></div>
             </div>
 
             <footer class="bg-white border-t py-16 px-10 text-center w-full">
@@ -111,8 +119,8 @@
         </main>
     </div>
 
-    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-[-20px_0_60px_rgba(0,0,0,0.1)] z-[100] flex flex-col">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+    <div id="cart-sidebar">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
             <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
@@ -122,76 +130,87 @@
             <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
         </div>
     </div>
-    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/40 backdrop-blur-md z-[90] opacity-0 hidden pointer-events-none"></div>
+    <div id="cart-overlay" onclick="toggleCart()"></div>
 
+    <script src="pricing.js"></script>
     <script>
         lucide.createIcons();
 
-        const banners = [
-            { name: 'Calendar Adhesive Vinyl', cat: 'adhesive', price: '$1.25 sq/ft', img: '../images/Large Printing/AB-Vinyl-01.png', desc: 'Standard & Clear options available.', tags: ['Standard', 'Clear'], url: 'calendar-adhesive-vinyl.html' },
-            { name: 'Bubble Free Adhesive Vinyl', cat: 'adhesive', price: '$2.50 – $5.75 sq/ft', img: '../images/Large Printing/AB-Vinyl-BF-01.png', desc: 'Easy install technology.', url: 'bubble-free-adhesive-vinyl.html' },
-            { name: 'Window Perforated Vinyl', cat: 'adhesive', price: '$2.50 sq/ft', img: '../images/Large Printing/Window-Perf-AB-Vinyl-01.png', desc: 'One-way vision film.', url: 'window-perforated-adhesive-vinyl.html' },
-            { name: 'Wrap Calendar Adhesive Vinyl', cat: 'adhesive', price: '$3.00 – $27.75 sq/ft', img: '../images/Large Printing/Cast-AB-Vinyl-BF-01.png', desc: 'Bubble free technology for vehicle wraps.', tags: ['Calendar', 'Cast'], url: 'wrapcalendar.html' },
-            { name: 'Rough Wall HT Vinyl', cat: 'adhesive', price: '$1.25 sq/ft', img: '../images/Large Printing/AB-Vinyl-01.png', desc: 'High tack for brick and stucco.', url: 'roughwall.html' },
-            { name: 'Poster', cat: 'paper', price: '$2.00 sq/ft', img: '../images/Large Printing/PaperPoster-01.png', desc: 'Indoor photo quality prints.', url: 'paper-poster.html' },
-            { name: 'Gallery Canvas', cat: 'paper', price: '$29.34 – $125.73', img: '../images/Large Printing/GalleryCanvas-01.png', desc: '1.5" MDF stretcher frame gallery wrap.', url: 'gcanvas.html' },
-            { name: 'PhotoTex', cat: 'specialty', price: '$2.50 sq/ft', img: '../images/Large Printing/PhotoTex-01.jpg', desc: 'Repositionable adhesive wallpaper.', url: 'phototex.html' },
-            { name: 'Table Cover', cat: 'specialty', price: '$105.75', img: '../images/Large Printing/AMS_TableThrow12.png', desc: 'Event branded table covers.', url: 'tablecover.html' },
-            { name: 'Glass Adhere™', cat: 'specialty', price: '$2.50 – $12.00 sq/ft', img: '../images/Large Printing/Glass-Adhere-01.jpg', desc: 'High visibility non-adhesive film.', url: 'glassadhere.html' },
-            { name: 'Magnet', cat: 'specialty', price: '$5.50 – $11.25 sq/ft', img: '../images/Large Printing/Magnet-01.jpg', desc: '30 mil high quality magnetic material.', url: 'magnet.html' },
-            { name: 'Adhesive Vinyl', cat: 'adhesive', price: '$3.00 - $7.75 sq/ft', img: '../images/Large Printing/AB-Vinyl-Backlit-01.png', desc: 'Versatile vinyl for flat surfaces.', url: 'adhesivevinyl.html' },
-            { name: 'Floor Graphics', cat: 'adhesive', price: '$4.00 – $4.75 sq/ft', img: '../images/Large Printing/FloorGraphics.png', desc: 'Non-slip texture for heavy traffic.', url: 'floorgraphics.html' },
-            { name: 'Reflective Adhesive Vinyl', cat: 'specialty', price: '$6.00 – $6.75 sq/ft', img: '../images/Large Printing/ReflectiveABVinyl.png', desc: '4 mil high visibility night film.', url: 'reflecvinyl.html' },
-            { name: 'Polyester Back-lit Film', cat: 'specialty', price: '$3.50 sq/ft', img: '../images/Large Printing/AB-Vinyl-BacklitFilm-01.png', desc: '10 mil heavy-duty translucent film.', url: 'polyesterfilm.html' },
-            { name: 'Heat Press T-Shirt Vinyl', cat: 'specialty', price: '$25.00 – $30.00 sq/ft', img: '../images/Large Printing/heat-transfer-vinyl-placement.jpg', desc: 'Full color t-shirt transfers.', url: 'tshirtvinyl.html' }
+        const materials = [
+            { id: 'calendar-vinyl', name: 'Calendar Adhesive Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/AB-Vinyl-01.png', desc: 'Standard & Clear options available.', url: 'calendar-adhesive-vinyl.html' },
+            { id: 'bubble-free', name: 'Bubble Free Adhesive Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/AB-Vinyl-BF-01.png', desc: 'Easy install technology.', url: 'bubble-free-adhesive-vinyl.html' },
+            { id: 'window-perf', name: 'Window Perforated Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/Window-Perf-AB-Vinyl-01.png', desc: 'One-way vision film.', url: 'window-perforated-adhesive-vinyl.html' },
+            { id: 'wrap-calendar', name: 'Wrap Calendar Adhesive Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/Cast-AB-Vinyl-BF-01.png', desc: 'Bubble free technology for vehicle wraps.', tags: ['Calendar', 'Cast'], url: 'wrapcalendar.html' },
+            { id: 'rough-wall', name: 'Rough Wall HT Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/AB-Vinyl-01.png', desc: 'High tack for brick and stucco.', url: 'roughwall.html' },
+            { id: 'poster', name: 'Poster', cat: 'paper', suffix: 'sq/ft', img: '../images/Large Printing/PaperPoster-01.png', desc: 'Indoor photo quality prints.', url: 'paper-poster.html' },
+            { id: 'gallery-canvas', name: 'Gallery Canvas', cat: 'paper', suffix: 'unit', img: '../images/Large Printing/GalleryCanvas-01.png', desc: '1.5" MDF stretcher frame gallery wrap.', url: 'gcanvas.html' },
+            { id: 'phototex', name: 'PhotoTex', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/PhotoTex-01.jpg', desc: 'Repositionable adhesive wallpaper.', url: 'phototex.html' },
+            { id: 'table-cover', name: 'Table Cover', cat: 'specialty', suffix: 'unit', img: '../images/Large Printing/AMS_TableThrow12.png', desc: 'Event branded table covers.', url: 'tablecover.html' },
+            { id: 'glass-adhere', name: 'Glass Adhere™', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/Glass-Adhere-01.jpg', desc: 'High visibility non-adhesive film.', url: 'glassadhere.html' },
+            { id: 'magnet', name: 'Magnet', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/Magnet-01.jpg', desc: '30 mil high quality magnetic material.', url: 'magnet.html' },
+            { id: 'adhesive-vinyl', name: 'Adhesive Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/AB-Vinyl-Backlit-01.png', desc: 'Versatile vinyl for flat surfaces.', url: 'adhesivevinyl.html' },
+            { id: 'floor-graphics', name: 'Floor Graphics', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/FloorGraphics.png', desc: 'Non-slip texture for heavy traffic.', url: 'floorgraphics.html' },
+            { id: 'reflective-vinyl', name: 'Reflective Adhesive Vinyl', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/ReflectiveABVinyl.png', desc: '4 mil high visibility night film.', url: 'reflecvinyl.html' },
+            { id: 'backlit-film', name: 'Polyester Back-lit Film', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/AB-Vinyl-BacklitFilm-01.png', desc: '10 mil heavy-duty translucent film.', url: 'polyesterfilm.html' },
+            { id: 'tshirt-vinyl', name: 'Heat Press T-Shirt Vinyl', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/heat-transfer-vinyl-placement.jpg', desc: 'Full color t-shirt transfers.', url: 'tshirtvinyl.html' }
         ];
 
+        function checkAuth() {
+            const userName = localStorage.getItem('userName');
+            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+            const authContainer = document.getElementById('auth-container');
+            const badge = document.getElementById('price-tier-badge');
+
+            if (userName) {
+                authContainer.innerHTML = `<div class="flex items-center whitespace-nowrap text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span></div>`;
+                badge.innerText = isWholesale ? "✓ Wholesale pricing enabled" : "Retail Pricing";
+                badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-green-50 text-green-600 rounded-full w-fit italic border-green-100 border";
+            } else {
+                authContainer.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`;
+                badge.innerText = "Public Retail Prices";
+                badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic";
+            }
+            renderProducts(materials);
+            renderCart();
+        }
+
         function renderProducts(data) {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = data.map(b => `
-                <div onclick="window.location.href='${b.url}'" class="product-card bg-white overflow-hidden cursor-pointer group shadow-sm border border-gray-100">
-                    <div class="h-64 p-8 flex items-center justify-center group-hover:bg-gray-50 transition-all duration-500 relative">
-                        ${b.tags ? `<span class="absolute top-6 left-6 bg-black text-white text-[7px] font-black px-3 py-1 rounded-full uppercase italic tracking-[0.2em] z-10">${b.tags.join(' & ')}</span>` : ''}
-                        <img src="${b.img}" alt="${b.name}" class="object-contain h-full drop-shadow-2xl transition-transform duration-500 group-hover:scale-110">
-                    </div>
-                    <div class="p-8 border-t border-gray-50">
-                        <h3 class="font-black text-sm text-gray-900 uppercase italic leading-tight h-10">${b.name}</h3>
-                        <p class="text-[10px] text-gray-400 font-bold mt-2 uppercase tracking-tight line-clamp-2">${b.desc}</p>
-                        <div class="flex justify-between items-center mt-8">
-                            <p class="text-2xl font-black text-black italic leading-none tracking-tighter">${b.price}</p>
-                            <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center group-hover:bg-red-600 transition-all shadow-xl group-hover:rotate-[-45deg]">
-                                <i data-lucide="arrow-right" class="text-white w-5 h-5"></i>
-                            </div>
-                        </div>
+    const grid = document.getElementById('product-grid');
+    const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+    
+    grid.innerHTML = data.map(b => {
+        // --- CAMBIO AQUÍ ---
+        const priceData = window.getLargeFormatPrice ? window.getLargeFormatPrice(b.id) : { unitPrice: 0 };
+        const price = priceData.unitPrice; // Extraemos solo el número
+        // -------------------
+
+        return `
+        <div onclick="window.location.href='${b.url}'" class="product-card overflow-hidden cursor-pointer group">
+            <div class="h-64 p-8 flex items-center justify-center group-hover:bg-gray-50 transition-all relative">
+                ${b.tags ? `<span class="absolute top-6 left-6 bg-black text-white text-[7px] font-black px-3 py-1 rounded-full uppercase italic tracking-[0.2em] z-10">${b.tags.join(' & ')}</span>` : ''}
+                ${!isWholesale ? '<span class="absolute top-6 right-6 bg-red-600 text-white text-[7px] font-black px-2 py-1 rounded-full uppercase italic shadow-lg">Retail</span>' : ''}
+                <img src="${b.img}" alt="${b.name}" class="object-contain h-full drop-shadow-2xl transition-transform duration-500 group-hover:scale-110">
+            </div>
+            <div class="p-8 border-t border-gray-50">
+                <h3 class="font-black text-[11px] text-gray-900 uppercase italic leading-tight h-10">${b.name}</h3>
+                <p class="text-[9px] text-gray-400 font-bold mt-1 uppercase line-clamp-2 tracking-tighter">${b.desc}</p>
+                <div class="flex justify-between items-center mt-8">
+                    <p class="text-2xl font-black text-black italic leading-none tracking-tighter">$${price.toFixed(2)} <span class="text-[10px] text-gray-300 not-italic uppercase font-bold">${b.suffix}</span></p>
+                    <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center group-hover:bg-red-600 transition-all shadow-xl group-hover:rotate-[-45deg]">
+                        <i data-lucide="arrow-right" class="text-white w-5 h-5"></i>
                     </div>
                 </div>
-            `).join('');
-            lucide.createIcons();
-        }
+            </div>
+        </div>`;
+    }).join('');
+    lucide.createIcons();
+}
 
-        function filterBy(cat, btn) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const filtered = cat === 'all' ? banners : banners.filter(b => b.cat === cat);
-            renderProducts(filtered);
-        }
-
-        function handleSearch(term) {
-            const searchResults = banners.filter(b => b.name.toLowerCase().includes(term.toLowerCase()) || b.desc.toLowerCase().includes(term.toLowerCase()));
-            renderProducts(searchResults);
-        }
-
-        function toggleCart() {
-            const sidebar = document.getElementById('cart-sidebar');
-            const overlay = document.getElementById('cart-overlay');
-            if (sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open'); overlay.classList.remove('visible');
-                setTimeout(() => overlay.classList.add('hidden'), 500); document.body.style.overflow = '';
-            } else {
-                sidebar.classList.add('open'); overlay.classList.remove('hidden');
-                setTimeout(() => overlay.classList.add('visible'), 10); document.body.style.overflow = 'hidden';
-                renderCart();
-            }
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
+        function toggleCart() { 
+            document.getElementById('cart-sidebar').classList.toggle('open');
+            document.getElementById('cart-overlay').classList.toggle('visible');
+            renderCart();
         }
 
         function renderCart() {
@@ -208,15 +227,15 @@
                     total += priceNum;
                     const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : (item.specs || "");
                     container.innerHTML += `
-                        <div class="flex gap-6 border-b border-gray-50 pb-6 text-black">
-                            <div class="w-20 h-20 bg-gray-50 rounded-2xl border overflow-hidden p-2"><img src="${item.image}" class="w-full h-full object-contain"></div>
-                            <div class="flex flex-col justify-between flex-grow py-1">
-                                <div class="flex justify-between items-start">
-                                    <h4 class="text-[11px] font-black uppercase italic leading-tight">${item.name}</h4>
+                        <div class="flex gap-4 border-b pb-4 text-black">
+                            <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg">
+                            <div class="flex-grow py-1">
+                                <div class="flex justify-between font-black uppercase italic text-[11px]">
+                                    <h4>${item.name}</h4>
                                     <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                                 </div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight tracking-tighter">${details}</p>
-                                <span class="text-lg font-black italic mt-2">$${priceNum.toFixed(2)}</span>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 tracking-tighter line-clamp-1">${details}</p>
+                                <span class="text-lg font-black italic">$${priceNum.toFixed(2)}</span>
                             </div>
                         </div>`;
                 });
@@ -226,12 +245,20 @@
             lucide.createIcons();
         }
 
-        function removeItem(i) {
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
+        function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }
+        function filterBy(cat, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filtered = cat === 'all' ? materials : materials.filter(b => b.cat === cat);
+            renderProducts(filtered);
         }
-
-        window.onload = () => { renderProducts(banners); renderCart(); };
+        function handleSearch(term) {
+            const searchResults = materials.filter(b => b.name.toLowerCase().includes(term.toLowerCase()));
+            renderProducts(searchResults);
+        }
+        function logout() { localStorage.clear(); window.location.reload(); }
+        window.onload = checkAuth;
     </script>
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/40 backdrop-blur-md z-[90] opacity-0 pointer-events-none hidden transition-opacity duration-500"></div>
 </body>
 </html>

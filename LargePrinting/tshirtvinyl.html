@@ -21,33 +21,35 @@
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
         
-        /* DISEÑO DE VALIDADOR REFINADO (ESTÁNDAR DE ORO) */
         .art-canvas-refined { background-color: #e5e7eb; border-radius: 1.5rem; position: relative; padding: 2.5rem; display: flex; align-items: center; justify-content: center; min-height: 350px; overflow: hidden; }
         .measure-capsule { background: white; padding: 4px 14px; border-radius: 8px; font-size: 13px; font-weight: 900; color: black; position: absolute; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 20; }
         .capsule-bottom { bottom: 15px; left: 50%; transform: translateX(-50%); }
         .capsule-right { right: 15px; top: 50%; transform: translateY(-50%) rotate(90deg); }
         .scale-badge-red { position: absolute; bottom: 15px; right: 15px; background: #e31e24; color: white; padding: 6px 12px; border-radius: 8px; font-weight: 900; font-style: italic; font-size: 11px; z-index: 30; }
         
-        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 110; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
-        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+        #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        #mobile-menu.open { transform: translateX(0); }
         .thumb-img { width: 64px; height: 64px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s; }
         .thumb-active { border: 2px solid black !important; }
-
-        .limit-reached-badge { background-color: #e31e24; color: white; padding: 6px 24px; border-radius: 9999px; font-weight: 900; font-style: italic; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3); pointer-events: none; z-index: 50; }
+        .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
+        .wholesale-badge { display: inline-flex; align-items: center; background-color: #f0fdf4; color: #16a34a; padding: 6px 16px; border-radius: 9999px; font-size: 10px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; border: 1px solid #dcfce7; margin-top: 10px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
                 <a href="../Displays/displays.html" class="hover:text-black transition-colors">Displays</a>
@@ -59,7 +61,8 @@
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <button onclick="toggleCart()" class="relative p-2 mr-2">
+            <div id="auth-container" class="flex items-center"></div>
+            <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
@@ -67,8 +70,8 @@
         </div>
     </nav>
 
-    <div class="flex flex-row flex-grow w-full">
-        <aside class="sidebar-fixed p-10 hidden lg:block">
+    <div class="flex flex-row flex-grow w-full text-black">
+        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
@@ -81,152 +84,163 @@
             </ul>
         </aside>
 
-        <main class="main-content-scroll">
-            <div class="p-12 flex-grow">
-                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-16">
-                    <div class="space-y-10">
-                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[400px]">
+        <main class="main-content-scroll text-black">
+            <div class="p-6 md:p-12 flex-grow">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-12 lg:gap-16">
+                    <div class="space-y-10 order-1 xl:order-1 text-black">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] md:min-h-[400px] relative text-black">
                             <img id="main-prod-img" src="../images/Large Printing/heat-transfer-vinyl-placement.jpg" alt="T-Shirt Vinyl" class="max-h-[300px] drop-shadow-2xl transition-all duration-300">
                         </div>
-
                         <div class="flex gap-3 justify-center" id="thumb-container">
                             <img src="../images/Large Printing/heat-transfer-vinyl-placement.jpg" class="thumb-img thumb-active" onclick="changeImage(this)">
                         </div>
-                        
                         <div class="pt-8 border-t border-gray-100 space-y-6">
                             <div>
-                                <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">Heat Press T-Shirt Vinyl</h2>
-                                <p class="text-[14px] text-gray-600 leading-relaxed font-medium">
-                                    Our Adhesive Vinyl uses a <strong>3 mil white Thermal Advantage Print Film 002 White</strong>. It is ideal for Full Color Printed 1-off t-shirts.
-                                </p>
+                                <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic text-black">Heat Press T-Shirt Vinyl</h2>
+                                <p class="text-[14px] text-gray-600 leading-relaxed font-medium">Our Adhesive Vinyl uses a <strong>3 mil white Thermal Advantage Print Film 002 White</strong>. It is ideal for Full Color Printed 1-off t-shirts.</p>
                             </div>
                             <div class="space-y-4">
-                                <h4 class="text-[11px] font-black uppercase tracking-widest">Features:</h4>
+                                <h4 class="text-[11px] font-black uppercase tracking-widest text-black">Features:</h4>
                                 <ul class="text-[13px] text-gray-700 space-y-2 font-medium">
                                     <li>• Maximum Area: 13.5" x 20" (Per press)</li>
                                     <li>• NO RUSH AVAILABLE – Must be min 2 Business days</li>
                                     <li>• 3 mil, printable heat transfer vinyl, matte white</li>
                                     <li>• Usage: T-Shirts, Polos, Jackets, Hats</li>
                                 </ul>
-                                <p class="text-[11px] text-gray-400 italic">*Any size job that cannot be nested to minimize waste will be charged as a 13.5" wide print.</p>
+                                <p class="text-[11px] text-gray-400 italic text-black">*Any size job that cannot be nested to minimize waste will be charged as a 13.5" wide print.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="space-y-8">
+                    <div class="space-y-8 order-2 xl:order-2 text-black">
                         <header>
-                            <h1 id="prod-title" class="text-4xl heavy-italic text-gray-900 leading-none italic">Heat Press Vinyl</h1>
-                            <p class="text-lg font-black text-gray-400 italic mt-4">$25.00 – $30.00 sq/ft</p>
+                            <h1 id="prod-title" class="text-4xl heavy-italic text-gray-900 leading-none italic uppercase text-black">Heat Press Vinyl</h1>
+                            <div id="wholesale-badge-container"></div>
                         </header>
 
                         <div class="space-y-5">
-                            <div>
-                                <label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Finishing Options</label>
-                                <select id="finish-select" class="custom-dropdown">
-                                    <option value="0">Contour Cut + Weed & Thermal Masking</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Application</label>
-                                <select id="app-select" onchange="calculatePrice()" class="custom-dropdown">
-                                    <option value="0">No Application (Vinyl Only)</option>
-                                    <option value="5">Apply to Supplied Items (+$5.00 per unit)</option>
-                                </select>
-                            </div>
-
-                            <div class="relative pt-4">
-                                <div id="limit-reached" class="hidden absolute -top-2 left-1/2 -translate-x-1/2 limit-reached-badge">
-                                    Limit reached (13.5"x20")
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic tracking-widest">Finishing</label>
+                                    <select id="finish-select" class="custom-dropdown text-black"><option value="0">Contour Cut + Weed & Mask</option></select>
                                 </div>
-                                <div class="grid grid-cols-2 gap-6">
-                                    <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Width (Max 13.5")</label><input type="number" id="w-input" value="12" oninput="validateSize()" class="custom-input"></div>
-                                    <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Height (Max 20")</label><input type="number" id="h-input" value="12" oninput="validateSize()" class="custom-input"></div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic tracking-widest text-black">Application</label>
+                                    <select id="app-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                        <option value="0">Vinyl Only</option>
+                                        <option value="5">Apply to Item (+$5.00)</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <div class="flex justify-between items-center pt-6 mt-6 border-t border-gray-100">
-                                <div class="flex flex-col"><span class="text-[10px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span><span class="text-[9px] font-bold text-gray-400 mt-1" id="area-display">1.000 sq ft</span></div>
-                                <span id="final-price" class="text-4xl font-black italic leading-none">$0.00</span>
+                            <div>
+                                <label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic tracking-widest">Turnaround</label>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                    <option value="Standard">Standard (2-3 Business Days)</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic tracking-widest">Width (Max 13.5")</label><input type="number" id="w-input" value="12" oninput="validateSize()" class="custom-input text-black"></div>
+                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic tracking-widest">Height (Max 20")</label><input type="number" id="h-input" value="12" oninput="validateSize()" class="custom-input text-black"></div>
                             </div>
 
                             <div class="space-y-4">
                                 <label class="text-[9px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
-                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-12 rounded-[2.5rem]">
-                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest italic text-center">Upload Artwork</span>
-                                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
-                                </div>
-
-                                <div id="validation-panel" class="hidden bg-[#f9fafb] border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6">
-                                    <h4 id="status-title" class="text-2xl font-black uppercase text-[#f97316] italic tracking-tighter">Analysis Complete</h4>
-                                    
+                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-8 rounded-[2rem] text-black"><span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Upload Artwork</span><input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)"></div>
+                                <div id="validation-panel" class="hidden bg-[#f9fafb] border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-4 text-black">
+                                    <h4 id="status-title" class="text-xl font-black uppercase text-[#f97316] italic text-center">Analyzing...</h4>
                                     <div class="art-canvas-refined">
-                                        <div id="measure-w-val" class="measure-capsule capsule-bottom">12"</div>
-                                        <div id="measure-h-val" class="measure-capsule capsule-right">12"</div>
+                                        <div id="measure-w-val" class="measure-capsule capsule-bottom text-black">12"</div>
+                                        <div id="measure-h-val" class="measure-capsule capsule-right text-black">12"</div>
                                         <div id="art-container" class="relative bg-white shadow-2xl flex items-center justify-center border border-gray-200 mx-auto" style="max-height: 85%; width: auto;">
                                             <img id="preview-thumb" class="max-h-full max-w-full object-contain rounded-lg">
-                                            <div id="scale-badge" class="scale-badge-red hidden">56% SCALE</div>
+                                            <div id="scale-badge" class="scale-badge-red hidden">50% SCALE</div>
                                         </div>
                                     </div>
-
                                     <div class="flex justify-between items-center px-2">
-                                        <div class="text-left"><p class="text-[10px] text-gray-400 uppercase font-black">Uploaded:</p><p id="file-dims" class="text-[14px] font-black italic">13.6" x 7.5"</p></div>
-                                        <div class="text-right"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-[14px] font-black italic text-[#22c55e]">Ready to Print</p></div>
+                                        <div class="text-left text-black"><p class="text-[10px] text-gray-400 uppercase font-black mb-1">Uploaded:</p><p id="file-dims" class="text-[14px] font-black italic">0" x 0"</p></div>
+                                        <div class="text-right text-black"><p class="text-[10px] text-gray-400 uppercase font-black mb-1">Status:</p><p id="dpi-info" class="text-[14px] font-black italic text-[#22c55e]">Verifying...</p></div>
                                     </div>
-
-                                    <div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar h-full bg-[#00ab66]"></div></div>
-
-                                    <div class="flex gap-4">
-                                        <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[13px] font-black uppercase py-5 rounded-[1.2rem] shadow-lg italic hover:opacity-90 transition-all">Approved, Send to Bag</button>
-                                        <button onclick="resetUpload()" class="px-8 bg-[#f3f4f6] text-gray-400 text-[13px] font-black uppercase rounded-[1.2rem] italic">Discard</button>
+                                    <div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden text-black"><div id="upload-progress" class="progress-bar text-black"></div></div>
+                                    <div class="flex gap-3 text-black">
+                                        <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[11px] font-black uppercase py-4 rounded-xl shadow-lg italic hover:bg-black transition-all">Approved</button>
+                                        <button onclick="resetUpload()" class="px-6 bg-[#f3f4f6] text-gray-400 text-[11px] font-black uppercase rounded-xl italic py-4 text-black">Discard</button>
                                     </div>
                                 </div>
                             </div>
 
+                            <div class="flex justify-between items-center pt-6 border-t border-gray-100 text-black">
+                                <div class="flex flex-col text-black">
+                                    <span class="text-[11px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span>
+                                    <span class="text-[9px] font-bold text-gray-400 mt-1" id="area-display">1.00 sq ft</span>
+                                </div>
+                                <span id="final-price" class="text-4xl font-black italic text-black leading-none">$0.00</span>
+                            </div>
+
                             <div class="flex gap-4">
-                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-4 border-2 border-gray-100 rounded-2xl font-black text-center text-lg">
-                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-4 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md">Add to Bag</button>
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-24 p-4 border-2 border-gray-100 rounded-2xl font-black text-center text-lg outline-none text-black">
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-4 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md text-black">Add to Bag</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <footer class="bg-white border-t py-16 px-10 text-center w-full mt-10">
-                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto"></div>
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
+                </div>
                 <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
     </div>
 
     <div id="cart-sidebar">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black">$0.00</span></div>
             <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
+    <script src="pricing.js"></script>
     <script>
         lucide.createIcons();
         let uploadedImageData = null;
-        let currentPriceValue = 0;
+        let globalTotalValue = 0;
+        const PRODUCT_ID = "heat-press-vinyl";
+
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
+        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); document.getElementById('cart-overlay').classList.toggle('visible'); renderCart(); }
+
+        function checkAuth() {
+            const userName = localStorage.getItem('userName');
+            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+            const authDiv = document.getElementById('auth-container');
+            const badgeBox = document.getElementById('wholesale-badge-container');
+            
+            if (userName) {
+                authDiv.innerHTML = `<div class="flex items-center text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span></div>`;
+                if (isWholesale) {
+                    badgeBox.innerHTML = `<div class="wholesale-badge">✓ Wholesale Enabled</div>`;
+                }
+            } else {
+                authDiv.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`;
+            }
+            calculatePrice();
+        }
 
         function validateSize() {
             const w = document.getElementById('w-input');
             const h = document.getElementById('h-input');
-            const limitBadge = document.getElementById('limit-reached');
-            let reached = false;
-            if (parseFloat(w.value) > 13.5) { w.value = 13.5; reached = true; }
-            if (parseFloat(h.value) > 20) { h.value = 20; reached = true; }
-            if (reached) {
-                limitBadge.classList.remove('hidden');
-                setTimeout(() => limitBadge.classList.add('hidden'), 2500);
-            }
+            if (parseFloat(w.value) > 13.5) w.value = 13.5;
+            if (parseFloat(h.value) > 20) h.value = 20;
             document.getElementById('measure-w-val').innerText = w.value + '"';
             document.getElementById('measure-h-val').innerText = h.value + '"';
             calculatePrice();
@@ -235,12 +249,13 @@
         function calculatePrice() {
             const w = parseFloat(document.getElementById('w-input').value) || 0;
             const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
             const appFee = parseFloat(document.getElementById('app-select').value) || 0;
-            const area = (w * h) / 144;
-            currentPriceValue = (area * 25.00 * qty) + (appFee * qty);
-            document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
-            document.getElementById('final-price').innerText = `$${currentPriceValue.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const multiplier = (localStorage.getItem('userTier') === 'wholesale') ? 1 : 2;
+
+            globalTotalValue = ((25.00 * multiplier) * ((w * h) / 144) * qty) + (appFee * qty);
+            document.getElementById('final-price').innerText = `$${globalTotalValue.toFixed(2)}`;
+            document.getElementById('area-display').innerText = `${((w * h) / 144).toFixed(3)} sq ft`;
         }
 
         function processFile(input) {
@@ -251,18 +266,16 @@
                 document.getElementById('validation-panel').classList.remove('hidden');
                 reader.onload = (e) => {
                     uploadedImageData = e.target.result;
-                    const img = new Image();
-                    img.src = e.target.result;
+                    const img = new Image(); img.src = e.target.result;
                     img.onload = function() {
                         const fileW = (this.width / 72); 
                         const scalePercent = Math.round((fileW / orderedW) * 100);
                         document.getElementById('preview-thumb').src = e.target.result;
                         document.getElementById('file-dims').innerText = `${fileW.toFixed(1)}" x ${(this.height/72).toFixed(1)}"`;
                         const badge = document.getElementById('scale-badge');
-                        if (scalePercent < 95 || scalePercent > 105) {
-                            badge.innerText = `${scalePercent}% SCALE`;
-                            badge.classList.remove('hidden');
-                        } else { badge.classList.add('hidden'); }
+                        if (scalePercent < 95) { badge.classList.remove('hidden'); badge.innerText = `${scalePercent}% SCALE`; } 
+                        else { badge.classList.add('hidden'); }
+                        document.getElementById('status-title').innerText = "Analysis Complete";
                         setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
                     };
                 };
@@ -272,9 +285,7 @@
 
         function approveArt() {
             const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = false;
-            btn.classList.replace('bg-gray-200', 'bg-black');
-            btn.classList.remove('cursor-not-allowed');
+            btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
             document.getElementById('status-title').innerText = "ARTWORK APPROVED";
             document.getElementById('status-title').style.color = "#00ab66";
         }
@@ -284,28 +295,29 @@
             document.getElementById('validation-panel').classList.add('hidden');
             document.getElementById('file-input').value = "";
             uploadedImageData = null;
-            const btn = document.getElementById('add-to-cart-btn');
-            btn.disabled = true;
-            btn.classList.replace('bg-black', 'bg-gray-200');
+            document.getElementById('add-to-cart-btn').disabled = true;
+            document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
         }
 
+        function changeImage(el) { document.getElementById('main-prod-img').src = el.src; }
+
         function addToCart() {
+            const appSel = document.getElementById('app-select');
+            const qty = document.getElementById('qty-input').value;
             const newItem = {
                 name: "Heat Press T-Shirt Vinyl",
                 image: uploadedImageData || document.getElementById('main-prod-img').src,
-                price: currentPriceValue,
-                options: {
-                    "Size": `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
-                    "Finish": document.getElementById('finish-select').options[0].text,
-                    "Application": document.getElementById('app-select').options[document.getElementById('app-select').selectedIndex].text,
-                    "Quantity": document.getElementById('qty-input').value
+                price: globalTotalValue,
+                options: { 
+                    "Size": document.getElementById('w-input').value + '" x ' + document.getElementById('h-input').value + '"', 
+                    "Application": appSel.options[appSel.selectedIndex].text,
+                    "Qty": qty 
                 }
             };
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             cart.push(newItem);
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            renderCart();
-            toggleCart();
+            renderCart(); toggleCart();
         }
 
         function renderCart() {
@@ -318,41 +330,31 @@
             } else {
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    total += parseFloat(item.price);
-                    const details = Object.entries(item.options).map(([k, v]) => `<span class="block">${k}: ${v}</span>`).join('');
-                    container.innerHTML += `<div class="flex gap-4 border-b pb-6 text-black"><img src="${item.image}" class="w-20 h-20 object-contain border rounded-lg bg-gray-50"><div class="flex-grow"><h4 class="text-[11px] font-black uppercase italic">${item.name}</h4><div class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight tracking-tight">${details}</div><div class="mt-2 text-lg font-black italic">$${parseFloat(item.price).toFixed(2)}</div></div><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button></div>`;
+                    const price = parseFloat(item.price) || 0;
+                    total += price;
+                    const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "";
+                    container.innerHTML += `
+                        <div class="flex gap-4 border-b pb-4">
+                            <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg bg-white">
+                            <div class="flex-grow py-1">
+                                <h4 class="text-[11px] font-black uppercase italic text-black">${item.name}</h4>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 tracking-tighter">${details}</p>
+                                <span class="text-lg font-black italic text-black">$${price.toFixed(2)}</span>
+                            </div>
+                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>`;
                 });
             }
-            document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
             lucide.createIcons();
         }
 
-        function removeItem(i) {
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1);
-            localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            renderCart();
-        }
-
-        function toggleCart() {
-            const sidebar = document.getElementById('cart-sidebar');
-            const overlay = document.getElementById('cart-overlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('visible');
-            if (sidebar.classList.contains('open')) {
-                document.body.style.overflow = 'hidden';
-                renderCart();
-            } else { document.body.style.overflow = ''; }
-        }
-
-        function changeImage(el) {
-            document.getElementById('main-prod-img').src = el.src;
-            document.querySelectorAll('.thumb-img').forEach(i => i.classList.remove('thumb-active'));
-            el.classList.add('thumb-active');
-        }
-
-        window.onload = () => { calculatePrice(); renderCart(); };
+        function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }
+        function logout() { localStorage.clear(); window.location.reload(); }
+        window.onload = checkAuth;
     </script>
 </body>
 </html>
