@@ -230,44 +230,22 @@
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('cart-items-container');
-            const totalDisplay = document.getElementById('cart-total-price');
-            const dot = document.getElementById('cart-dot');
-            container.innerHTML = '';
-            let total = 0;
-
+            container.innerHTML = ''; let total = 0;
             if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Bag is empty</div>`;
-                dot.classList.add('hidden');
+                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
             } else {
-                dot.classList.remove('hidden');
+                document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
-                    total += priceNum;
-                    
-                    // LÓGICA INTELIGENTE DE DESGLOSE (Evita UNDEFINED)
-                    const showDetails = item.details || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO SPECS");
-                    
-                    container.innerHTML += `
-                        <div class="flex gap-6 border-b border-gray-50 pb-6 last:border-0 text-black">
-                            <div class="w-20 h-20 bg-gray-50 rounded-[1.5rem] border overflow-hidden p-2 flex items-center justify-center">
-                                <img src="${item.image}" class="max-h-full max-w-full object-contain">
-                            </div>
-                            <div class="flex flex-col justify-between flex-grow py-1">
-                                <div class="flex justify-between">
-                                    <h4 class="text-[11px] font-black uppercase italic tracking-tighter">${item.name}</h4>
-                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                                </div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p>
-                                <div class="flex justify-between items-end mt-2">
-                                    <span class="text-lg font-black italic">$${priceNum.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        </div>`;
+                    const pNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
+                    total += pNum;
+                    const showDetails = item.details || item.specs || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
+                    container.innerHTML += `<div class="flex gap-4 border-b pb-6 text-black"><div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0"><img src="${item.image}" class="max-h-full max-w-full object-contain"></div><div class="flex-grow py-1 text-black"><div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p><span class="text-lg font-black italic">$${pNum.toFixed(2)}</span></div></div>`;
                 });
             }
+            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
             lucide.createIcons();
-            totalDisplay.innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
         }
 
         function removeItem(i) {
