@@ -288,43 +288,50 @@
         }
 
         async function validateAndPlaceOrder() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            if (cart.length === 0) return alert("Bag is empty");
-            if (cart.some(i => (typeof i.price === 'string' ? parseFloat(i.price.replace(/[$,]/g, '')) : i.price) < 50 && !i.isMinimumApplied)) {
-                return alert("Please Accept the $50 minimum adjustment before ordering.");
-            }
-            if (!currentPayment) return alert("Please select a payment method.");
-            
-            const btn = document.getElementById('place-order-btn');
-            btn.innerText = "SENDING ORDER...";
-            btn.disabled = true;
+    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+    if (cart.length === 0) return alert("Bag is empty");
+    
+    // ... (mantén tus validaciones de precio mínimo y pago)
 
-            const oNum = 'ORD-' + Math.floor(Math.random() * 900000);
-            const oInfo = {
-                order_id: oNum,
-                customer_name: document.getElementById('fullName').value,
-                customer_email: document.getElementById('emailAddress').value,
-                total_price: document.getElementById('final-price-display').innerText,
-                delivery_method: currentMethod,
-                payment_method: currentPayment,
-                items: cart
-            };
+    const btn = document.getElementById('place-order-btn');
+    btn.innerText = "SENDING ORDER...";
+    btn.disabled = true;
 
-            const formData = new FormData();
-            formData.append('data', JSON.stringify(oInfo));
+    const oNum = 'ORD-' + Math.floor(Math.random() * 900000);
+    
+    // CORRECCIÓN AQUÍ: Estructura compatible con el Backend
+    const oInfo = {
+        order_id: oNum,
+        customer_name: document.getElementById('fullName').value,
+        customer_email: document.getElementById('emailAddress').value,
+        total_price: document.getElementById('final-price-display').innerText,
+        // Convertimos el array de items en un solo string separado por saltos de línea
+        order_items: cart.map(i => `${i.name}, Price: $${i.price}`).join('\n')
+    };
 
-            try {
-                const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { method: 'POST', body: formData });
-                if (res.ok) {
-                    localStorage.removeItem('sqft_cart');
-                    window.location.href = `order.html?id=${oNum}`;
-                } else { alert("Server error."); }
-            } catch (e) { alert("Connection failed."); } 
-            finally {
-                btn.innerText = "Place Order Now";
-                btn.disabled = false;
-            }
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(oInfo));
+
+    try {
+        // Asegúrate de usar la URL con "l" minúscula al final
+        const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { 
+            method: 'POST', 
+            body: formData 
+        });
+        
+        if (res.ok) {
+            localStorage.removeItem('sqft_cart');
+            window.location.href = `order.html?id=${oNum}`;
+        } else { 
+            alert("Server error. Check Render logs."); 
         }
+    } catch (e) { 
+        alert("Connection failed."); 
+    } finally {
+        btn.innerText = "Place Order Now";
+        btn.disabled = false;
+    }
+}
 
         window.onload = () => {
             checkAuth();
