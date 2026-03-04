@@ -122,16 +122,21 @@ const emailTemplate = (orderData) => `
             <h1 class="heavy-italic">New Order Received!</h1>
             <p><strong>Order ID:</strong> ${orderData.order_id}</p>
             <p><strong>Customer:</strong> ${orderData.customer_name} (${orderData.customer_email})</p>
-            <div class="details-box">
-                <h3 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Order Summary</h3>
-                ${orderData.order_items.split('\n').filter(l => l.trim()).map((item, i) => `
-                    <div class="item">
-                        <strong>ITEM #${i + 1}</strong>
-                        ${item.split(',').map(line => `<span class="product-line">• ${line.trim()}</span>`).join('')}
-                    </div>
-                `).join('')}
-                <div style="font-size: 24px; font-weight: 900; text-align: right; margin-top: 25px;">TOTAL: ${orderData.total_price}</div>
-            </div>
+            // En server.js, dentro de la función emailTemplate
+<div class="details-box">
+    <h3 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Order Summary</h3>
+    ${orderData.order_items.split('\n---\n').map((itemBlock, i) => `
+        <div class="item" style="border-bottom: 1px solid #eee; padding: 20px 0;">
+            <strong style="display:block; margin-bottom:10px;">ITEM #${i + 1}</strong>
+            ${itemBlock.split('\n').filter(line => line.trim() !== "").map(line => `
+                <span class="product-line" style="display:block; font-size:14px; color:#4b5563; margin-bottom:4px;">
+                    • ${line.trim()}
+                </span>
+            `).join('')}
+        </div>
+    `).join('')}
+    <div style="font-size: 24px; font-weight: 900; text-align: right; margin-top: 25px;">TOTAL: ${orderData.total_price}</div>
+</div>
         </div>
         <div class="footer">© 2026 Square Foot Printing - Las Vegas</div>
     </div>
