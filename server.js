@@ -147,7 +147,13 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => { cb(null, Date.now() + '-' + file.originalname); }
 });
-const upload = multer({ storage });
+const upload = multer({ 
+    storage,
+    limits: {
+        fieldSize: 100 * 1024 * 1024, // 100MB - Mucho más seguro
+        fileSize: 500 * 1024 * 1024   // 500MB para archivos adjuntos
+    }
+});
 
 app.post('/api/place-order', upload.array('files'), async (req, res) => {
     try {
