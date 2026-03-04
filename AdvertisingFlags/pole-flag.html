@@ -17,46 +17,42 @@
         .main-content-scroll { min-height: calc(100vh - 73px); flex-grow: 1; background-color: white; display: flex; flex-direction: column; }
         .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
         .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
-        .custom-input:focus { border-color: #000; }
-        .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
-        .canvas-bg-grid { background-color: #f3f4f6; background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
+        .canvas-bg-grid { background-color: #f3f4f6; background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%); background-size: 20px 20px; }
         #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
         #mobile-menu.open { transform: translateX(0); }
         #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 110; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
-        .thumb-img { width: 64px; height: 64px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s; }
-        .thumb-active { border: 2px solid black !important; }
         .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
+        .wholesale-badge { display: inline-flex; align-items: center; background-color: #f0fdf4; color: #16a34a; padding: 6px 16px; border-radius: 9999px; font-size: 10px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; border: 1px solid #dcfce7; margin-top: 10px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
-    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
-            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6 text-black"></i></button>
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic text-black">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
-                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
-                <a href="#" class="hover:text-black transition-colors text-black">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors text-black">Stickers</a>
-                <a href="#" class="hover:text-black transition-colors">Apparel</a>
+                <a href="../Displays/displays.html" class="hover:text-black transition-colors">Displays</a>
+                <a href="advertising-flags.html" class="text-black border-b-2 border-black pb-1">Advertising Flags</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <div id="auth-container" class="flex items-center text-black"></div>
-            <button onclick="toggleCart()" class="relative p-2 mr-2 text-black">
+            <div id="auth-container" class="flex items-center"></div>
+            <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
@@ -64,11 +60,11 @@
     </nav>
 
     <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden text-black">
-        <div class="flex justify-between items-center border-b pb-4 text-black">
-            <span class="heavy-italic text-xl italic text-black">Navigation</span>
-            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
         </div>
-        <ul class="space-y-6 text-sm font-black uppercase italic text-black">
+        <ul class="space-y-6 text-sm font-black uppercase italic">
             <li><a href="../index.html">Wall Art</a></li>
             <li><a href="../Banners/banners.html">Banners</a></li>
             <li><a href="advertising-flags.html" class="text-red-600">Advertising Flags</a></li>
@@ -76,14 +72,14 @@
         </ul>
     </div>
 
-   <div class="flex flex-row flex-grow w-full">
-        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
-            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black">Product Categories</h3>
+    <div class="flex flex-row flex-grow w-full text-black">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer active"><a href="advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
             </ul>
@@ -93,56 +89,52 @@
             <div class="p-12 flex-grow text-black">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
                     <div class="space-y-8">
-                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative text-black text-black">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative">
                             <img id="main-prod-img" src="../images/Advertising Flags/Custom-Pole-Flag-02-1.png" alt="Pole Flag" class="max-h-[400px] drop-shadow-2xl transition-all duration-300">
                         </div>
-                        <div class="pt-8 border-t border-gray-100 text-black">
-                            <h2 class="text-4xl heavy-italic mb-6 italic">Product Details</h2>
-                            <div class="text-[14px] leading-[1.8] space-y-6 font-medium text-black">
-                                <p>Our Custom Pole Flags are printed on premium 3oz polyester using advanced dye-sublimation. Durable, waterproof, and UV-resistant for long-lasting outdoor impact.</p>
-                                <ul class="list-disc pl-5 space-y-3 text-[13px]">
-                                    <li>High-resolution digital printing for vivid colors</li>
-                                    <li>Indoor and outdoor use, waterproof and UV safe</li>
-                                    <li>Double-sided option includes blockout liner</li>
-                                    <li>Multiple finishing options for any mounting style</li>
+                        <div class="pt-8 border-t border-gray-100">
+                            <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-4 italic">Custom Pole Flags</h2>
+                            <p class="text-sm text-gray-600 font-medium leading-relaxed">Our Custom Pole Flags are printed on premium 3oz polyester using advanced dye-sublimation. Durable, waterproof, and UV-resistant for long-lasting outdoor impact.</p>
+                            <div class="mt-8 space-y-4 bg-gray-50 p-6 md:p-8 rounded-[2rem] border border-gray-100">
+                                <h4 class="text-xs font-black uppercase tracking-widest text-black mb-4">Core Benefits:</h4>
+                                <ul class="space-y-4 text-[12px] text-gray-700 font-medium">
+                                    <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500 shrink-0 mt-0.5"></i><span>High-resolution digital printing for vivid colors.</span></li>
+                                    <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500 shrink-0 mt-0.5"></i><span>Double-sided option includes blockout liner.</span></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    <div class="space-y-10 text-black">
+                    <div class="space-y-10">
                         <header>
-                            <h1 id="prod-title" class="text-4xl heavy-italic text-gray-900 leading-none">Custom Pole Flag</h1>
-                            <div id="price-tier-badge" class="mt-4 text-[9px] font-black uppercase px-4 py-2 rounded-full w-fit italic bg-gray-100 text-black"></div>
+                            <h1 id="prod-title" class="text-4xl md:text-5xl heavy-italic">Custom Pole Flag</h1>
+                            <div id="wholesale-badge-container"></div>
+                            <p class="text-lg md:text-xl font-black text-gray-400 italic mt-6" id="prod-range">$3.00 – $12.00 sq/ft</p>
                         </header>
 
                         <div class="space-y-6">
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Width (Inches)</label>
-                                    <select id="w-input" onchange="calculatePrice()" class="custom-dropdown text-black">
-                                        <option value="12">12"</option><option value="18">18"</option><option value="24" selected>24"</option><option value="30">30"</option><option value="36">36"</option><option value="48">48"</option><option value="60">60"</option>
+                                <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Width (Inches)</label>
+                                    <select id="w-input" onchange="calculatePrice()" class="custom-dropdown">
+                                        <option value="12">12"</option><option value="18">18"</option><option value="24" selected>24"</option><option value="36">36"</option><option value="48">48"</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Height (Inches)</label>
-                                    <select id="h-input" onchange="calculatePrice()" class="custom-dropdown text-black">
-                                        <option value="12">12"</option><option value="18">18"</option><option value="24" selected>24"</option><option value="36">36"</option><option value="48">48"</option><option value="60">60"</option><option value="72">72"</option><option value="84">84"</option><option value="96">96"</option><option value="100">100"</option>
+                                <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Height (Inches)</label>
+                                    <select id="h-input" onchange="calculatePrice()" class="custom-dropdown">
+                                        <option value="12">12"</option><option value="18">18"</option><option value="24" selected>24"</option><option value="36">36"</option><option value="48">48"</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Graphic Side</label>
-                                <select id="side-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                            <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic text-black">Graphic Side</label>
+                                <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
                                     <option value="base">Single Sided Print Thru</option>
                                     <option value="double">Double Sided (Blockout)</option>
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black text-black">Finishing</label>
-                                <select id="finish-select" class="custom-dropdown text-black">
+                            <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic text-black">Finishing</label>
+                                <select id="finish-select" class="custom-dropdown">
                                     <option>Hemmed & Grommet Strip - Left Side</option>
                                     <option>Hemmed & Grommet Strip - Top Side</option>
                                     <option>Hem Only</option>
@@ -150,110 +142,96 @@
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black text-black">Turnaround</label>
-                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
-                                    <option value="0" selected>Standard (2-3 Days)</option>
-                                    <option value="10">Next Day (+$10.00)</option>
-                                    <option value="50">Same Day Rush (+$50.00)</option>
+                            <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic text-black">Turnaround</label>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="Standard" selected>Standard (2-3 Days)</option>
+                                    <option value="Rush">Same Day Rush +$50.00</option>
                                 </select>
                             </div>
 
-                            <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
-                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">
-                                    <span class="text-[11px] font-black text-gray-400 uppercase italic">Select Design File</span>
-                                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
+                            <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2rem] p-6 shadow-2xl space-y-6">
+                                <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing Artwork...</h4>
+                                <div class="relative w-full bg-gray-200 rounded-xl canvas-bg-grid flex items-center justify-center border-2 border-gray-200" style="height: 250px;">
+                                    <div class="absolute top-2 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-2 py-0.5 rounded font-bold z-20 uppercase shadow-lg">W: <span id="ordered-w-label">0</span>"</div>
+                                    <div class="absolute right-2 top-1/2 -translate-y-1/2 bg-black text-white text-[9px] px-2 py-0.5 rounded font-bold z-20 uppercase rotate-90 shadow-lg">H: <span id="ordered-h-label">0</span>"</div>
+                                    <div id="art-container" class="relative bg-white shadow-2xl flex items-center justify-center overflow-hidden border">
+                                        <img id="preview-thumb" class="max-h-full max-w-full object-contain">
+                                    </div>
                                 </div>
-                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6">
-                                    <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter text-center">Analyzing...</h4>
-                                    <div class="relative w-full bg-gray-200 rounded-xl overflow-hidden canvas-bg-grid flex items-center justify-center border-2 border-gray-200" style="height: 250px;">
-                                        <div class="absolute top-2 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-2 py-0.5 rounded font-bold z-20 uppercase shadow-lg">Ordered: <span id="ordered-w-label">0</span>"</div>
-                                        <div class="absolute right-2 top-1/2 -translate-y-1/2 bg-black text-white text-[9px] px-2 py-0.5 rounded font-bold z-20 uppercase rotate-90 shadow-lg text-black">Ordered: <span id="ordered-h-label">0</span>"</div>
-                                        <div id="art-container" class="relative bg-white shadow-2xl transition-all duration-500 flex items-center justify-center overflow-hidden border">
-                                            <img id="preview-thumb" class="w-full h-full object-contain">
-                                            <div id="scale-badge" class="absolute bottom-2 right-2 bg-red-600 text-white text-[10px] px-2 py-1 rounded font-black italic shadow-lg">50% SCALE</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl text-black">
-                                        <div class="text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Uploaded File Size:</p><p id="file-dims" class="text-sm font-black italic">0" x 0"</p></div>
-                                        <div class="text-right text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-sm font-black italic text-green-600">High Quality</p></div>
-                                    </div>
-                                    <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden text-black"><div id="upload-progress" class="progress-bar"></div></div>
-                                    <div class="flex gap-4">
-                                        <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-2xl shadow-lg italic hover:bg-black transition-all">Approved, Send to print now</button>
-                                        <button onclick="resetUpload()" class="px-8 bg-gray-100 text-gray-400 text-[12px] font-black uppercase rounded-2xl italic hover:text-black text-black">Reupload</button>
-                                    </div>
+                                <div class="flex justify-between items-center bg-gray-100/50 p-4 rounded-[1.5rem] text-black">
+                                    <div class="text-left"><p class="text-[10px] text-gray-400 uppercase font-black">Uploaded size:</p><p id="file-dims" class="text-sm font-black italic">0" x 0"</p></div>
+                                    <div class="text-right"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-sm font-black italic text-green-600">Verifying...</p></div>
+                                </div>
+                                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
+                                <div class="flex flex-col md:flex-row gap-4">
+                                    <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-2xl shadow-lg italic">Approve</button>
+                                    <button onclick="resetUpload()" class="px-10 bg-gray-100 text-gray-400 text-[12px] font-black uppercase py-5 rounded-2xl italic">Discard</button>
                                 </div>
                             </div>
 
-                            <div class="price-row border-none pt-8 text-black">
+                            <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-8 md:p-12 rounded-[2.5rem]">
+                                <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Upload Design File</span>
+                                <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
+                            </div>
+
+                            <div class="flex justify-between items-center pt-8 border-t border-gray-100">
                                 <div class="flex flex-col">
-                                    <span class="text-[11px] font-black uppercase tracking-widest italic text-black">Estimated Total</span>
-                                    <span class="text-[10px] font-bold text-gray-400 uppercase text-black" id="area-display">4.00 sq ft</span>
+                                    <span class="text-[11px] font-black uppercase tracking-widest italic leading-none text-black">Estimated Total</span>
+                                    <span class="text-[10px] font-bold text-gray-400 mt-1 uppercase" id="area-display">4.00 sq ft</span>
                                 </div>
-                                <span id="final-price" class="text-5xl heavy-italic italic text-black leading-none">$0.00</span>
+                                <span id="final-price" class="text-4xl md:text-6xl heavy-italic italic leading-none">$0.00</span>
                             </div>
 
-                            <div class="flex gap-6">
-                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-xl text-black text-black">
-                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md text-white">Add to Bag</button>
+                            <div class="flex gap-4 md:gap-6">
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-20 md:w-28 p-4 md:p-6 border-2 border-gray-100 rounded-2xl font-black text-center text-xl outline-none text-black">
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-4 md:py-6 rounded-2xl text-[12px] uppercase italic cursor-not-allowed shadow-md">Add to Bag</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <footer class="bg-white border-t py-12 px-10 text-center w-full mt-auto text-black">
-                <div class="bg-black p-2 rounded-xl inline-block mb-6 shadow-2xl">
-                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 md:h-8 w-auto">
+
+            <footer class="bg-white border-t py-12 md:py-16 px-6 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
                 </div>
-                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+                <p class="text-[9px] md:text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
     </div>
 
     <div id="cart-sidebar">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black text-black text-black">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black text-black text-black"><i data-lucide="x" class="w-6 h-6 text-black text-black"></i></button>
+        <div class="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black text-black"></div>
-        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black text-black">
-            <div class="flex justify-between items-end text-black text-black text-black text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white">Checkout</button>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-6 md:p-8 space-y-8 bg-white text-black text-black"></div>
+        <div class="p-6 md:p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-5 md:py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white">Checkout</button>
         </div>
     </div>
-    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/40 z-[105] hidden text-black"></div>
+    <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script src="pricing.js"></script>
     <script>
         lucide.createIcons();
         let uploadedImageData = null;
-        const PRODUCT_ID = "custom-pole-flag";
+        let globalTotal = 0;
 
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
-        function toggleCart() { 
-            document.getElementById('cart-sidebar').classList.toggle('open');
-            document.getElementById('cart-overlay').classList.toggle('visible');
-            renderCart();
-        }
+        function logout() { localStorage.clear(); window.location.reload(); }
 
         function checkAuth() {
             const userName = localStorage.getItem('userName');
-            const userTier = localStorage.getItem('userTier');
-            const isWholesale = (userTier === 'wholesale');
-            const authContainer = document.getElementById('auth-container');
-            const badge = document.getElementById('price-tier-badge');
-
+            const isWholesale = localStorage.getItem('userTier') === 'wholesale';
+            const authDiv = document.getElementById('auth-container');
+            const badgeBox = document.getElementById('wholesale-badge-container');
             if (userName) {
-                authContainer.innerHTML = `<div class="flex items-center whitespace-nowrap"><span class="text-[9px] md:text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5 text-black">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic text-black">LOGOUT</span></div>`;
-                badge.innerText = isWholesale ? "✓ Wholesale pricing enabled" : "Retail Pricing";
-                badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-green-50 text-green-600 rounded-full w-fit italic";
+                authDiv.innerHTML = `<div class="flex items-center text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2 text-red-600">LOGOUT</span></div>`;
+                if (isWholesale && badgeBox) badgeBox.innerHTML = `<div class="wholesale-badge">✓ Wholesale Enabled</div>`;
             } else {
-                authContainer.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic text-black">Login</button>`;
-                badge.innerText = "Public Retail Prices";
-                badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic text-black";
+                authDiv.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`;
             }
             calculatePrice();
         }
@@ -262,40 +240,36 @@
             const w = parseFloat(document.getElementById('w-input').value) || 0;
             const h = parseFloat(document.getElementById('h-input').value) || 0;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const turnFee = parseFloat(document.getElementById('turn-select').value) || 0;
-            const sideType = document.getElementById('side-select').value; 
+            const sideType = document.getElementById('side-select').value;
+            const turnVal = document.getElementById('turn-select').value;
+            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
             
             const area = (w * h) / 144;
-            
-            // Lógica de precio base de Pole Flag: $3.00 (Single) o $6.00 (Double)
             let basePricePerSqFt = (sideType === 'double') ? 6.00 : 3.00;
-            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
             const multiplier = isWholesale ? 1 : 2;
             
-            const finalTotal = (area * (basePricePerSqFt * multiplier) * qty) + turnFee;
-            
+            let rushFee = 0;
+            if (turnVal === "Rush") rushFee = 50.00 * multiplier;
+
+            globalTotal = (area * (basePricePerSqFt * multiplier) * qty) + rushFee;
+
             document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
-            document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('final-price').innerText = `$${globalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
         function processFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                const orderedW = parseFloat(document.getElementById('w-input').value);
-                const orderedH = parseFloat(document.getElementById('h-input').value);
                 document.getElementById('drop-zone').classList.add('hidden');
                 document.getElementById('validation-panel').classList.remove('hidden');
                 reader.onload = (e) => {
                     uploadedImageData = e.target.result;
-                    const img = new Image();
-                    img.src = e.target.result;
+                    document.getElementById('preview-thumb').src = e.target.result;
+                    const img = new Image(); img.src = e.target.result;
                     img.onload = function() {
-                        const fileW = (this.width / 100); 
-                        const fileH = (this.height / 100);
-                        document.getElementById('preview-thumb').src = e.target.result;
-                        document.getElementById('file-dims').innerText = `${fileW.toFixed(1)}" x ${fileH.toFixed(1)}"`;
-                        document.getElementById('ordered-w-label').innerText = orderedW;
-                        document.getElementById('ordered-h-label').innerText = orderedH;
+                        document.getElementById('file-dims').innerText = `${(this.width/100).toFixed(1)}" x ${(this.height/100).toFixed(1)}"`;
+                        document.getElementById('ordered-w-label').innerText = document.getElementById('w-input').value;
+                        document.getElementById('ordered-h-label').innerText = document.getElementById('h-input').value;
                         setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
                     };
                 };
@@ -314,24 +288,25 @@
         function resetUpload() {
             document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
-            document.getElementById('file-input').value = "";
-            uploadedImageData = null;
+            document.getElementById('file-input').value = ""; uploadedImageData = null;
             document.getElementById('add-to-cart-btn').disabled = true;
             document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
         }
 
+        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); document.getElementById('cart-overlay').classList.toggle('visible'); renderCart(); }
+
         function addToCart() {
-            const finish = document.getElementById('finish-select');
+            const w = document.getElementById('w-input').value;
+            const h = document.getElementById('h-input').value;
             const side = document.getElementById('side-select');
+            const finish = document.getElementById('finish-select');
             const turn = document.getElementById('turn-select');
-            const item = {
-                name: "Custom Pole Flag",
-                image: uploadedImageData || document.getElementById('main-prod-img').src,
-                price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
-                specs: `${document.getElementById('w-input').value}"x${document.getElementById('h-input').value}" | ${side.options[side.selectedIndex].text} | ${finish.options[finish.selectedIndex].text} | Turn: ${turn.options[turn.selectedIndex].text} | Qty: ${document.getElementById('qty-input').value}`
-            };
+            const qty = document.getElementById('qty-input').value;
+
+            const details = `SIZE: ${w}X${h} | PRINT: ${side.options[side.selectedIndex].text.toUpperCase()} | FINISHING: ${finish.value.toUpperCase()} | TURNAROUND: ${turn.options[turn.selectedIndex].text.toUpperCase()} | QTY: ${qty}`;
+            
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push(item);
+            cart.push({ name: "CUSTOM POLE FLAG", price: globalTotal, image: uploadedImageData || "../images/Advertising Flags/Custom-Pole-Flag-02-1.png", details: details });
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
             toggleCart();
         }
@@ -341,13 +316,15 @@
             const container = document.getElementById('cart-items-container');
             container.innerHTML = ''; let total = 0;
             if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px] text-black">Bag Empty</div>`;
+                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
                 document.getElementById('cart-dot').classList.add('hidden');
             } else {
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    total += item.price;
-                    container.innerHTML += `<div class="flex gap-4 border-b pb-4 text-black text-black"><img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg text-black text-black"><div class="flex-grow py-1 text-black text-black text-black"><h4 class="text-[11px] font-black uppercase italic text-black text-black">${item.name}</h4><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 text-black">${item.specs || ""}</p><span class="text-lg font-black italic text-black text-black">$${item.price.toFixed(2)}</span></div><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 text-black text-black"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button></div>`;
+                    const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
+                    total += priceNum;
+                    const showDetails = item.details || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
+                    container.innerHTML += `<div class="flex gap-4 border-b border-gray-50 pb-6 text-black"><div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0"><img src="${item.image}" class="max-h-full max-w-full object-contain"></div><div class="flex-grow py-1"><div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p><span class="text-lg font-black italic">$${priceNum.toFixed(2)}</span></div></div>`;
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
@@ -355,19 +332,8 @@
             lucide.createIcons();
         }
 
-        function removeItem(i) {
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
-        }
-
-        function changeImage(el) {
-            document.getElementById('main-prod-img').src = el.src;
-            document.querySelectorAll('.thumb-img').forEach(i => i.classList.remove('thumb-active'));
-            el.classList.add('thumb-active');
-        }
-
-        function logout() { localStorage.clear(); window.location.reload(); }
-        window.onload = () => { checkAuth(); renderCart(); };
+        function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }
+        window.onload = checkAuth;
     </script>
 </body>
 </html>

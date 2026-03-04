@@ -31,13 +31,16 @@
         .option-card { border: 2px solid #f3f4f6; transition: all 0.2s; cursor: pointer; background: white; }
         .option-card.active { border-color: #6366f1; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1); }
         
-        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 130; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
-        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 120; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+
+        #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        #mobile-menu.open { transform: translateX(0); }
     </style>
 </head>
-<body class="theme-light flex flex-col min-h-screen">
+<body class="theme-light flex flex-col min-h-screen text-black">
 
     <svg style="position: absolute; width: 0; height: 0;">
         <filter id="smart-contour-filter" color-interpolation-filters="sRGB">
@@ -49,40 +52,59 @@
         </filter>
     </svg>
 
-    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
-        <div class="flex items-center gap-8">
-            <div class="bg-black p-2 rounded-lg inline-block">
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
+        <div class="flex items-center gap-4 md:gap-8">
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
+            <div class="bg-black p-2 rounded-lg inline-block shadow-lg">
                 <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6">
             </div>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+                <a href="../index.html" class="hover:text-black">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black">Banners</a>
+                <a href="stickers.html" class="text-black border-b-2 border-black pb-1">Stickers</a>
+                <a href="../Rigid Signs/rigidsigns.html" class="hover:text-black">Rigid Signs</a>
+            </div>
         </div>
-        <div class="flex items-center gap-4 text-black">
-            <button onclick="toggleCart()" class="relative p-2 mr-2">
-                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCart()" class="relative p-2">
+                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
         </div>
     </nav>
 
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 xl:hidden text-black">
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+        </div>
+        <ul class="space-y-6 text-sm font-black uppercase italic">
+            <li><a href="../index.html" onclick="toggleMobileMenu()">Home</a></li>
+            <li><a href="stickers.html" onclick="toggleMobileMenu()">Stickers</a></li>
+            <li><a href="../Rigid Signs/rigidsigns.html" onclick="toggleMobileMenu()">Rigid Signs</a></li>
+        </ul>
+    </div>
+
     <div class="flex flex-grow w-full overflow-hidden">
         <main class="flex-grow bg-grid relative flex items-center justify-center overflow-hidden">
             <div id="res-alert" class="absolute top-8 right-8 z-50 hidden">
-                <div class="bg-orange-50 border-2 border-orange-200 p-4 rounded-2xl flex items-start gap-3 shadow-xl max-w-xs relative">
+                <div class="bg-orange-50 border-2 border-orange-200 p-4 rounded-2xl flex items-start gap-3 shadow-xl max-w-xs relative text-black">
                     <i data-lucide="alert-triangle" class="text-orange-500 w-6 h-6 shrink-0"></i>
                     <div class="pr-6">
                         <p class="text-[10px] font-black uppercase text-orange-700">Image Quality</p>
                         <p id="res-text" class="text-[9px] font-bold text-orange-600 leading-tight">Checking...</p>
                     </div>
-                    <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="absolute top-2 right-2 text-orange-400 hover:text-orange-600 transition-colors">
+                    <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="absolute top-2 right-2 text-orange-400 hover:text-orange-600">
                         <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
 
             <div class="absolute top-8 left-8 z-50">
-                <div class="relative bg-gray-200 dark:bg-gray-700 p-1 rounded-full flex w-44 shadow-inner cursor-pointer" onclick="toggleTheme()">
+                <div class="relative bg-gray-200 p-1 rounded-full flex w-36 shadow-inner cursor-pointer" onclick="toggleTheme()">
                     <div id="pill-bg" class="absolute top-1 left-1 bottom-1 w-[calc(50%-4px)] bg-black rounded-full transition-all duration-300"></div>
-                    <button class="relative z-10 flex-1 py-2 text-[10px] font-900 uppercase italic tracking-widest text-white">Light</button>
-                    <button class="relative z-10 flex-1 py-2 text-[10px] font-900 uppercase italic tracking-widest text-gray-400">Dark</button>
+                    <button class="relative z-10 flex-1 py-1.5 text-[9px] font-900 uppercase italic tracking-widest text-white">Light</button>
+                    <button class="relative z-10 flex-1 py-1.5 text-[9px] font-900 uppercase italic tracking-widest text-gray-400">Dark</button>
                 </div>
             </div>
 
@@ -100,7 +122,7 @@
             </div>
         </main>
 
-        <aside class="w-[400px] bg-white border-l p-8 flex flex-col gap-6 shadow-2xl z-40 overflow-y-auto">
+        <aside class="w-[380px] bg-white border-l p-8 flex flex-col gap-6 shadow-2xl z-40 overflow-y-auto text-black">
             <header>
                 <h2 class="text-2xl font-[900] italic uppercase tracking-tighter text-black">Sticker Editor</h2>
                 <div class="flex gap-2 mt-2">
@@ -109,22 +131,24 @@
                 </div>
             </header>
 
-            <div class="grid grid-cols-2 gap-4 text-black">
+            <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Size (Max 11")</label>
-                    <div class="relative"><input type="number" id="input-size" value="1" min="1" max="11" step="0.1" oninput="validateSize(this)" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none focus:border-indigo-500 text-black"><span class="absolute right-3 top-3 text-[10px] font-bold text-gray-400 uppercase">in</span></div>
+                    <div class="relative"><input type="number" id="input-size" value="1" min="1" max="11" step="0.1" oninput="validateSize(this)" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none focus:border-indigo-500 text-black"><span class="absolute right-3 top-3 text-[10px] font-bold text-gray-400">in</span></div>
                 </div>
                 <div class="space-y-1">
                     <label class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Cut Type</label>
-                    <select id="select-shape" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none focus:border-indigo-500 cursor-pointer text-black">
-                        <option value="contour cut">Contour Cut</option><option value="circle">Circle Cut</option><option value="square">Square Cut</option>
+                    <select id="select-shape" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none cursor-pointer text-black">
+                        <option value="contour cut">Contour Cut</option>
+                        <option value="circle">Circle Cut</option>
+                        <option value="square">Square Cut</option>
                     </select>
                 </div>
             </div>
 
             <div class="space-y-1">
                 <label class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Quantity</label>
-                <select id="select-qty" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none focus:border-indigo-500 cursor-pointer text-black">
+                <select id="select-qty" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none cursor-pointer text-black">
                     <option value="50">50 pcs</option>
                     <option value="100">100 pcs</option>
                     <option value="250">250 pcs</option>
@@ -141,34 +165,37 @@
             </div>
 
             <div class="mt-auto pt-6 border-t flex justify-between items-baseline mb-4 text-black">
-                <span class="text-[10px] font-bold text-gray-400 italic uppercase">TOTAL</span>
+                <span class="text-[10px] font-bold text-gray-400 italic uppercase tracking-widest">SUBTOTAL</span>
                 <span id="price-display" class="text-4xl font-black italic tracking-tighter text-indigo-600">$0.00</span>
             </div>
-            <button onclick="addToCart()" class="w-full bg-black text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest italic hover:bg-indigo-600 transition-all shadow-xl active:scale-[0.98]">
+            <button onclick="addToCart()" class="w-full bg-black text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest italic hover:bg-indigo-600 transition-all shadow-xl active:scale-95">
                 Add to Bag
             </button>
         </aside>
     </div>
 
     <div id="cart-sidebar">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
+        <div class="p-8 border-b flex justify-between items-center bg-white sticky top-0 text-black">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase mt-1" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
         <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
-        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
+        <div class="p-8 bg-gray-50 border-t space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase italic hover:bg-red-600 transition-all">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
+    <script src="pricing.js"></script>
     <script>
         lucide.createIcons();
         const canvas = document.getElementById('sticker-canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
         const master = document.getElementById('master-wrapper'), container = document.getElementById('sticker-container');
         let originalImg = new Image();
         let currentMaterial = "Matte White";
+
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
 
         window.onload = function() {
             originalImg.crossOrigin = "anonymous";
@@ -186,7 +213,7 @@
             document.getElementById('select-qty').value = finalQty;
             document.getElementById('select-shape').value = finalShape.toLowerCase();
             
-            if(finalFinish.includes('gloss')) applyMaterial('gloss', document.getElementById('btn-gloss'));
+            if(finalFinish.toLowerCase().includes('gloss')) applyMaterial('gloss', document.getElementById('btn-gloss'));
             else applyMaterial('matte', document.getElementById('btn-matte'));
 
             originalImg.onload = renderAll;
@@ -196,8 +223,9 @@
         function calculatePrice(size, qty) {
             const prices = { "50": 36.00, "100": 52.00, "250": 95.00, "500": 160.00 };
             let base = prices[qty] || 36.00;
+            const multiplier = localStorage.getItem('userTier') === 'wholesale' ? 1 : 2;
             let sizeSurcharge = size > 2 ? 1 + ((size - 2) * 0.15) : 1;
-            return base * sizeSurcharge;
+            return base * sizeSurcharge * multiplier;
         }
 
         function validateSize(input) {
@@ -211,31 +239,26 @@
             let shape = document.getElementById('select-shape').value;
             let qty = document.getElementById('select-qty').value;
 
-            // 1. QUALITY LOGIC (DPI)
+            // QUALITY MONITOR (DPI)
             const dpi = Math.round(originalImg.width / size);
             const alertBox = document.getElementById('res-alert');
             const resText = document.getElementById('res-text');
             if (dpi < 150) {
                 alertBox.classList.remove('hidden');
-                resText.innerHTML = `<b class="text-red-600">CRITICAL: ${dpi} DPI</b><br>Image will look blurry and pixelated.`;
+                resText.innerHTML = `<b class="text-red-600">CRITICAL: ${dpi} DPI</b><br>Will look blurry.`;
             } else if (dpi < 300) {
                 alertBox.classList.remove('hidden');
-                resText.innerHTML = `<b class="text-orange-500">LOW QUALITY: ${dpi} DPI</b><br>Good for small stickers, but might not be sharp.`;
+                resText.innerHTML = `<b class="text-orange-500">LOW: ${dpi} DPI</b><br>Might not be sharp.`;
             } else { alertBox.classList.add('hidden'); }
 
-            // 2. PRICING & BADGES
+            // PRICING
             let finalPrice = calculatePrice(size, qty);
             document.getElementById('price-display').innerText = `$${finalPrice.toFixed(2)}`;
             document.getElementById('badge-size').innerText = `${size}x${size} IN`;
             document.getElementById('badge-shape').innerText = shape.toUpperCase();
             document.getElementById('text-h').innerText = document.getElementById('text-v').innerText = `${size}"`;
 
-            // 3. VISUAL SCALE
-            const availableSpace = Math.min(window.innerWidth - 450, window.innerHeight - 200);
-            const currentPx = (availableSpace * 0.40) + ((size - 1) / 10) * (availableSpace * 0.55);
-            container.style.width = container.style.height = currentPx + 'px';
-
-            // 4. CANVAS DRAWING
+            // CANVAS & FILTERS
             const padding = 120;
             const targetSide = Math.max(originalImg.width, originalImg.height);
             canvas.width = targetSide + padding;
@@ -271,7 +294,7 @@
         function applyMaterial(type, btn) {
             document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
-            currentMaterial = btn.innerText;
+            currentMaterial = btn.innerText.replace('Matte White', 'MATTE').replace('Glossy Finish', 'GLOSSY');
             container.classList.toggle('active-gloss', type === 'gloss');
             syncLayers();
         }
@@ -294,24 +317,14 @@
             const qty = document.getElementById('select-qty').value;
             const finalPrice = parseFloat(document.getElementById('price-display').innerText.replace('$', ''));
             
-            // GENERATE EDIT URL
-            const editUrl = new URL(window.location.href);
-            editUrl.searchParams.set('size', size);
-            editUrl.searchParams.set('shape', shape);
-            editUrl.searchParams.set('qty', qty);
-            editUrl.searchParams.set('finish', currentMaterial.toLowerCase().includes('gloss') ? 'glossy' : 'matte');
+            // ESTANDARIZACIÓN DE DETALLES PARA LA BOLSA
+            const details = `SHAPE: ${shape.toUpperCase()} | FINISH: ${currentMaterial.toUpperCase()} | SIZE: ${size}X${size} | QTY: ${qty} PCS`;
 
             const item = {
-                name: "Custom Sticker",
+                name: "CUSTOM STICKER",
                 image: canvas.toDataURL('image/png', 0.5),
                 price: finalPrice,
-                url: editUrl.toString(),
-                options: {
-                    "Size": `${size}" x ${size}"`,
-                    "Cut": shape.toUpperCase(),
-                    "Finish": currentMaterial,
-                    "Quantity": `${qty} pcs`
-                }
+                details: details // Blindaje contra Undefined
             };
 
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
@@ -323,31 +336,27 @@
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const cont = document.getElementById('cart-items-container');
+            const dot = document.getElementById('cart-dot');
             cont.innerHTML = ''; let total = 0;
             
             if (cart.length === 0) {
-                cont.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Bag Empty</div>`;
-                document.getElementById('cart-dot').classList.add('hidden');
+                cont.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
+                if(dot) dot.classList.add('hidden');
             } else {
-                document.getElementById('cart-dot').classList.remove('hidden');
+                if(dot) dot.classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    total += item.price;
-                    const details = Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ');
+                    const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : parseFloat(item.price);
+                    total += priceNum;
+                    const showDetails = item.details || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
                     cont.innerHTML += `
                         <div class="flex gap-4 border-b pb-4 text-black">
-                            <a href="${item.url || '#'}">
-                                <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg bg-gray-50 shadow-sm hover:opacity-80 transition-all">
-                            </a>
+                            <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg bg-gray-50 shadow-sm">
                             <div class="flex-grow py-1">
-                                <a href="${item.url || '#'}" class="hover:underline">
-                                    <h4 class="text-[11px] font-black uppercase italic tracking-tighter">${item.name}</h4>
-                                </a>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${details}</p>
-                                <span class="text-lg font-black italic mt-1 block">$${item.price.toFixed(2)}</span>
+                                <h4 class="text-[11px] font-black uppercase italic tracking-tighter">${item.name}</h4>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p>
+                                <span class="text-lg font-black italic mt-1 block">$${priceNum.toFixed(2)}</span>
                             </div>
-                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 transition-colors">
-                                <i data-lucide="trash-2" class="w-4 h-4 text-black"></i>
-                            </button>
+                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button>
                         </div>`;
                 });
             }
@@ -358,7 +367,8 @@
 
         function removeItem(i) {
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            cart.splice(i, 1);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
             renderCart();
         }
 
@@ -378,6 +388,3 @@
     </script>
 </body>
 </html>
-
-
-//transparent background, pricing logic, quality alerts, dynamic badges, 3D parallax, cart system with localStorage, edit links, and dark mode toggle.

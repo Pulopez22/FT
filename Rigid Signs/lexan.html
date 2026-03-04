@@ -22,18 +22,24 @@
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
         .canvas-bg-grid { background-color: #f3f4f6; background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%); background-size: 20px 20px; }
-        
-        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 110; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+        #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        #mobile-menu.open { transform: translateX(0); }
         .measure-label { position: absolute; background: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; color: black; }
+        .measure-h { top: 50%; right: 8px; transform: translateY(-50%) rotate(90deg); }
+        .measure-w { bottom: 8px; left: 50%; transform: translateX(-50%); }
+        .wholesale-badge { display: inline-flex; align-items: center; background-color: #f0fdf4; color: #16a34a; padding: 6px 16px; border-radius: 9999px; font-size: 10px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; border: 1px solid #dcfce7; margin-top: 10px; }
+        .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
-        <div class="flex items-center gap-8 text-black">
+        <div class="flex items-center gap-8">
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
@@ -51,13 +57,27 @@
             </div>
         </div>
         <div class="flex items-center gap-4">
+            <div id="auth-container"></div>
             <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
-            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5">Track Order</button>
+            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 hover:text-red-600 transition-colors">Track Order</button>
         </div>
     </nav>
+
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 xl:hidden text-black">
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+        </div>
+        <ul class="space-y-6 text-sm font-black uppercase italic">
+            <li><a href="../index.html" onclick="toggleMobileMenu()">Wall Art</a></li>
+            <li><a href="../Banners/banners.html" onclick="toggleMobileMenu()">Banners</a></li>
+            <li><a href="../LargePrinting/largeprinting.html" onclick="toggleMobileMenu()">Large Format</a></li>
+            <li><a href="rigidsigns.html" class="text-red-600" onclick="toggleMobileMenu()">Rigid Signs</a></li>
+        </ul>
+    </div>
 
     <div class="flex flex-row flex-grow w-full text-black">
         <aside class="sidebar-fixed p-10 hidden lg:block text-black">
@@ -73,12 +93,12 @@
             </ul>
         </aside>
 
-        <main class="main-content-scroll">
-            <div class="p-12 flex-grow text-black">
+        <main class="main-content-scroll text-black">
+            <div class="p-12 flex-grow">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20">
                     
                     <div class="space-y-12">
-                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative text-black">
+                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative">
                             <img id="main-prod-img" src="../images/Rigid Signs/AB-Vinyl-Backlit-01.png" alt="Lexan Sign" class="max-h-[350px] drop-shadow-2xl transition-all duration-300">
                         </div>
                         
@@ -90,7 +110,7 @@
                                 </p>
                             </div>
 
-                            <div class="space-y-4 bg-gray-50 p-8 rounded-[2rem] border border-gray-100 text-black">
+                            <div class="space-y-4 bg-gray-50 p-8 rounded-[2rem] border border-gray-100">
                                 <h3 class="text-xs font-black uppercase tracking-widest text-black mb-4">Product Highlights:</h3>
                                 <ul class="space-y-4 text-sm text-gray-700 font-medium">
                                     <li class="flex items-start gap-3"><i data-lucide="shield-check" class="w-5 h-5 text-green-500 shrink-0 mt-0.5"></i><span><strong>Impact Resistant:</strong> Shatter-proof material designed for maximum security.</span></li>
@@ -101,17 +121,18 @@
                         </div>
                     </div>
 
-                    <div class="space-y-10 text-black">
+                    <div class="space-y-10">
                         <header>
                             <h1 id="prod-title" class="text-4xl heavy-italic text-gray-900 leading-none italic">Lexan / Polycarbonate</h1>
-                            <p class="text-1xl font-black text-gray-400 italic mt-6">$12.00 – $26.25 sq/ft</p>
+                            <div id="wholesale-badge-container"></div>
+                            <p id="prod-range" class="text-xl font-black text-gray-400 italic mt-6">Calculating...</p>
                         </header>
 
-                        <div class="space-y-6 text-black">
+                        <div class="space-y-6">
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Substrate Selection</label>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Substrate</label>
                                 <select id="mat-select" onchange="handleMaterialChange()" class="custom-dropdown text-black">
-                                    <optgroup label="Standard Lexan">
+                                  <optgroup label="Standard Lexan">
                                         <option value="white">Sign White (1st Surface Print)</option>
                                         <option value="clear">Clear (2nd Surface White Flood)</option>
                                         <option value="blackout">Clear (2nd Surface BlackOut)</option>
@@ -123,18 +144,9 @@
                                 </select>
                             </div>
 
-                            <div class="relative">
-                                <div id="limit-msg" class="hidden absolute -top-8 left-0 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit reached (100")</div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Width (Max 100")</label>
-                                        <input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input text-black">
-                                    </div>
-                                    <div>
-                                        <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Height (Inches)</label>
-                                        <input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input text-black">
-                                    </div>
-                                </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Width (Max 100")</label><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input"></div>
+                                <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Height</label><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input"></div>
                             </div>
 
                             <div>
@@ -151,56 +163,61 @@
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic text-black">Turnaround Time</label>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Turnaround Time</label>
                                 <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
-                                    <option value="3-5 Days">3-5 Business Days</option>
-                                    <option value="Next Day">Next Day</option>
+                                    <option value="Standard">Standard (3-5 Days)</option>
+                                    <option value="Next Day">Next Day (+$50.00)</option>
                                 </select>
                             </div>
 
-                            <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
-                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-12 rounded-[2.5rem]">
-                                    <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Upload Artwork</span>
-                                    <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
+                            <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6">
+                                <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing...</h4>
+                                <div class="relative w-full bg-gray-200 rounded-xl overflow-hidden canvas-bg-grid flex items-center justify-center border-2 border-gray-200" style="height: 300px;">
+                                    <div id="measure-w-val" class="measure-label measure-w">24"</div>
+                                    <div id="measure-h-val" class="measure-label measure-h">24"</div>
+                                    <div id="art-container" class="relative bg-white shadow-2xl transition-all duration-500 flex items-center justify-center border border-gray-300 mx-auto" style="max-height: 90%; width: auto;">
+                                        <img id="preview-thumb" class="max-h-full max-w-full object-contain">
+                                    </div>
                                 </div>
-                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6">
-                                    <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing...</h4>
-                                    <div class="relative w-full bg-gray-200 rounded-xl overflow-hidden canvas-bg-grid flex items-center justify-center border-2 border-gray-200" style="height: 300px;">
-                                        <div id="measure-w-val" class="measure-label" style="bottom: 8px; left: 50%; transform: translateX(-50%);">24"</div>
-                                        <div id="measure-h-val" class="measure-label" style="top: 50%; right: 8px; transform: translateY(-50%) rotate(90deg);">24"</div>
-                                        <div id="art-container" class="relative bg-white shadow-2xl transition-all duration-500 flex items-center justify-center border border-gray-300 mx-auto" style="max-height: 90%; width: auto;">
-                                            <img id="preview-thumb" class="max-h-full max-w-full object-contain">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
-                                        <div class="text-left text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Uploaded size:</p><p id="file-dims" class="text-sm font-black italic">0" x 0"</p></div>
-                                        <div class="text-right text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-sm font-black italic text-green-600">Verifying...</p></div>
-                                    </div>
-                                    <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
-                                    <div class="flex gap-4">
-                                        <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-2xl shadow-lg italic hover:bg-black transition-all">Approve artwork</button>
-                                        <button onclick="resetUpload()" class="px-8 bg-gray-100 text-gray-400 text-[12px] font-black uppercase rounded-2xl italic">Discard</button>
-                                    </div>
+                                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
+                                    <div class="text-left text-black"><p class="text-[10px] text-gray-400 uppercase font-black">File Info:</p><p id="file-dims" class="text-sm font-black italic">0" x 0"</p></div>
+                                    <div class="text-right text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-sm font-black italic text-green-600">Verifying...</p></div>
+                                </div>
+                                <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
+                                <div class="flex gap-4">
+                                    <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-2xl shadow-lg italic">Approve artwork</button>
+                                    <button onclick="resetUpload()" class="px-8 bg-gray-100 text-gray-400 text-[12px] font-black uppercase rounded-2xl italic">Discard</button>
                                 </div>
                             </div>
 
-                            <div class="flex justify-between items-center pt-8 border-t border-gray-100 relative text-black">
+                            <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-12 rounded-[2.5rem]">
+                                <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Upload Artwork</span>
+                                <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
+                            </div>
+
+                            <div class="flex justify-between items-center pt-8 border-t border-gray-100 relative">
                                 <div class="flex flex-col text-black">
                                     <span class="text-[11px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span>
                                     <span class="text-[10px] font-bold text-gray-400 mt-1" id="area-display">4.000 sq ft</span>
                                 </div>
-                                <span id="final-price" class="text-5xl heavy-italic italic text-black leading-none">$0.00</span>
+                                <span id="final-price" class="text-5xl heavy-italic italic leading-none">$0.00</span>
                             </div>
 
                             <div class="flex gap-6">
-                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center text-xl">
-                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md">Add to Bag</button>
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center text-xl text-black">
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase italic cursor-not-allowed shadow-md">Add to Bag</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <footer class="bg-white border-t py-16 px-10 text-center w-full text-black">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
+                </div>
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+            </footer>
         </main>
     </div>
 
@@ -209,7 +226,7 @@
             <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
             <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
             <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white">Checkout</button>
@@ -217,10 +234,11 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
+    <script src="pricing.js"></script>
     <script>
         lucide.createIcons();
         let uploadedImageData = null;
-        let currentPriceValue = 0;
+        let globalTotal = 0;
 
         const thickMap = {
             white: ['1/8"', '3/16"'],
@@ -230,71 +248,73 @@
             backlit_clear: ['0.060"', '1/8"', '3/16"']
         };
 
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
+        function logout() { localStorage.clear(); window.location.reload(); }
+
+        function checkAuth() {
+            const userName = localStorage.getItem('userName');
+            const isWholesale = localStorage.getItem('userTier') === 'wholesale';
+            const multiplier = isWholesale ? 1 : 2;
+            const authDiv = document.getElementById('auth-container');
+            const badgeBox = document.getElementById('wholesale-badge-container');
+            const rangeDisplay = document.getElementById('prod-range');
+
+            if (userName) {
+                authDiv.innerHTML = `<div class="flex items-center text-black text-black text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2 cursor-pointer text-black text-black">LOGOUT</span></div>`;
+                if (isWholesale && badgeBox) badgeBox.innerHTML = `<div class="wholesale-badge">✓ Wholesale Enabled</div>`;
+            } else { authDiv.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic text-black">Login</button>`; }
+
+            if (rangeDisplay) rangeDisplay.innerText = `$${(12.00 * multiplier).toFixed(2)} – $${(26.25 * multiplier).toFixed(2)} sq/ft`;
+            handleMaterialChange();
+        }
+
         function handleMaterialChange() {
             const mat = document.getElementById('mat-select').value;
             const thickSelect = document.getElementById('thick-select');
-            const sideSelect = document.getElementById('side-select');
             thickSelect.innerHTML = '';
             thickMap[mat].forEach(t => thickSelect.add(new Option(t, t)));
-            
-            if (mat === 'blackout') { sideSelect.value = "1"; sideSelect.disabled = true; } 
-            else { sideSelect.disabled = false; }
-            
             calculatePrice();
         }
 
         function validateSize() {
-            const w = document.getElementById('w-input');
-            const h = document.getElementById('h-input');
-            const msg = document.getElementById('limit-msg');
-            let showMsg = false;
-            if (parseFloat(w.value) > 100) { w.value = 100; showMsg = true; }
-            if (showMsg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2500); }
-            
-            if(document.getElementById('measure-w-val')) document.getElementById('measure-w-val').innerText = w.value + '"';
-            if(document.getElementById('measure-h-val')) document.getElementById('measure-h-val').innerText = h.value + '"';
+            const w = document.getElementById('w-input'); const h = document.getElementById('h-input');
+            if (parseFloat(w.value) > 100) w.value = 100;
+            document.getElementById('measure-w-val').innerText = w.value + '"';
+            document.getElementById('measure-h-val').innerText = h.value + '"';
             calculatePrice();
         }
 
-        function calculatePrice() {
-            const mat = document.getElementById('mat-select').value;
-            const turn = document.getElementById('turn-select').value;
-            const sides = parseInt(document.getElementById('side-select').value);
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const area = (w * h) / 144;
-            
-            let pSqFt = (mat === 'white') ? 16 : 20;
-            if (sides === 2) pSqFt *= 1.5;
+       function calculatePrice() {
+    const mat = document.getElementById('mat-select').value;     // ej: "backlit_white"
+    const thick = document.getElementById('thick-select').value; // ej: "3/16\""
+    const turn = document.getElementById('turn-select').value;
+    
+    // LLAMADA AL JS ACTUALIZADO
+    const pricing = window.getLargeFormatPrice("Lexan", turn, mat, thick);
+    
+    const w = parseFloat(document.getElementById('w-input').value) || 0;
+    const h = parseFloat(document.getElementById('h-input').value) || 0;
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+    const area = (w * h) / 144;
 
-            let totalPerUnit = pSqFt * area;
-            if (turn === "Same Day Rush") totalPerUnit += 50.00;
-            
-            currentPriceValue = totalPerUnit * qty;
-            document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
-            document.getElementById('final-price').innerText = `$${currentPriceValue.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        }
+    // Ya no necesitas IFs de precios aquí, el JS ya te dio el 'unitPrice' final.
+    globalTotal = (pricing.unitPrice * area + pricing.fixedFee) * qty;
 
-        function toggleCart() {
-            document.getElementById('cart-sidebar').classList.toggle('open');
-            document.getElementById('cart-overlay').classList.toggle('visible');
-            renderCart();
-        }
+    document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
+    document.getElementById('final-price').innerText = `$${globalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+}
 
         function processFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                const orderedW = parseFloat(document.getElementById('w-input').value) || 1;
                 document.getElementById('drop-zone').classList.add('hidden');
                 document.getElementById('validation-panel').classList.remove('hidden');
                 reader.onload = (e) => {
                     uploadedImageData = e.target.result;
                     const img = new Image(); img.src = e.target.result;
                     img.onload = function() {
-                        const fileW = (this.width / 72); 
                         document.getElementById('preview-thumb').src = e.target.result;
-                        document.getElementById('file-dims').innerText = `${fileW.toFixed(1)}" x ${(this.height/72).toFixed(1)}"`;
+                        document.getElementById('file-dims').innerText = `${(this.width/72).toFixed(1)}" x ${(this.height/72).toFixed(1)}"`;
                         setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
                     };
                 };
@@ -305,44 +325,20 @@
         function approveArt() {
             const btn = document.getElementById('add-to-cart-btn');
             btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
-            btn.classList.remove('cursor-not-allowed');
             document.getElementById('status-title').innerText = "ARTWORK APPROVED";
-            document.getElementById('status-title').className = "text-xl font-black uppercase text-green-600 italic tracking-tighter";
+            document.getElementById('status-title').style.color = "#00ab66";
         }
 
         function resetUpload() {
-            document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
-            document.getElementById('file-input').value = "";
+            document.getElementById('drop-zone').classList.remove('hidden');
+            document.getElementById('file-input').value = ""; 
             uploadedImageData = null;
             document.getElementById('add-to-cart-btn').disabled = true;
             document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
         }
 
-        function addToCart() {
-            const mat = document.getElementById('mat-select');
-            const thick = document.getElementById('thick-select');
-            const sides = document.getElementById('side-select');
-            const turn = document.getElementById('turn-select');
-            
-            const newItem = {
-                name: "Lexan / Polycarbonate Sign",
-                image: uploadedImageData || document.getElementById('main-prod-img').src,
-                price: currentPriceValue,
-                options: {
-                    "Material": mat.options[mat.selectedIndex].text,
-                    "Thickness": thick.value,
-                    "Sides": sides.options[sides.selectedIndex].text,
-                    "Size": `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
-                    "Turnaround": turn.value,
-                    "Qty": document.getElementById('qty-input').value
-                }
-            };
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push(newItem);
-            localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            toggleCart();
-        }
+        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); document.getElementById('cart-overlay').classList.toggle('visible'); renderCart(); }
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
@@ -355,20 +351,38 @@
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
                     total += parseFloat(item.price);
-                    const details = Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ');
-                    container.innerHTML += `<div class="flex gap-4 border-b pb-4 text-black text-black"><img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg"><div class="flex-grow py-1"><h4 class="text-[11px] font-black uppercase italic">${item.name}</h4><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 text-black">${details}</p><span class="text-lg font-black italic text-black">$${parseFloat(item.price).toFixed(2)}</span></div><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black text-black"></i></button></div>`;
+                    const details = item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "";
+                    container.innerHTML += `<div class="flex gap-4 border-b border-gray-50 pb-6 text-black"><div class="w-20 h-20 bg-gray-50 rounded-xl border overflow-hidden p-1 flex items-center justify-center text-black"><img src="${item.image}" class="max-h-full max-w-full object-contain"></div><div class="flex-grow py-1 text-black text-black text-black"><div class="flex justify-between font-black uppercase italic text-xs text-black"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 text-black text-black text-black text-black text-black text-black text-black text-black"><i data-lucide="trash-2" class="w-4 h-4 text-black text-black"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black">${details}</p><span class="text-lg font-black italic text-black">$${parseFloat(item.price).toFixed(2)}</span></div></div>`;
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
             lucide.createIcons();
         }
 
-        function removeItem(i) {
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
-        }
+        function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }
 
-        window.onload = () => { handleMaterialChange(); renderCart(); };
+        function addToCart() {
+            const mat = document.getElementById('mat-select');
+            const thick = document.getElementById('thick-select');
+            const side = document.getElementById('side-select');
+            const item = {
+                name: "LEXAN SIGN",
+                price: globalTotal,
+                image: uploadedImageData || "../images/Rigid Signs/AB-Vinyl-Backlit-01.png",
+                options: { 
+                    "Material": mat.options[mat.selectedIndex].text,
+                    "Thickness": thick.value,
+                    "Sides": side.options[side.selectedIndex].text,
+                    "Size": `${document.getElementById('w-input').value}"x${document.getElementById('h-input').value}"`, 
+                    "Qty": document.getElementById('qty-input').value 
+                }
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(item); localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            toggleCart();
+        }
+        window.onload = checkAuth;
     </script>
 </body>
 </html>

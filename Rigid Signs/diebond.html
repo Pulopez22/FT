@@ -21,30 +21,23 @@
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
-        .info-tag { background: #f9fafb; border: 1px solid #e5e7eb; padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 13px; font-weight: 700; color: #1f2937; display: flex; align-items: center; gap: 10px; }
-        
-        .canvas-bg-grid {
-            background-color: #f3f4f6;
-            background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), 
-                              linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), 
-                              linear-gradient(45deg, transparent 75%, #e5e7eb 75%), 
-                              linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
-            background-size: 20px 20px;
-        }
-
-        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
+        .canvas-bg-grid { background-color: #f3f4f6; background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%); background-size: 20px 20px; }
+        #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        #mobile-menu.open { transform: translateX(0); }
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 110; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
         .measure-label { position: absolute; background: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; color: black; }
-        .measure-h { top: 50%; right: 8px; transform: translateY(-50%) rotate(90deg); }
-        .measure-w { bottom: 8px; left: 50%; transform: translateX(-50%); }
+        .wholesale-badge { display: inline-flex; align-items: center; background-color: #f0fdf4; color: #16a34a; padding: 6px 16px; border-radius: 9999px; font-size: 10px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; border: 1px solid #dcfce7; margin-top: 10px; }
+        .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
-        <div class="flex items-center gap-8">
+        <div class="flex items-center gap-4 md:gap-8">
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
@@ -61,265 +54,247 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <div class="flex items-center gap-4 text-black text-black">
-            <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
+        <div class="flex items-center gap-2 md:gap-4">
+            <div id="auth-container"></div>
+            <button onclick="toggleCart()" class="relative text-black p-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
-            <button class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 hover:text-red-600 transition-colors">Track Order</button>
         </div>
     </nav>
 
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 xl:hidden text-black">
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+        </div>
+        <ul class="space-y-6 text-sm font-black uppercase italic">
+            <li><a href="../index.html" onclick="toggleMobileMenu()">Wall Art</a></li>
+            <li><a href="../Banners/banners.html" onclick="toggleMobileMenu()">Banners</a></li>
+            <li><a href="../Displays/displays.html" onclick="toggleMobileMenu()">Displays</a></li>
+            <li><a href="rigidsigns.html" class="text-red-600" onclick="toggleMobileMenu()">Rigid Signs</a></li>
+        </ul>
+    </div>
+
     <div class="flex flex-row flex-grow w-full text-black">
-        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
-            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black">Product Categories</h3>
+        <aside class="sidebar-fixed p-10 hidden lg:block">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html">Banners</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html">Displays</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html">Printed Fabric</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html">Stickers</a></li>
                 <li class="sidebar-item cursor-pointer active text-black"><a href="rigidsigns.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
 
         <main class="main-content-scroll text-black">
-            <div class="p-12 flex-grow text-black text-black">
-                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-20 text-black">
-                    <div class="space-y-12">
-                        <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[450px] relative">
-                            <img id="main-prod-img" src="../images/Rigid Signs/Die-Bond-01.png" alt="Aluminum Sign" class="max-h-[300px] drop-shadow-2xl transition-all duration-300">
+            <div class="p-6 md:p-12 flex-grow">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-20">
+                    <div class="space-y-8 md:space-y-12">
+                        <div class="bg-gray-50 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-6 flex items-center justify-center border border-gray-100 min-h-[300px] md:min-h-[450px]">
+                            <img id="main-prod-img" src="../images/Rigid Signs/Die-Bond-01.png" alt="Aluminum Sign" class="max-h-[250px] md:max-h-[300px] drop-shadow-2xl transition-all">
                         </div>
-                        <div class="pt-8 border-t border-gray-100 space-y-8">
+                        <div class="pt-8 border-t border-gray-100 space-y-6 md:space-y-8">
                             <div>
-                                <h2 id="desc-title" class="text-4xl font-black uppercase tracking-tighter mb-6 italic text-black">White Aluminum Signs</h2>
-                                <p id="desc-body" class="text-lg text-gray-600 font-medium leading-relaxed">Solid aluminum sheets designed for high durability and a sleek finish. Perfect for long-term outdoor use, real estate, and industrial signage.</p>
+                                <h2 id="desc-title" class="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-4 italic">White Aluminum Signs</h2>
+                                <p id="desc-body" class="text-sm text-gray-600 font-medium leading-relaxed">Solid aluminum sheets designed for high durability and a sleek finish. Perfect for long-term outdoor use, real estate, and industrial signage.</p>
                             </div>
-                            <div class="space-y-4 bg-gray-50 p-8 rounded-[2rem] border border-gray-100 text-black text-black">
+                            <div class="space-y-4 bg-gray-50 p-6 md:p-8 rounded-[2rem] border border-gray-100">
                                 <h4 class="text-xs font-black uppercase tracking-widest text-black mb-4">Included Features:</h4>
-                                <ul id="desc-features" class="space-y-4 text-sm text-gray-700 font-medium">
-                                    <li class="flex items-start gap-3">
-                                        <i data-lucide="check" class="w-5 h-5 text-green-500 shrink-0 mt-0.5"></i>
-                                        <span><strong>Weatherproof:</strong> UV safe inks for long-term outdoor exposure.</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <i data-lucide="check" class="w-5 h-5 text-green-500 shrink-0 mt-0.5"></i>
-                                        <span id="desc-router"><strong>Standard Cut:</strong> Precision trim to size included.</span>
-                                    </li>
+                                <ul id="desc-features" class="space-y-4 text-[12px] text-gray-700 font-medium">
+                                    <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500 shrink-0 mt-0.5"></i><span><strong>Weatherproof:</strong> UV safe inks for outdoor exposure.</span></li>
+                                    <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500 shrink-0 mt-0.5"></i><span id="desc-router"><strong>Standard Cut:</strong> Precision trim to size included.</span></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    <div class="space-y-10 text-black">
+                    <div class="space-y-8 md:space-y-10">
                         <header>
-                            <h1 id="prod-title" class="text-5xl heavy-italic text-gray-900 leading-none italic text-black text-black">Aluminum Signs</h1>
-                            <p class="text-1xl font-black text-gray-400 italic mt-6" id="prod-range">$4.50 – $14.00 sq/ft</p>
+                            <h1 id="prod-title" class="text-4xl md:text-5xl heavy-italic">Aluminum Signs</h1>
+                            <div id="wholesale-badge-container"></div>
+                            <p class="text-lg md:text-xl font-black text-gray-400 italic mt-4 md:mt-6" id="prod-range">Calculating...</p>
                         </header>
 
-                        <div class="space-y-6 text-black">
-                            <div class="relative">
-                                <div id="limit-msg" class="hidden absolute -top-8 left-0 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit Reached</div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Width (Max 48")</label>
-                                        <input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input text-black">
-                                    </div>
-                                    <div>
-                                        <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Height (Max 96")</label>
-                                        <input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input text-black">
-                                    </div>
-                                </div>
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Width</label><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input"></div>
+                                <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Height</label><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input"></div>
                             </div>
-
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Substrate Selection</label>
-                                <select id="mat-select" onchange="handleMaterialChange()" class="custom-dropdown text-black">
+                                <select id="mat-select" onchange="handleMaterialChange()" class="custom-dropdown">
                                     <option value="white_alum" selected>White Aluminum (Solid Sheet)</option>
                                     <option value="die_bond">Die Bond (Aluminum Composite)</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Thickness Options</label>
-                                <select id="thick-select" onchange="calculatePrice()" class="custom-dropdown text-black"></select>
+                                <select id="thick-select" onchange="calculatePrice()" class="custom-dropdown"></select>
                             </div>
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic"># Of Sides</label>
-                                <select id="side-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                <select id="side-select" onchange="calculatePrice()" class="custom-dropdown">
                                     <option value="1">Single Sided</option>
                                     <option value="2">Double Sided</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Turnaround Time</label>
-                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
-                                    <option value="3-5 Days" selected>3-5 Business Days</option>
-                                    <option value="Same Day Rush">SAME DAY RUSH (11am Cut Off) + $50.00</option>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="Standard" selected>3-5 Business Days</option>
+                                    <option value="Same Day Rush">SAME DAY RUSH + $50.00</option>
                                 </select>
                             </div>
 
-                            <div class="space-y-4 text-black">
-                                <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest text-black">Art Validation Required</label>
-                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem] text-black">
-                                    <span class="text-[11px] font-black text-gray-400 uppercase italic text-center">Select Design File</span>
-                                    <input type="file" id="file-input" class="hidden text-black" accept="image/*" onchange="processFile(this)">
+                            <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2rem] p-6 shadow-2xl space-y-6">
+                                <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing...</h4>
+                                <div class="relative w-full bg-gray-200 rounded-xl canvas-bg-grid flex items-center justify-center border-2 border-gray-200" style="height: 250px;">
+                                    <div id="measure-w-val" class="measure-label" style="bottom: 8px; left: 50%; transform: translateX(-50%);">24"</div>
+                                    <div id="measure-h-val" class="measure-label" style="top: 50%; right: 8px; transform: translateY(-50%) rotate(90deg);">24"</div>
+                                    <div id="art-container" class="relative bg-white shadow-2xl flex items-center justify-center border border-gray-300 mx-auto" style="max-height: 90%; width: auto;">
+                                        <img id="preview-thumb" class="max-h-full max-w-full object-contain">
+                                    </div>
                                 </div>
-                                <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6 text-black">
-                                    <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic tracking-tighter">Analyzing...</h4>
-                                    <div class="relative w-full bg-gray-200 rounded-xl overflow-hidden canvas-bg-grid flex items-center justify-center border-2 border-gray-200 text-black" style="height: 300px;">
-                                        <div id="measure-w-val" class="measure-label measure-w text-black">24"</div>
-                                        <div id="measure-h-val" class="measure-label measure-h text-black">24"</div>
-                                        <div id="art-container" class="relative bg-white shadow-2xl transition-all duration-500 flex items-center justify-center border border-gray-300 mx-auto text-black" style="max-height: 90%; width: auto;">
-                                            <img id="preview-thumb" class="max-h-full max-w-full object-contain">
-                                            <div id="scale-badge" class="absolute bottom-2 right-2 bg-red-600 text-white text-[10px] px-2 py-1 rounded font-black italic">50% SCALE</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl text-black">
-                                        <div class="text-left text-black"><p class="text-[10px] text-gray-400 uppercase font-black text-black">Uploaded File:</p><p id="file-dims" class="text-sm font-black italic text-black">0" x 0"</p></div>
-                                        <div class="text-right text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-sm font-black italic text-green-600 italic">Verifying...</p></div>
-                                    </div>
-                                    <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden text-black"><div id="upload-progress" class="progress-bar"></div></div>
-                                    <div class="flex gap-4">
-                                        <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-2xl shadow-lg italic hover:bg-black transition-all">Approve artwork</button>
-                                        <button onclick="resetUpload()" class="px-8 bg-gray-100 text-gray-400 text-[12px] font-black uppercase rounded-2xl italic text-black">Discard</button>
-                                    </div>
+                                <div class="flex justify-between items-center bg-gray-100/50 p-4 rounded-[1.5rem]">
+                                    <div class="text-left text-black"><p class="text-[10px] text-gray-400 uppercase font-black">File Info:</p><p id="file-dims" class="text-lg font-black italic">0" x 0"</p></div>
+                                    <div class="text-right text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-lg font-black text-green-600 italic">Verifying...</p></div>
+                                </div>
+                                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
+                                <div class="flex flex-col md:flex-row gap-4">
+                                    <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-2xl shadow-lg italic">Approve</button>
+                                    <button onclick="resetUpload()" class="px-10 bg-gray-100 text-gray-400 text-[12px] font-black uppercase py-5 rounded-2xl italic">Discard</button>
                                 </div>
                             </div>
 
-                            <div class="flex justify-between items-center pt-8 border-t border-gray-100 relative text-black">
-                                <div class="flex flex-col text-black">
+                            <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-8 md:p-12 rounded-[2.5rem]">
+                                <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Upload Design File</span>
+                                <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
+                            </div>
+
+                            <div class="flex justify-between items-center pt-8 border-t border-gray-100">
+                                <div class="flex flex-col">
                                     <span class="text-[11px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span>
-                                    <span class="text-[10px] font-bold text-gray-400 uppercase mt-1 text-black" id="area-display">4.000 sq ft</span>
+                                    <span class="text-[10px] font-bold text-gray-400 mt-1 uppercase" id="area-display">4.000 sq ft</span>
                                 </div>
-                                <span id="final-price" class="text-5xl heavy-italic italic text-black leading-none">$0.00</span>
+                                <span id="final-price" class="text-4xl md:text-6xl heavy-italic italic leading-none">$0.00</span>
                             </div>
 
-                            <div class="flex gap-6 text-black">
-                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-xl">
-                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md">Add to Bag</button>
+                            <div class="flex gap-4 md:gap-6">
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-20 md:w-28 p-4 md:p-6 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-xl">
+                                <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-4 md:py-6 rounded-2xl text-[12px] uppercase italic cursor-not-allowed shadow-md">Add to Bag</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <footer class="bg-white border-t py-16 px-10 text-center w-full text-black">
-                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl text-black text-black text-black">
+
+            <footer class="bg-white border-t py-12 px-6 text-center w-full">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
                 </div>
-                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+                <p class="text-[9px] md:text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
         </main>
     </div>
 
-    <div id="cart-sidebar" class="text-black text-black">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black text-black">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter text-black text-black">Your Order</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black text-black" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black text-black"><i data-lucide="x" class="w-6 h-6 text-black text-black"></i></button>
+    <div id="cart-sidebar">
+        <div class="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black"></div>
-        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end text-black text-black text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1 text-black text-black">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black text-black">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white text-black">Checkout</button>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-6 md:p-8 space-y-8 bg-white text-black"></div>
+        <div class="p-6 md:p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-5 md:py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
+    <script src="pricing.js"></script>
     <script>
         lucide.createIcons();
         let uploadedImageData = null;
-        const thickOptions = { white_alum: ['0.040" Solid', '0.063" Solid', '0.080" Solid'], die_bond: ['1/8" (3mm) Composite', '1/4" (6mm) Composite'] };
+        let globalTotal = 0;
+        const thickMap = { 
+            white_alum: ['0.040" Solid', '0.063" Solid', '0.080" Solid'], 
+            die_bond: ['1/8" (3mm) Composite', '1/4" (6mm) Composite'] 
+        };
+
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
+        function logout() { localStorage.clear(); window.location.reload(); }
+
+        function checkAuth() {
+            const userName = localStorage.getItem('userName');
+            const isWholesale = localStorage.getItem('userTier') === 'wholesale';
+            const multiplier = isWholesale ? 1 : 2;
+            const authDiv = document.getElementById('auth-container');
+            const badgeBox = document.getElementById('wholesale-badge-container');
+            const rangeDisplay = document.getElementById('prod-range');
+            if (userName) {
+                authDiv.innerHTML = `<div class="flex items-center text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2 cursor-pointer text-red-600">LOGOUT</span></div>`;
+                if (isWholesale && badgeBox) badgeBox.innerHTML = `<div class="wholesale-badge">✓ Wholesale Enabled</div>`;
+            } else { authDiv.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`; }
+            if (rangeDisplay) rangeDisplay.innerText = `$${(4.50 * multiplier).toFixed(2)} – $${(14.00 * multiplier).toFixed(2)} sq/ft`;
+            handleMaterialChange();
+        }
 
         function handleMaterialChange() {
             const mat = document.getElementById('mat-select').value;
             const thickSelect = document.getElementById('thick-select');
             thickSelect.innerHTML = '';
-            thickOptions[mat].forEach(opt => thickSelect.add(new Option(opt, opt)));
-            
+            thickMap[mat].forEach(opt => thickSelect.add(new Option(opt, opt)));
             if (mat === "white_alum") {
                 document.getElementById('desc-title').innerText = "White Aluminum Signs";
-                document.getElementById('desc-body').innerText = "Solid aluminum sheets designed for high durability and a sleek finish. Perfect for long-term outdoor use, real estate, and industrial signage.";
+                document.getElementById('desc-body').innerText = "Solid aluminum sheets designed for high durability and a sleek finish. Perfect for long-term outdoor use.";
                 document.getElementById('desc-router').innerHTML = "<strong>Standard Cut:</strong> Precision trim to size included.";
             } else {
                 document.getElementById('desc-title').innerText = "Die Bond / E-Panel";
                 document.getElementById('desc-body').innerText = "Aluminum composite material with a solid core. Ideal for permanent wall signs and custom shapes.";
-                document.getElementById('desc-router').innerHTML = "<strong>FREE ROUTER CUTTING:</strong> We can cut any custom shape for free.";
+                document.getElementById('desc-router').innerHTML = "<strong>FREE ROUTER CUTTING:</strong> Custom shapes included.";
             }
-            validateSize();
-        }
-
-        function validateSize() {
-            const mat = document.getElementById('mat-select').value;
-            const w = document.getElementById('w-input'); const h = document.getElementById('h-input');
-            const msg = document.getElementById('limit-msg');
-            const maxW = (mat === 'die_bond') ? 46 : 48; const maxH = (mat === 'die_bond') ? 94 : 96;
-            
-            let showMsg = false;
-            if (parseFloat(w.value) > maxW) { w.value = maxW; showMsg = true; }
-            if (parseFloat(h.value) > maxH) { h.value = maxH; showMsg = true; }
-            
-            if (showMsg) {
-                msg.innerText = `Limit: ${maxW}" x ${maxH}"`;
-                msg.classList.remove('hidden');
-                setTimeout(() => msg.classList.add('hidden'), 2500);
-            }
-            if(document.getElementById('measure-w-val')) document.getElementById('measure-w-val').innerText = w.value + '"';
-            if(document.getElementById('measure-h-val')) document.getElementById('measure-h-val').innerText = h.value + '"';
             calculatePrice();
         }
 
-        function toggleCart() {
-            document.getElementById('cart-sidebar').classList.toggle('open');
-            document.getElementById('cart-overlay').classList.toggle('visible');
-            renderCart();
+        function validateSize() {
+            const w = document.getElementById('w-input'); const h = document.getElementById('h-input');
+            const mat = document.getElementById('mat-select').value;
+            const maxW = (mat === 'die_bond') ? 46 : 48;
+            const maxH = (mat === 'die_bond') ? 94 : 96;
+            if (parseFloat(w.value) > maxW) w.value = maxW;
+            if (parseFloat(h.value) > maxH) h.value = maxH;
+            document.getElementById('measure-w-val').innerText = w.value + '"';
+            document.getElementById('measure-h-val').innerText = h.value + '"';
+            calculatePrice();
         }
 
         function calculatePrice() {
+            const pricing = window.getLargeFormatPrice("Aluminum Signs", document.getElementById('turn-select').value);
             const mat = document.getElementById('mat-select').value;
-            const sides = document.getElementById('side-select').value;
             const thick = document.getElementById('thick-select').value;
-            const turn = document.getElementById('turn-select').value;
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const sides = document.getElementById('side-select').value;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const area = (w * h) / 144;
-            
-            let pSqFt = 0;
-            if (mat === "white_alum") { pSqFt = (sides === "1") ? 7.50 : 12.00; }
-            else { 
-                if (thick.includes("1/8")) pSqFt = (sides === "1") ? 4.50 : 8.50;
-                else pSqFt = (sides === "1") ? 9.00 : 14.00;
-            }
-
-            let total = pSqFt * area * qty;
-            if(turn === "Same Day Rush") total += 50.00;
-
+            const area = (parseFloat(document.getElementById('w-input').value) * parseFloat(document.getElementById('h-input').value)) / 144;
+            let pSqFt = (mat === "white_alum") ? ((sides === "1") ? 7.50 : 12.00) : (thick.includes("1/8") ? ((sides === "1") ? 4.50 : 8.50) : ((sides === "1") ? 9.00 : 14.00));
+            globalTotal = (pSqFt * pricing.multiplier * area + pricing.fixedFee) * qty;
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
-            document.getElementById('final-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('final-price').innerText = `$${globalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
         function processFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                const orderedW = parseFloat(document.getElementById('w-input').value) || 1;
                 document.getElementById('drop-zone').classList.add('hidden');
                 document.getElementById('validation-panel').classList.remove('hidden');
                 reader.onload = (e) => {
                     uploadedImageData = e.target.result;
                     const img = new Image(); img.src = e.target.result;
                     img.onload = function() {
-                        const fileW = (this.width / 72); 
-                        const scalePercent = Math.round((fileW / orderedW) * 100);
                         document.getElementById('preview-thumb').src = e.target.result;
-                        document.getElementById('file-dims').innerText = `${fileW.toFixed(1)}" x ${(this.height/72).toFixed(1)}"`;
-                        const badge = document.getElementById('scale-badge');
-                        if (scalePercent < 95) {
-                            badge.innerText = `${scalePercent}% SCALE`;
-                            badge.classList.remove('hidden');
-                        } else {
-                            badge.classList.add('hidden');
-                        }
-                        document.getElementById('status-title').innerText = "Analysis Complete";
+                        document.getElementById('file-dims').innerText = `${(this.width/72).toFixed(1)}" x ${(this.height/72).toFixed(1)}"`;
                         setTimeout(() => { document.getElementById('upload-progress').style.width = '100%'; }, 100);
                     };
                 };
@@ -330,39 +305,29 @@
         function approveArt() {
             const btn = document.getElementById('add-to-cart-btn');
             btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
-            btn.classList.remove('cursor-not-allowed');
             document.getElementById('status-title').innerText = "ARTWORK APPROVED";
-            document.getElementById('status-title').className = "text-xl font-black uppercase text-green-600 italic tracking-tighter text-black text-black";
+            document.getElementById('status-title').style.color = "#00ab66";
         }
 
         function resetUpload() {
-            document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
-            document.getElementById('file-input').value = "";
-            document.getElementById('upload-progress').style.width = '0%';
-            uploadedImageData = null;
+            document.getElementById('drop-zone').classList.remove('hidden');
+            document.getElementById('file-input').value = ""; uploadedImageData = null;
             document.getElementById('add-to-cart-btn').disabled = true;
             document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
         }
 
+        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); document.getElementById('cart-overlay').classList.toggle('visible'); renderCart(); }
+
         function addToCart() {
-            const newItem = {
-                name: "Aluminum Sign",
-                image: uploadedImageData || document.getElementById('main-prod-img').src,
-                price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
-                options: {
-                    "Material": document.getElementById('mat-select').options[document.getElementById('mat-select').selectedIndex].text,
-                    "Thickness": document.getElementById('thick-select').value,
-                    "Sides": document.getElementById('side-select').value,
-                    "Size": `${document.getElementById('w-input').value}" x ${document.getElementById('h-input').value}"`,
-                    "Turnaround": document.getElementById('turn-select').value,
-                    "Quantity": document.getElementById('qty-input').value
-                }
-            };
+            const mat = document.getElementById('mat-select');
+            const thick = document.getElementById('thick-select');
+            const side = document.getElementById('side-select');
+            const turn = document.getElementById('turn-select');
+            const details = `MATERIAL: ${mat.options[mat.selectedIndex].text.toUpperCase()} | THICKNESS: ${thick.value.toUpperCase()} | SIDES: ${side.options[side.selectedIndex].text.toUpperCase()} | TURNAROUND: ${turn.options[turn.selectedIndex].text.toUpperCase()} | SIZE: ${document.getElementById('w-input').value}X${document.getElementById('h-input').value} | QTY: ${document.getElementById('qty-input').value}`;
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push(newItem);
+            cart.push({ name: "ALUMINUM SIGN", price: globalTotal, image: uploadedImageData || "../images/Rigid Signs/Die-Bond-01.png", details: details });
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            renderCart();
             toggleCart();
         }
 
@@ -371,23 +336,13 @@
             const container = document.getElementById('cart-items-container');
             container.innerHTML = ''; let total = 0;
             if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px] text-black text-black">Bag Empty</div>`;
+                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
                 document.getElementById('cart-dot').classList.add('hidden');
             } else {
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
                     total += parseFloat(item.price);
-                    const details = Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ');
-                    container.innerHTML += `
-                        <div class="flex gap-4 border-b pb-4 text-black text-black">
-                            <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg text-black text-black text-black">
-                            <div class="flex-grow py-1 text-black text-black">
-                                <h4 class="text-[11px] font-black uppercase italic text-black text-black text-black">${item.name}</h4>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 tracking-tighter text-black text-black text-black">${details}</p>
-                                <span class="text-lg font-black italic text-black text-black text-black">$${parseFloat(item.price).toFixed(2)}</span>
-                            </div>
-                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 text-black text-black text-black text-black text-black text-black"><i data-lucide="trash-2" class="w-4 h-4 text-black text-black text-black text-black"></i></button>
-                        </div>`;
+                    container.innerHTML += `<div class="flex gap-4 border-b border-gray-50 pb-6"><div class="w-20 h-20 bg-gray-50 rounded-xl border flex items-center justify-center"><img src="${item.image}" class="max-h-full max-w-full object-contain"></div><div class="flex-grow py-1"><div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.details || "NO INFO"}</p><span class="text-lg font-black italic">$${parseFloat(item.price).toFixed(2)}</span></div></div>`;
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
@@ -395,12 +350,8 @@
             lucide.createIcons();
         }
 
-        function removeItem(i) {
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart();
-        }
-
-        window.onload = () => { handleMaterialChange(); renderCart(); };
+        function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }
+        window.onload = checkAuth;
     </script>
 </body>
 </html>
