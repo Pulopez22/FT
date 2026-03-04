@@ -1,5 +1,5 @@
 // pricing-displays.js - Específico para la categoría DISPLAYS
-window.bannerPricing = {
+window.displaysPricing = {
     "gallery-canvas": { "material": 29.34 },
     "table-cover": { "material": 120.00 },
     "aframe": { "material": 95.67 },

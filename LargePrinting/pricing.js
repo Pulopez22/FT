@@ -2,11 +2,11 @@
 window.largeFormatPricing = {
     "calendar-vinyl": { 
         "material": 1.25,
-        "bubbleFreeBase": 2.00 // Precio base si eligen Bubble Free en este producto
+        "bubbleFreeBase": 2.00 
     },
     "bubble-free": { 
         "material": 2.50, 
-        "specialPrice": 5.75, // Se activa con Thru-Cut
+        "specialPrice": 5.75, 
         "maxLimit": 53.5 
     },
     "window-cling": {
@@ -16,17 +16,18 @@ window.largeFormatPricing = {
             "double-matte": 12.00
         }
     },
-    "wrap-calendar": {
-    "cast": { "material": 4.00, "THRU": 4.75, "CONTOUR": 35.00, "TRIM": 4.00 },
-    "calendar": { "material": 3.00, "THRU": 3.75, "CONTOUR": 27.75, "TRIM": 3.00 }
+    "wrap-adhesive": {
+        "cast": { "material": 4.00, "THRU": 4.75, "CONTOUR": 35.00, "TRIM": 4.00 },
+        "calendar": { "material": 3.00, "THRU": 3.75, "CONTOUR": 27.75, "TRIM": 3.00 }
     },
     "rough-wall": { "material": 2.50 },
     "posters": {
-    "types": {
-        "paper": 2.00,
-        "popup": 3.75
-    }
-},
+        "material": 2.00,
+        "types": {
+            "paper": 2.00,
+            "popup": 3.75
+        }
+    },
     "gallery-canvas": {
         "sizes": {
             "8x10": 29.34,
@@ -45,12 +46,12 @@ window.largeFormatPricing = {
     "phototex": { "material": 2.50 },
     "table-cover": {
         "sizes": {
-            "4-3": 105.75, // 4ft Open Back
-            "6-3": 125.75, // 6ft Open Back
-            "8-3": 146.66, // 8ft Open Back
-            "4-4": 141.75, // 4ft Full Coverage
-            "6-4": 161.75, // 6ft Full Coverage
-            "8-4": 191.75  // 8ft Full Coverage
+            "4-3": 105.75, 
+            "6-3": 125.75, 
+            "8-3": 146.66, 
+            "4-4": 141.75, 
+            "6-4": 161.75, 
+            "8-4": 191.75  
         }
     },
     "glass-adhere": { "material": 2.50 },
@@ -59,7 +60,8 @@ window.largeFormatPricing = {
     "floor-graphics": { "material": 4.00 },
     "reflective-vinyl": { "material": 6.00 },
     "tshirt-vinyl": { "material": 25.00 },
-    "backlit-film": {   "material": 3.50, },
+    "heat-press-vinyl": { "material": 25.00 },
+    "backlit-film": { "material": 3.50 },
     "aframe": { "material": 95.67 },
     "window-perf": { "material": 2.50 }
 };
@@ -76,11 +78,24 @@ window.getLargeFormatPrice = function(productID, turnVal = "Standard") {
     if (!product) return { unitPrice: 0, fixedFee: 0, multiplier: multiplier };
 
     try {
-        let basePrice = product.material * multiplier;
-        let fixedFee = 0;
+        let basePrice = 0;
 
+        // Caso 1: Productos con precio directo de material (sq/ft)
+        if (product.material) {
+            basePrice = product.material * multiplier;
+        } 
+        // Caso 2: Productos con tallas fijas (Gallery Canvas, Table Covers)
+        else if (product.sizes) {
+            const firstKey = Object.keys(product.sizes)[0];
+            basePrice = product.sizes[firstKey] * multiplier;
+        }
+        // Caso 3: Productos con variantes de material (Wrap cast/calendar)
+        else if (product.calendar || product.cast) {
+            basePrice = (product.calendar ? product.calendar.material : 3.00) * multiplier;
+        }
+
+        let fixedFee = 0;
         // Lógica de cargo por urgencia (Rush)
-        // Buscamos palabras clave como "Rush" o "Same Day" en el valor del turnaround
         if (turnVal.toLowerCase().includes("rush") || turnVal.toLowerCase().includes("same day")) {
             fixedFee = 50.00;
         }
@@ -88,7 +103,7 @@ window.getLargeFormatPrice = function(productID, turnVal = "Standard") {
         return {
             unitPrice: basePrice,
             fixedFee: fixedFee,
-            multiplier: multiplier // Lo devolvemos para que el HTML lo use en laminación/acabados
+            multiplier: multiplier 
         };
     } catch (e) {
         console.error("Error calculando precio en Large Printing:", e);
@@ -96,7 +111,6 @@ window.getLargeFormatPrice = function(productID, turnVal = "Standard") {
     }
 };
 
-// Función de utilidad para obtener el multiplicador actual rápidamente
 window.getTierMultiplier = function() {
     return localStorage.getItem('userTier') === 'wholesale' ? 1 : 2;
 };

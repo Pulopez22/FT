@@ -1,5 +1,5 @@
 // pricing.js - Base de Datos Centralizada (Precios Wholesale)
-const masterPricing = {
+window.masterPricing = {
     "custom-pole-flag": { 
         "base": 10.00,   // Single Sided
         "double": 18.50  // Double Sided

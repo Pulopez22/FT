@@ -1,5 +1,5 @@
 // pricing.js FINAL
-const bannerPricing = {
+window.bannerPricing = {
     "blockout-fabric": {
         "material": 6.75, 
         "velcro": { "none": 0.00, "1": 1.50, "2": 2.50 },
