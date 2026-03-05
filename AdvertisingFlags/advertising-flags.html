@@ -34,7 +34,7 @@
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
-                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="../Displays/displays.html" class="hover:text-black transition-colors">Displays</a>
                 <a href="#" class="hover:text-black transition-colors">Decals</a>
                 <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
                 <a href="#" class="hover:text-black transition-colors">Apparel</a>
@@ -97,7 +97,7 @@
     <div id="cart-sidebar">
         <div class="p-8 border-b flex justify-between items-center bg-white sticky top-0">
             <h3 class="text-2xl font-black uppercase italic">Your Bag</h3>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-100 rounded-2xl"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
         </div>
         <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 text-black"></div>
         <div class="p-8 bg-gray-50 border-t space-y-6">
@@ -135,11 +135,7 @@
             const badge = document.getElementById('price-tier-badge');
 
             if (userName) {
-                authContainer.innerHTML = `
-                    <div class="flex items-center whitespace-nowrap">
-                        <span class="text-[9px] md:text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5 text-black">HI, ${userName.split(' ')[0]}</span>
-                        <span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span>
-                    </div>`;
+                authContainer.innerHTML = `<div class="flex items-center whitespace-nowrap"><span class="text-[9px] md:text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5 text-black">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span></div>`;
                 badge.innerText = isWholesale ? "✓ Wholesale pricing enabled" : "Retail Pricing";
                 badge.className = isWholesale ? "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-green-50 text-green-600 rounded-full w-fit italic" : "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic";
              } else {
@@ -153,10 +149,8 @@
         function renderProducts(isWholesale) {
             const grid = document.getElementById('product-grid');
             if (!grid) return;
-
             grid.innerHTML = products.map(b => {
                 const price = (typeof getPrice === 'function') ? getPrice(b.id) : 0;
-                
                 return `
                 <div onclick="window.location.href='${b.url}'" class="product-card cursor-pointer group">
                     <div class="h-64 p-8 flex items-center justify-center relative">
@@ -175,7 +169,6 @@
             lucide.createIcons();
         }
 
-        // Lógica de la bolsa blindada contra UNDEFINED
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('cart-items-container');
@@ -192,10 +185,7 @@
                 cart.forEach((item, i) => {
                     const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
                     total += priceNum;
-
-                    // FIX PARA UNDEFINED: Prioriza 'details' o 'specs', si no existen usa 'options'
-                    const showDetails = item.details || item.specs || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
-
+                    const showDetails = item.details || item.specs || "NO INFO";
                     container.innerHTML += `
                         <div class="flex gap-4 border-b border-gray-50 pb-6 mb-6 last:border-0 text-black">
                             <div class="w-20 h-20 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0">
