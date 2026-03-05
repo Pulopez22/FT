@@ -190,7 +190,7 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
         // 2. Enviar Correo
         await transporter.sendMail({
             // Asegúrate de que ventas@sfpvegas.com esté verificado en Resend
-            from: '"Square Foot Printing" <ventas@sfpvegas.com>', 
+            from: '"Square Foot Printing" <onboarding@resend.dev>',
             to: `${orderData.customer_email}, za19012245@zapopan.tecmm.edu.mx`,
             subject: `Order Confirmation: ${orderData.order_id}`,
             html: emailTemplate(orderData, fileLinks),
