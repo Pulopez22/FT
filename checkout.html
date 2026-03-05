@@ -315,8 +315,9 @@
     const formData = new FormData();
     formData.append('data', JSON.stringify(oInfo));
 
-    // IMPORTANTE: Aquí enviamos los archivos reales si existen en el carrito
-    // Nota: Tu lógica de carrito debe guardar el objeto 'File' en item.file si quieres que se manden
+    // LÓGICA DE ARCHIVOS: 
+    // Para que esto funcione, tu cart-logic.js debe haber guardado 
+    // el archivo real en 'item.file' (no solo la URL)
     cart.forEach(item => {
         if (item.file) { 
             formData.append('files', item.file); 
@@ -333,8 +334,8 @@
             localStorage.removeItem('sqft_cart');
             window.location.href = `order.html?id=${oNum}`;
         } else { 
-            const errorData = await res.json();
-            alert("Error: " + (errorData.error || "Order could not be processed.")); 
+            const errorText = await res.json();
+            alert("Order Error: " + errorText.error); 
         }
     } catch (e) { 
         alert("Connection failed. Check your internet or server status."); 
