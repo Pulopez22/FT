@@ -73,7 +73,7 @@
     </div>
 
     <div class="flex flex-row flex-grow w-full text-black">
-        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer active"><a href="advertising-flags.html" class="block w-full">Advertising Flags</a></li>
@@ -217,7 +217,6 @@
     <script>
         lucide.createIcons();
         
-        // --- 1. DECLARACIONES CRÍTICAS ---
         let uploadedFileUrl = ""; 
         let uploadedImageData = null;
         let globalTotal = 0;
@@ -260,7 +259,6 @@
             document.getElementById('final-price').innerText = `$${globalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
-        // --- 2. PROCESAMIENTO CON SUBIDA REAL ---
         async function processFile(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -273,17 +271,29 @@
                 statusTitle.className = "text-xl font-black uppercase text-orange-500 italic tracking-tighter";
                 approveBtn.disabled = true;
 
-                // Preview local rápida
                 const reader = new FileReader();
+                // FIX: Recuperamos los valores de ancho y alto de los selectores para las etiquetas
+                const orderedW = document.getElementById('w-input').value;
+                const orderedH = document.getElementById('h-input').value;
+
                 reader.onload = (e) => {
                     uploadedImageData = e.target.result;
                     document.getElementById('preview-thumb').src = e.target.result;
-                    document.getElementById('ordered-w-label').innerText = document.getElementById('w-input').value;
-                    document.getElementById('ordered-h-label').innerText = document.getElementById('h-input').value;
+                    
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const fileW = (this.width / 100); 
+                        const fileH = (this.height / 100);
+                        // MOSTRAR TAMAÑO: Inyectamos los datos en los elementos HTML
+                        document.getElementById('file-dims').innerText = `${fileW.toFixed(1)}" x ${fileH.toFixed(1)}"`;
+                        document.getElementById('ordered-w-label').innerText = orderedW;
+                        document.getElementById('ordered-h-label').innerText = orderedH;
+                        document.getElementById('dpi-info').innerText = "Vibrant Quality Detected";
+                    };
                 };
                 reader.readAsDataURL(file);
 
-                // --- SUBIDA A RENDER ---
                 const formData = new FormData();
                 formData.append('file', file);
 
@@ -295,7 +305,7 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        uploadedFileUrl = data.url; // <--- GUARDAMOS EL LINK REAL
+                        uploadedFileUrl = data.url; 
                         document.getElementById('upload-progress').style.width = '100%';
                         statusTitle.innerText = "READY TO APPROVE";
                         statusTitle.className = "text-xl font-black uppercase text-green-600 italic tracking-tighter text-black";
@@ -329,7 +339,6 @@
 
         function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); document.getElementById('cart-overlay').classList.toggle('visible'); renderCart(); }
 
-        // --- 3. AÑADIR AL CARRITO ACTUALIZADO ---
         function addToCart() {
             if (!uploadedFileUrl) return alert("Please upload your file first.");
 
@@ -346,8 +355,8 @@
             cart.push({ 
                 name: "CUSTOM POLE FLAG", 
                 price: globalTotal, 
-                image: "../images/Advertising Flags/Custom-Pole-Flag-02-1.png", // MINIATURA FIJA
-                fileUrl: uploadedFileUrl, // LINK PARA ADMIN
+                image: "../images/Advertising Flags/Custom-Pole-Flag-02-1.png", 
+                fileUrl: uploadedFileUrl, 
                 details: details 
             });
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
