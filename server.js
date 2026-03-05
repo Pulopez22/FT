@@ -86,22 +86,29 @@ const emailTemplate = (orderData, fileLinks) => {
                     <table width="600" style="background-color: #ffffff; border: 1px solid #dddddd; border-radius: 8px;">
                         <tr>
                             <td align="center" style="background-color: #000000; padding: 30px;">
-                                <img src="cid:logo_sfp" alt="Square Foot Printing" width="200">
+                                <h2 style="color: #ffffff; margin: 0;">SQUARE FOOT PRINTING</h2>
                             </td>
                         </tr>
                         <tr>
                             <td style="padding: 40px;">
-                                <h1 style="font-style: italic; color: #000000; font-size: 26px;">New Order Received!</h1>
+                                <h1 style="font-style: italic; color: #000000; font-size: 26px; margin-top:0;">New Order Received!</h1>
                                 <p><strong>Order ID:</strong> ${orderData.order_id}</p>
                                 <p><strong>Customer:</strong> ${orderData.customer_name} (${orderData.customer_email})</p>
+                                
                                 <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px;">
-                                    <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px;">Order Summary</h3>
+                                    <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-top:0;">Order Summary</h3>
                                     ${itemsHtml}
                                     ${downloadSection}
                                     <div style="font-size: 28px; font-weight: 900; text-align: right; margin-top: 20px; font-style: italic;">
                                         TOTAL: ${orderData.total_price}
                                     </div>
                                 </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" style="background-color: #f3f4f6; padding: 20px; font-size: 11px; color: #9ca3af;">
+                                © 2026 Square Foot Printing - Las Vegas <br>
+                                4425 W. Quail Ave. Suite 4, Las Vegas, NV 89118
                             </td>
                         </tr>
                     </table>
@@ -112,8 +119,7 @@ const emailTemplate = (orderData, fileLinks) => {
     </html>`;
 };
 
-// --- 5. CONFIGURACIÓN DE MULTER (CORREGIDO PARA RENDER) ---
-// Usamos /tmp que es la carpeta temporal universal de Linux
+// --- 5. CONFIGURACIÓN DE MULTER (OPTIMIZADO PARA RENDER) ---
 const upload = multer({ 
     dest: '/tmp/', 
     limits: { fileSize: 50 * 1024 * 1024 } 
@@ -121,6 +127,7 @@ const upload = multer({
 
 // --- 6. RUTAS ---
 
+// Auth
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, email, password, isWholesale } = req.body;
@@ -147,28 +154,27 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// RUTA DE ORDEN (OPTIMIZADA)
+// RUTA DE ORDEN (SIN DEPENDER DE CARPETAS LOCALES)
 app.post('/api/place-order', upload.array('files'), async (req, res) => {
     try {
-        console.log("🚀 Nueva orden recibida...");
+        console.log("🚀 Nueva orden recibida en Render...");
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
         let fileLinks = [];
 
-        // Subir archivos a Cloudinary
+        // 1. Subir archivos a Cloudinary
         for (const file of files) {
-            console.log(`Subiendo ${file.originalname} a Cloudinary...`);
             const result = await cloudinary.uploader.upload(file.path, {
                 folder: 'sfp_orders',
                 resource_type: 'auto'
             });
             fileLinks.push(result.secure_url);
             
-            // Borrar archivo de /tmp después de subirlo
+            // Borrar el archivo de /tmp inmediatamente
             if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
         }
 
-        // Enviar Correo
+        // 2. Enviar Correo con Resend
         await transporter.sendMail({
             from: '"Square Foot Printing" <onboarding@resend.dev>',
             to: `${orderData.customer_email}, za19012245@zapopan.tecmm.edu.mx`,
@@ -177,11 +183,10 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
             attachments: [] 
         });
 
-        console.log("✅ Orden procesada con éxito");
-        res.status(200).send({ success: true, message: 'Order sent successfully!' });
+        res.status(200).send({ success: true, message: 'Order processed and email sent!' });
 
     } catch (error) {
-        console.error("❌ ERROR EN PLACE-ORDER:", error.message);
+        console.error("❌ ERROR EN EL SERVIDOR:", error.message);
         res.status(500).send({ success: false, error: error.message });
     }
 });
