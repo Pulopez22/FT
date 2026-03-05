@@ -291,7 +291,6 @@
     const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
     if (cart.length === 0) return alert("Bag is empty");
 
-    // Validaciones básicas de campos
     const name = document.getElementById('fullName').value;
     const email = document.getElementById('emailAddress').value;
     if (!name || !email) return alert("Please fill in contact information");
@@ -302,27 +301,27 @@
 
     const oNum = 'ORD-' + Math.floor(Math.random() * 900000);
 
-    // --- AJUSTE CRÍTICO AQUÍ PARA EL FORMATO DEL CORREO ---
     const oInfo = {
         order_id: oNum,
         customer_name: name,
         customer_email: email,
         total_price: document.getElementById('final-price-display').innerText,
-        // Formateamos cada item para que el Backend pueda mapearlo línea por línea
         order_items: cart.map((item) => {
-            const productName = item.name.toUpperCase();
-            
-            // Si item.details viene con "|", lo limpiamos para que cada opción sea una línea nueva
-            const cleanDetails = item.details 
-                ? item.details.split('|').map(d => d.trim()).join('\n') 
-                : "No specific details";
-
-            return `${productName}\n${cleanDetails}\nQty: ${item.qty || 1}\nPrice: $${item.price}`;
-        }).join('\n---\n') // Este delimitador es el que usa el backend para separar productos
+            const cleanDetails = item.details ? item.details.split('|').map(d => d.trim()).join('\n') : "No details";
+            return `${item.name.toUpperCase()}\n${cleanDetails}\nQty: ${item.qty || 1}\nPrice: $${item.price}`;
+        }).join('\n---\n')
     };
 
     const formData = new FormData();
     formData.append('data', JSON.stringify(oInfo));
+
+    // IMPORTANTE: Aquí enviamos los archivos reales si existen en el carrito
+    // Nota: Tu lógica de carrito debe guardar el objeto 'File' en item.file si quieres que se manden
+    cart.forEach(item => {
+        if (item.file) { 
+            formData.append('files', item.file); 
+        }
+    });
 
     try {
         const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { 
@@ -332,9 +331,10 @@
         
         if (res.ok) {
             localStorage.removeItem('sqft_cart');
-            window.location.href = `order.html?id=${oNum}`; // Asegúrate de que el nombre de la página sea correcto
+            window.location.href = `order.html?id=${oNum}`;
         } else { 
-            alert("Order could not be processed. Please try again."); 
+            const errorData = await res.json();
+            alert("Error: " + (errorData.error || "Order could not be processed.")); 
         }
     } catch (e) { 
         alert("Connection failed. Check your internet or server status."); 
