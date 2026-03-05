@@ -1,60 +1,73 @@
-/**
- * Square Foot Printing - Universal Cart Logic [FINAL]
- */
-function addToCart() {
-    // 1. Elementos básicos (IDs consistentes en todas las páginas)
-    const productName = document.getElementById('prod-title')?.innerText || "Custom Product";
-    // Limpiamos el precio de símbolos para asegurar que sea un número
-    const productPrice = document.getElementById('final-price')?.innerText.replace(/[$,]/g, '') || "0.00";
-    const mainImage = document.getElementById('preview-thumb')?.src || document.getElementById('main-prod-img')?.src;
+// CART-LOGIC.JS 
+window.currentFileUrl = ""; 
 
-    // 2. Objeto para las opciones técnicas
-    const selections = {};
+async function handleImmediateUpload(event, buttonId) {
+    const file = event.target.files[0];
+    const btn = document.getElementById(buttonId);
+    
+    if (!file) return;
 
-    // 3. Captura automática de medidas (Width/Height manual o Select)
-    const w = document.getElementById('w-input')?.value;
-    const h = document.getElementById('h-input')?.value;
-    if (w && h) {
-        selections["Size"] = `${w}" x ${h}"`;
-    } else {
-        const sizeSelect = document.getElementById('size-select');
-        if (sizeSelect) selections["Size"] = sizeSelect.value;
+    // Feedback visual para el cliente
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = "UPLOADING ARTWORK...";
+        btn.style.opacity = "0.5";
+        btn.style.cursor = "not-allowed";
     }
 
-    // 4. Captura automática de todos los menús desplegables (select)
-    const selectElements = document.querySelectorAll('select');
-    selectElements.forEach(select => {
-        // Evitamos duplicar el "Size" si ya lo capturamos arriba
-        if (select.id !== 'size-select') { 
-            const labelElement = select.parentElement.querySelector('label');
-            const labelName = labelElement ? labelElement.innerText.trim() : select.id;
-            selections[labelName] = select.options[select.selectedIndex].text;
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch('https://ft-f34l.onrender.com/api/upload-preview', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            window.currentFileUrl = data.url; // Guardamos el link de Cloudinary
+            console.log("✅ File ready:", window.currentFileUrl);
+            
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "ADD TO CART";
+                btn.style.opacity = "1";
+                btn.style.cursor = "pointer";
+            }
+        } else {
+            throw new Error(data.error);
         }
-    });
+    } catch (error) {
+        alert("Upload failed. Please try again.");
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "RETRY UPLOAD";
+        }
+    }
+}
 
-    // 5. DETECCIÓN INTELIGENTE DE CANTIDAD (Qty)
-    // Buscamos el input de cantidad. Si no existe, por defecto es 1.
-    const qtyElement = document.getElementById('qty-input');
-    const quantity = qtyElement ? parseInt(qtyElement.value) : 1;
+function addToCartWithFile(productData) {
+    if (!window.currentFileUrl) {
+        alert("Please upload your design before adding to cart.");
+        return;
+    }
 
-    // 6. Crear el objeto final estructurado para el Checkout y Mailtrap
-    const productEntry = {
-        name: productName,
-        price: parseFloat(productPrice),
-        options: selections, // Detalles técnicos completos
-        image: mainImage,
-        quantity: quantity // Cantidad validada
+    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+    
+    // Unimos los datos del producto con la URL de la imagen
+    const finalProduct = {
+        ...productData,
+        image: productData.image || '../images/placeholder.png', // Miniatura del producto
+        fileUrl: window.currentFileUrl // El archivo de alta resolución para imprimir
     };
 
-    // 7. Guardar en localStorage
-    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(productEntry);
+    cart.push(finalProduct);
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
-
-    // 8. Feedback visual (Abre el sidebar si existe la función)
-    if (typeof toggleCart === "function") {
-        toggleCart();
-    } else {
-        alert(`${productName} added to cart!`);
-    }
+    
+    // Actualizamos el contador del carrito si existe la función
+    if (typeof renderCart === 'function') renderCart();
+    
+    alert("Added to bag successfully!");
 }

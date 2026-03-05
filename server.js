@@ -128,5 +128,37 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
     }
 });
 
+// AGREGAR ESTO A TU ARCHIVO DE SERVIDOR (Node.js)
+
+// Ruta específica para la pre-carga de archivos
+app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: "No file received" });
+        }
+
+        console.log("⬆️ Subiendo pre-visualización a Cloudinary...");
+
+        // Subida a Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'sfp_previews',
+            resource_type: 'auto'
+        });
+
+        // Borrar el archivo temporal del servidor de Render
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+
+        // Devolvemos la URL segura
+        res.status(200).json({ 
+            success: true, 
+            url: result.secure_url 
+        });
+
+    } catch (error) {
+        console.error("❌ Error en pre-carga:", error.message);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server ready on port ${PORT}`));
