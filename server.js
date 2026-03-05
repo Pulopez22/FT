@@ -58,7 +58,6 @@ const emailTemplate = (orderData, fileLinks) => {
         const lines = itemBlock.split('\n').filter(line => line.trim() !== "");
         const productName = lines[0] || "Product";
         const options = lines.slice(1);
-
         return `
         <div style="border-bottom: 1px solid #eeeeee; padding: 15px 0;">
             <strong style="display: block; font-size: 16px; color: #000; text-transform: uppercase;">ITEM #${i + 1}: ${productName}</strong>
@@ -78,48 +77,22 @@ const emailTemplate = (orderData, fileLinks) => {
     return `
     <!DOCTYPE html>
     <html>
-    <head><meta charset="utf-8"></head>
-    <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
-        <table width="100%" border="0" cellspacing="0" cellpadding="0">
-            <tr>
-                <td align="center" style="padding: 20px 0;">
-                    <table width="600" style="background-color: #ffffff; border: 1px solid #dddddd; border-radius: 8px;">
-                        <tr>
-                            <td align="center" style="background-color: #000000; padding: 30px;">
-                                <h2 style="color: #ffffff; margin: 0;">SQUARE FOOT PRINTING</h2>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 40px;">
-                                <h1 style="font-style: italic; color: #000000; font-size: 26px; margin-top:0;">New Order Received!</h1>
-                                <p><strong>Order ID:</strong> ${orderData.order_id}</p>
-                                <p><strong>Customer:</strong> ${orderData.customer_name} (${orderData.customer_email})</p>
-                                
-                                <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px;">
-                                    <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-top:0;">Order Summary</h3>
-                                    ${itemsHtml}
-                                    ${downloadSection}
-                                    <div style="font-size: 28px; font-weight: 900; text-align: right; margin-top: 20px; font-style: italic;">
-                                        TOTAL: ${orderData.total_price}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="center" style="background-color: #f3f4f6; padding: 20px; font-size: 11px; color: #9ca3af;">
-                                © 2026 Square Foot Printing - Las Vegas <br>
-                                4425 W. Quail Ave. Suite 4, Las Vegas, NV 89118
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+    <body style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2 style="background: #000; color: #fff; padding: 10px; text-align: center;">Square Foot Printing</h2>
+        <h1>New Order Received!</h1>
+        <p><strong>Order ID:</strong> ${orderData.order_id}</p>
+        <p><strong>Customer:</strong> ${orderData.customer_name} (${orderData.customer_email})</p>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+            ${itemsHtml}
+            ${downloadSection}
+            <h2 style="text-align: right;">TOTAL: ${orderData.total_price}</h2>
+        </div>
     </body>
     </html>`;
 };
 
-// --- 5. CONFIGURACIÓN DE MULTER (OPTIMIZADO PARA RENDER) ---
+// --- 5. CONFIGURACIÓN DE MULTER (CORREGIDO PARA RENDER) ---
+// Usamos /tmp que es la carpeta temporal universal de Linux/Render
 const upload = multer({ 
     dest: '/tmp/', 
     limits: { fileSize: 50 * 1024 * 1024 } 
@@ -127,7 +100,6 @@ const upload = multer({
 
 // --- 6. RUTAS ---
 
-// Auth
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, email, password, isWholesale } = req.body;
@@ -157,13 +129,14 @@ app.post('/api/auth/login', async (req, res) => {
 // RUTA DE ORDEN (SIN DEPENDER DE CARPETAS LOCALES)
 app.post('/api/place-order', upload.array('files'), async (req, res) => {
     try {
-        console.log("🚀 Nueva orden recibida en Render...");
+        console.log("🚀 Procesando nueva orden en Render...");
         const orderData = JSON.parse(req.body.data);
         const files = req.files || [];
         let fileLinks = [];
 
         // 1. Subir archivos a Cloudinary
         for (const file of files) {
+            console.log(`Subiendo ${file.originalname} a Cloudinary...`);
             const result = await cloudinary.uploader.upload(file.path, {
                 folder: 'sfp_orders',
                 resource_type: 'auto'
@@ -174,19 +147,18 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
             if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
         }
 
-        // 2. Enviar Correo con Resend
+        // 2. Enviar Correo
         await transporter.sendMail({
             from: '"Square Foot Printing" <onboarding@resend.dev>',
             to: `${orderData.customer_email}, za19012245@zapopan.tecmm.edu.mx`,
             subject: `Order Confirmation: ${orderData.order_id}`,
             html: emailTemplate(orderData, fileLinks),
-            attachments: [] 
         });
 
-        res.status(200).send({ success: true, message: 'Order processed and email sent!' });
+        res.status(200).send({ success: true, message: 'Order sent successfully!' });
 
     } catch (error) {
-        console.error("❌ ERROR EN EL SERVIDOR:", error.message);
+        console.error("❌ ERROR DETECTADO:", error.message);
         res.status(500).send({ success: false, error: error.message });
     }
 });
