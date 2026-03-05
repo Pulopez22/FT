@@ -45,13 +45,15 @@ const transporter = nodemailer.createTransport({
     port: 465,
     auth: {
         user: 'resend',
-        pass: process.env.RESEND_API_KEY, // Tu API Key de Resend re_...
+        pass: process.env.RESEND_API_KEY, 
     },
 });
 
-// --- 4. TEMPLATE DE CORREO (Diseño UI) ---
+// --- 4. TEMPLATE DE CORREO ---
 const emailTemplate = (orderData, fileLinks) => {
-    const itemsArray = orderData.order_items.split('\n---\n').filter(item => item.trim() !== "");
+    // Validar que order_items existe para evitar error .split
+    const itemsRaw = orderData.order_items || "";
+    const itemsArray = itemsRaw.split('\n---\n').filter(item => item.trim() !== "");
 
     const itemsHtml = itemsArray.map((itemBlock, i) => {
         const lines = itemBlock.split('\n').filter(line => line.trim() !== "");
@@ -71,11 +73,10 @@ const emailTemplate = (orderData, fileLinks) => {
         </div>`;
     }).join('');
 
-    // Generar HTML de links de descarga si existen
     const downloadSection = fileLinks.length > 0 
-        ? `<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px;">
-            <h4 style="margin: 0 0 10px 0;">Archivos de Impresión:</h4>
-            ${fileLinks.map((link, idx) => `<a href="${link}" style="display:block; color: #856404; font-size: 12px; margin-bottom: 5px;">Descargar Archivo #${idx+1}</a>`).join('')}
+        ? `<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px; border: 1px solid #ffeeba;">
+            <h4 style="margin: 0 0 10px 0; color: #856404;">Archivos de Impresión:</h4>
+            ${fileLinks.map((link, idx) => `<a href="${link}" target="_blank" style="display:block; color: #0056b3; font-size: 13px; margin-bottom: 8px; text-decoration: underline;">Descargar Archivo #${idx+1}</a>`).join('')}
            </div>`
         : '';
 
@@ -95,12 +96,12 @@ const emailTemplate = (orderData, fileLinks) => {
                         </tr>
                         <tr>
                             <td style="padding: 40px;">
-                                <h1 style="font-style: italic; color: #000000; font-size: 26px;">New Order Received!</h1>
+                                <h1 style="font-style: italic; color: #000000; font-size: 26px; margin-top:0;">New Order Received!</h1>
                                 <p><strong>Order ID:</strong> ${orderData.order_id}</p>
                                 <p><strong>Customer:</strong> ${orderData.customer_name} (${orderData.customer_email})</p>
                                 
                                 <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px;">
-                                    <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px;">Order Summary</h3>
+                                    <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-top:0;">Order Summary</h3>
                                     ${itemsHtml}
                                     ${downloadSection}
                                     <div style="font-size: 28px; font-weight: 900; text-align: right; margin-top: 20px; font-style: italic;">
@@ -136,12 +137,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ 
     storage,
-    limits: { fileSize: 50 * 1024 * 1024 } // Límite de 50MB por archivo
+    limits: { fileSize: 50 * 1024 * 1024 } 
 });
 
 // --- 6. RUTAS ---
 
-// Registro
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, email, password, isWholesale } = req.body;
@@ -154,7 +154,6 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// Login
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -169,7 +168,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// RUTA DE ORDEN (CON CLOUDINARY)
+// RUTA DE ORDEN (CON CLOUDINARY Y RESEND)
 app.post('/api/place-order', upload.array('files'), async (req, res) => {
     try {
         const orderData = JSON.parse(req.body.data);
@@ -183,13 +182,13 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
                 resource_type: 'auto'
             });
             fileLinks.push(result.secure_url);
-            // Borrar archivo local inmediatamente después de subirlo a la nube
-            fs.unlinkSync(file.path);
+            // Borrar archivo local inmediatamente
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
         }
 
         // 2. Enviar Correo
         await transporter.sendMail({
-            // Asegúrate de que ventas@sfpvegas.com esté verificado en Resend
+            // Cambia ventas@sfpvegas.com si ya verificaste el dominio en Resend
             from: '"Square Foot Printing" <onboarding@resend.dev>',
             to: `${orderData.customer_email}, za19012245@zapopan.tecmm.edu.mx`,
             subject: `Order Confirmation: ${orderData.order_id}`,
@@ -211,5 +210,5 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
 // --- 7. INICIO DEL SERVIDOR ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });
