@@ -46,79 +46,81 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// --- 4. TEMPLATE DE CORREO ---
-const emailTemplate = (orderData, fileLinks) => {
-    const itemsRaw = orderData.order_items || "";
-    const itemsArray = itemsRaw.split('\n---\n').filter(item => item.trim() !== "");
-
-    const itemsHtml = itemsArray.map((itemBlock, i) => {
-        const lines = itemBlock.split('\n').filter(line => line.trim() !== "");
-        const productName = lines[0] || "Product";
-        const details = lines.slice(1);
-        return `
-        <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
-            <strong>ITEM #${i + 1}: ${productName}</strong><br>
-            ${details.map(d => `<small style="color: #666;">• ${d}</small><br>`).join('')}
-        </div>`;
-    }).join('');
-
-    const downloadSection = fileLinks.length > 0 
-        ? `<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px;">
-            <h4 style="margin: 0;">Archivos de Impresión:</h4>
-            ${fileLinks.map((link, idx) => `<a href="${link}" target="_blank" style="display:block; font-size: 12px; margin-top:5px;">Descargar Archivo #${idx+1}</a>`).join('')}
-           </div>`
-        : '';
+// --- 4. TEMPLATE DE CORREO MEJORADO ---
+const emailTemplate = (orderData) => {
+    const itemsHtml = orderData.order_items.map((item, i) => `
+        <div style="border-bottom: 1px solid #eee; padding: 15px 0;">
+            <strong style="font-size: 16px; color: #000;">ITEM #${i + 1}: ${item.name}</strong><br>
+            <p style="color: #666; font-size: 12px; white-space: pre-wrap; margin: 5px 0;">${item.details}</p>
+            ${item.fileUrl ? `
+                <a href="${item.fileUrl}" 
+                   style="display: inline-block; background: #ef4444; color: #fff; padding: 10px 15px; 
+                   text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 11px; margin-top: 10px;">
+                   DOWNLOAD PRINT FILE
+                </a>` : '<span style="color: #999; font-size: 10px;">No file attached</span>'}
+        </div>
+    `).join('');
 
     return `
     <html>
-    <body style="font-family: Arial; padding: 20px;">
-        <h2 style="background: #000; color: #fff; padding: 10px; text-align: center;">Square Foot Printing</h2>
-        <h3>New Order: ${orderData.order_id}</h3>
-        <p><strong>Customer:</strong> ${orderData.customer_name} (${orderData.customer_email})</p>
-        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
-            ${itemsHtml}
-            ${downloadSection}
-            <h2 style="text-align: right;">TOTAL: ${orderData.total_price}</h2>
-        </div>
-    </body>
+        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+            <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid #ddd;">
+                <div style="background: #000; color: #fff; padding: 20px; text-align: center;">
+                    <h1 style="margin: 0; letter-spacing: 2px;">SQUARE FOOT PRINTING</h1>
+                </div>
+                <div style="padding: 30px;">
+                    <h2 style="margin-top: 0; color: #000;">New Order: ${orderData.order_id}</h2>
+                    <p><strong>Customer:</strong> ${orderData.customer_name}</p>
+                    <p><strong>Email:</strong> ${orderData.customer_email}</p>
+                    <hr style="border: 0; border-top: 1px solid #eee;">
+                    ${itemsHtml}
+                    <div style="margin-top: 30px; text-align: right;">
+                        <h2 style="color: #000; margin: 0;">TOTAL: ${orderData.total_price}</h2>
+                    </div>
+                </div>
+                <div style="background: #eee; padding: 15px; text-align: center; font-size: 10px; color: #888;">
+                    © 2026 Square Foot Printing - Las Vegas, NV
+                </div>
+            </div>
+        </body>
     </html>`;
 };
 
-// --- 5. CONFIGURACIÓN DE MULTER (PARA RENDER) ---
+// --- 5. CONFIGURACIÓN DE MULTER ---
 const upload = multer({ dest: '/tmp/' });
 
 // --- 6. RUTAS ---
-app.post('/api/auth/register', async (req, res) => { /* Tu lógica de registro */ });
-app.post('/api/auth/login', async (req, res) => { /* Tu lógica de login */ });
 
-// RUTA DE ORDEN CORREGIDA
-app.post('/api/place-order', upload.array('files'), async (req, res) => {
+// RUTA A: Pre-carga de archivos (Se usa en la página de producto)
+app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
     try {
-        console.log("🚀 Procesando orden...");
-        
-        // Protección contra JSON malformado o ausente
-        if (!req.body.data) throw new Error("No order data provided");
-        const orderData = JSON.parse(req.body.data);
-        
-        const files = req.files || [];
-        let fileLinks = [];
+        if (!req.file) return res.status(400).json({ success: false, error: "No file received" });
 
-        // Subir a Cloudinary (solo si hay archivos)
-        for (const file of files) {
-            const result = await cloudinary.uploader.upload(file.path, {
-                folder: 'sfp_orders',
-                resource_type: 'auto'
-            });
-            fileLinks.push(result.secure_url);
-            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-        }
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'sfp_orders',
+            resource_type: 'auto'
+        });
 
-        // Enviar Correo
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+
+        res.status(200).json({ success: true, url: result.secure_url });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// RUTA B: Procesar Orden Final (Se usa en checkout.html)
+app.post('/api/place-order', async (req, res) => {
+    try {
+        const orderData = req.body; // Recibe el JSON del nuevo checkout
+        
+        console.log(`📦 Procesando Orden ${orderData.order_id}...`);
+
         await transporter.sendMail({
             from: '"Square Foot Printing" <onboarding@resend.dev>',
             to: `${orderData.customer_email}, za19012245@zapopan.tecmm.edu.mx`,
             subject: `Order Confirmation: ${orderData.order_id}`,
-            html: emailTemplate(orderData, fileLinks),
+            html: emailTemplate(orderData),
         });
 
         res.status(200).json({ success: true });
@@ -128,37 +130,9 @@ app.post('/api/place-order', upload.array('files'), async (req, res) => {
     }
 });
 
-// AGREGAR ESTO A TU ARCHIVO DE SERVIDOR (Node.js)
-
-// Ruta específica para la pre-carga de archivos
-app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ success: false, error: "No file received" });
-        }
-
-        console.log("⬆️ Subiendo pre-visualización a Cloudinary...");
-
-        // Subida a Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path, {
-            folder: 'sfp_previews',
-            resource_type: 'auto'
-        });
-
-        // Borrar el archivo temporal del servidor de Render
-        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-
-        // Devolvemos la URL segura
-        res.status(200).json({ 
-            success: true, 
-            url: result.secure_url 
-        });
-
-    } catch (error) {
-        console.error("❌ Error en pre-carga:", error.message);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
+// Rutas de Auth (Mantén tus lógicas aquí)
+app.post('/api/auth/register', async (req, res) => { /* ... */ });
+app.post('/api/auth/login', async (req, res) => { /* ... */ });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server ready on port ${PORT}`));

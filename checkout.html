@@ -287,7 +287,8 @@
             lucide.createIcons();
         }
 
-        async function validateAndPlaceOrder() {
+        // REEMPLAZA TU FUNCIÓN validateAndPlaceOrder POR ESTA:
+async function validateAndPlaceOrder() {
     const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
     if (cart.length === 0) return alert("Bag is empty");
 
@@ -301,33 +302,33 @@
 
     const oNum = 'ORD-' + Math.floor(Math.random() * 900000);
 
+    // Mapeamos los items para que incluyan el link de Cloudinary en el texto del correo
+    const orderItemsStructured = cart.map((item) => {
+        const cleanDetails = item.details ? item.details.split('|').map(d => d.trim()).join('\n') : "No details";
+        const fileLink = item.fileUrl ? `\nPRINT FILE: ${item.fileUrl}` : "\nNo file attached";
+        
+        return {
+            name: item.name.toUpperCase(),
+            details: cleanDetails,
+            price: item.price,
+            fileUrl: item.fileUrl || "" // Pasamos la URL por separado para que el server la reconozca
+        };
+    });
+
     const oInfo = {
         order_id: oNum,
         customer_name: name,
         customer_email: email,
         total_price: document.getElementById('final-price-display').innerText,
-        order_items: cart.map((item) => {
-            const cleanDetails = item.details ? item.details.split('|').map(d => d.trim()).join('\n') : "No details";
-            return `${item.name.toUpperCase()}\n${cleanDetails}\nQty: ${item.qty || 1}\nPrice: $${item.price}`;
-        }).join('\n---\n')
+        order_items: orderItemsStructured // Ahora enviamos un objeto estructurado
     };
 
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(oInfo));
-
-    // LÓGICA DE ARCHIVOS: 
-    // Para que esto funcione, tu cart-logic.js debe haber guardado 
-    // el archivo real en 'item.file' (no solo la URL)
-    cart.forEach(item => {
-        if (item.file) { 
-            formData.append('files', item.file); 
-        }
-    });
-
     try {
+        // Ahora enviamos un JSON normal, mucho más rápido y seguro
         const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { 
             method: 'POST', 
-            body: formData 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(oInfo) 
         });
         
         if (res.ok) {
@@ -338,13 +339,12 @@
             alert("Order Error: " + errorText.error); 
         }
     } catch (e) { 
-        alert("Connection failed. Check your internet or server status."); 
+        alert("Connection failed. Check your server status."); 
     } finally {
         btn.innerText = "Place Order Now";
         btn.disabled = false;
     }
 }
-
         window.onload = () => {
             checkAuth();
             loadCheckoutData();
