@@ -57,56 +57,57 @@ const transporter = nodemailer.createTransport({
 // --- TEMPLATE DE CORREO ---
 const emailTemplate = (orderData) => {
     const itemsHtml = orderData.order_items.map((item, i) => {
-        // Formatear detalles si vienen como string con saltos de línea
+        // Convertimos los detalles en una lista con bullets
         const detailsArray = item.details ? item.details.split('\n') : [];
         const detailsHtml = detailsArray
             .map(detail => `<li style="margin-bottom: 2px;">• ${detail.toUpperCase()}</li>`)
             .join('');
 
         return `
-            <div style="margin-bottom: 25px; font-family: Arial, sans-serif;">
+            <div style="margin-bottom: 20px; font-family: Arial, sans-serif;">
                 <strong style="font-size: 16px; color: #000; display: block; margin-bottom: 5px;">
                     ITEM #${i + 1}: ${item.name.toUpperCase()}
                 </strong>
-                <ul style="list-style: none; padding: 0; margin: 0; color: #666; font-size: 13px; line-height: 1.4;">
+                <ul style="list-style: none; padding: 0; margin: 0; color: #666; font-size: 13px; line-height: 1.5;">
                     ${detailsHtml}
+                    <li style="margin-bottom: 2px;">• QTY: ${item.quantity || 1}</li>
                     <li style="margin-bottom: 2px;">• PRICE: $${item.price}</li>
                 </ul>
-                ${item.fileUrl ? `
-                    <a href="${item.fileUrl}" style="display: inline-block; background: #000; color: #fff; padding: 8px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 10px; margin-top: 10px;">
-                        DOWNLOAD PRINT FILE
-                    </a>` : ''}
             </div>
         `;
     }).join('');
 
     return `
     <html>
-    <body style="font-family: Arial, sans-serif; background-color: #fff; margin: 0; padding: 20px;">
+    <body style="font-family: Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 20px;">
         <div style="max-width: 600px; margin: auto;">
             
-            <div style="background: #000; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-                <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="SQUARE FOOT PRINTING" style="width: 280px; filter: brightness(0) invert(1);">
+            <div style="background: #000; padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" 
+                     alt="SQUARE FOOT PRINTING" 
+                     style="width: 300px; height: auto; display: block; margin: 0 auto;">
             </div>
 
             <div style="padding: 30px 10px;">
-                <h1 style="font-style: italic; font-weight: 900; font-size: 28px; margin: 0 0 20px 0; color: #000;">
+                <h1 style="font-style: italic; font-weight: 900; font-size: 32px; margin: 0 0 20px 0; color: #000; letter-spacing: -1px;">
                     NEW ORDER RECEIVED!
                 </h1>
                 
-                <p style="margin: 0 0 5px 0; font-size: 15px; color: #333;">
-                    <strong>Order ID:</strong> ${orderData.order_id}
-                </p>
-                <p style="margin: 0 0 30px 0; font-size: 15px; color: #333;">
+                <div style="font-size: 15px; color: #333; margin-bottom: 30px; line-height: 1.6;">
+                    <strong>Order ID:</strong> ${orderData.order_id}<br>
                     <strong>Customer:</strong> ${orderData.customer_name} (${orderData.customer_phone})
-                </p>
+                </div>
 
-                <div style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; background-color: #fcfcfc;">
-                    <h2 style="font-size: 16px; margin: 0 0 15px 0; border-bottom: 2px solid #000; display: inline-block; padding-bottom: 5px; width: 100%;">
+                <div style="border: 1px solid #eee; border-radius: 12px; padding: 25px; background-color: #fafafa;">
+                    <h2 style="font-size: 16px; margin: 0 0 20px 0; border-bottom: 2px solid #000; padding-bottom: 8px; width: 100%; letter-spacing: 1px;">
                         ORDER SUMMARY
                     </h2>
                     
                     ${itemsHtml}
+                </div>
+                
+                <div style="text-align: right; margin-top: 20px;">
+                    <h2 style="font-size: 20px; color: #000;">TOTAL: $${orderData.total_price}</h2>
                 </div>
             </div>
         </div>
