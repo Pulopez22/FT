@@ -18,7 +18,6 @@
         .custom-dropdown { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-weight: 700; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1em; outline: none; }
         .custom-input { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb; font-weight: 900; font-size: 16px; text-align: center; outline: none; transition: border-color 0.3s; }
         .custom-input:focus { border-color: #000; }
-        .price-row { border-bottom: 1px solid #f3f4f6; padding: 1.25rem 0; display: flex; justify-content: space-between; align-items: center; }
         .upload-zone { border: 2px dashed #e5e7eb; transition: all 0.3s ease; cursor: pointer; }
         .upload-zone:hover { border-color: #000; background-color: #f9fafb; }
         .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
@@ -57,7 +56,7 @@
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <div id="auth-container" class="flex items-center text-black text-black"></div>
+            <div id="auth-container" class="flex items-center"></div>
             <button onclick="toggleCart()" class="relative p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
@@ -68,7 +67,7 @@
     <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden text-black">
         <div class="flex justify-between items-center border-b pb-4">
             <span class="heavy-italic text-xl italic">Navigation</span>
-            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
         </div>
         <ul class="space-y-6 text-sm font-black uppercase italic">
             <li><a href="../index.html">Wall Art</a></li>
@@ -78,8 +77,8 @@
         </ul>
     </div>
 
-    <div class="flex flex-row flex-grow w-full text-black">
-        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
+    <div class="flex flex-row flex-grow w-full">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
@@ -93,9 +92,8 @@
         </aside>
 
         <main class="main-content-scroll text-black">
-            <div class="p-6 md:p-12 flex-grow text-black">
+            <div class="p-6 md:p-12 flex-grow">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
-                    
                     <div class="space-y-8">
                         <div class="bg-gray-50 rounded-[2.5rem] p-6 flex items-center justify-center border border-gray-100 shadow-sm min-h-[350px] md:min-h-[450px] relative">
                             <img id="main-prod-img" src="../images/Displays/SQFT-X-Stand-01_1200.png" alt="X-Stand" class="max-h-[300px] md:max-h-[400px] drop-shadow-2xl">
@@ -114,7 +112,7 @@
                         </div>
                     </div>
 
-                    <div class="space-y-8 md:space-y-10 text-black">
+                    <div class="space-y-8 md:space-y-10">
                         <header>
                             <h1 id="prod-title" class="text-4xl heavy-italic text-gray-900 leading-none uppercase">X-Stand Banner</h1>
                             <div id="price-tier-badge" class="mt-4 text-[9px] font-black uppercase px-4 py-2 rounded-full w-fit italic bg-gray-100"></div>
@@ -138,7 +136,7 @@
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Turnaround</label>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Turnaround</label>
                                 <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                     <option value="Standard" selected>Standard (2-3 Days)</option>
                                     <option value="Next Day">Next Day (+$30)</option>
@@ -147,7 +145,7 @@
 
                             <div class="space-y-4">
                                 <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
-                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-8 md:p-10 rounded-[2rem] text-black">
+                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-8 md:p-10 rounded-[2rem]">
                                     <span class="text-[11px] font-black text-gray-400 uppercase italic">Select Design File</span>
                                     <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
                                 </div>
@@ -162,8 +160,8 @@
                                         </div>
                                     </div>
                                     <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
-                                        <div class="text-left text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Uploaded Size:</p><p id="file-dims" class="text-sm font-black italic">0" x 0"</p></div>
-                                        <div class="text-right text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-sm font-black italic text-green-600">Analysis Complete</p></div>
+                                        <div class="text-left"><p class="text-[10px] text-gray-400 uppercase font-black">Uploaded Size:</p><p id="file-dims" class="text-sm font-black italic">0" x 0"</p></div>
+                                        <div class="text-right"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-sm font-black italic text-green-600">Analysis Complete</p></div>
                                     </div>
                                     <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden text-black"><div id="upload-progress" class="progress-bar"></div></div>
                                     <div class="flex flex-col sm:flex-row gap-4">
@@ -173,15 +171,15 @@
                                 </div>
                             </div>
 
-                            <div class="price-row flex justify-between items-center pt-8 border-t border-gray-100 text-black">
+                            <div class="price-row flex justify-between items-center pt-8 border-t border-gray-100">
                                 <div class="flex flex-col">
-                                    <span class="text-[11px] font-black uppercase tracking-widest italic leading-none text-black">Estimated Total</span>
+                                    <span class="text-[11px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span>
                                     <span class="text-[10px] font-bold text-gray-400 uppercase mt-1" id="area-display">Economy Display Kit</span>
                                 </div>
                                 <span id="final-price" class="text-4xl md:text-5xl heavy-italic italic text-black leading-none">$0.00</span>
                             </div>
 
-                            <div class="flex gap-4 md:gap-6 text-black text-black">
+                            <div class="flex gap-4 md:gap-6">
                                 <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-20 md:w-28 p-4 md:p-6 border-2 border-gray-100 rounded-2xl font-black text-center outline-none text-xl">
                                 <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-4 md:py-6 rounded-2xl text-[11px] uppercase tracking-[0.25em] transition-all cursor-not-allowed italic shadow-md">Add to Bag</button>
                             </div>
@@ -190,7 +188,7 @@
                 </div>
             </div>
 
-            <footer class="bg-white border-t py-16 px-10 text-center w-full text-black">
+            <footer class="bg-white border-t py-16 px-10 text-center w-full">
                 <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
                 </div>
@@ -200,14 +198,14 @@
     </div>
 
     <div id="cart-sidebar">
-        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black text-black">
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
             <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black"></div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end text-black text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1 text-black">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white text-white">Checkout</button>
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
@@ -215,12 +213,16 @@
     <script src="pricing.js"></script>
     <script>
         lucide.createIcons();
-        let uploadedFileUrl = ""; // NUEVO
+        let uploadedFileUrl = ""; 
         let uploadedImageData = null;
         const PRODUCT_ID = "x-stand";
 
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
-        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); document.getElementById('cart-overlay').classList.toggle('visible'); renderCart(); }
+        function toggleCart() { 
+            document.getElementById('cart-sidebar').classList.toggle('open');
+            document.getElementById('cart-overlay').classList.toggle('visible');
+            renderCart();
+        }
 
         function checkAuth() {
             const userName = localStorage.getItem('userName');
@@ -228,7 +230,7 @@
             const authContainer = document.getElementById('auth-container');
             const badge = document.getElementById('price-tier-badge');
             if (userName) {
-                authContainer.innerHTML = `<div class="flex items-center whitespace-nowrap text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5 text-black">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span></div>`;
+                authContainer.innerHTML = `<div class="flex items-center whitespace-nowrap text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span></div>`;
                 badge.innerText = isWholesale ? "✓ Wholesale pricing enabled" : "Retail Pricing";
                 badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-green-50 text-green-600 rounded-full w-fit italic border border-green-100";
             } else {
@@ -253,7 +255,7 @@
             document.getElementById('measure-h').innerText = sel.getAttribute('data-h') + '"';
         }
 
-        // --- SUBIDA REAL INYECTADA SIN TOCAR TU LÓGICA VISUAL ---
+        // --- SUBIDA REAL CLOUDINARY + TU VALIDADOR ORIGINAL ---
         async function processFile(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -264,8 +266,9 @@
                 document.getElementById('drop-zone').classList.add('hidden');
                 document.getElementById('validation-panel').classList.remove('hidden');
                 document.getElementById('status-title').innerText = "ANALYZING & UPLOADING...";
-                document.getElementById('approve-btn').disabled = true;
+                if(document.getElementById('approve-btn')) document.getElementById('approve-btn').disabled = true;
 
+                // Tu lógica visual original
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     uploadedImageData = e.target.result;
@@ -293,7 +296,7 @@
                         uploadedFileUrl = data.url; 
                         document.getElementById('upload-progress').style.width = '100%';
                         document.getElementById('status-title').innerText = "READY TO APPROVE";
-                        document.getElementById('approve-btn').disabled = false;
+                        if(document.getElementById('approve-btn')) document.getElementById('approve-btn').disabled = false;
                     }
                 } catch (error) { alert("Upload failed."); resetUpload(); }
             }
@@ -304,7 +307,7 @@
             const btn = document.getElementById('add-to-cart-btn');
             btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
             document.getElementById('status-title').innerText = "ARTWORK APPROVED";
-            document.getElementById('status-title').className = "text-xl font-black uppercase text-green-600 italic tracking-tighter text-center";
+            document.getElementById('status-title').className = "text-xl font-black uppercase text-green-600 italic tracking-tighter text-center text-black";
         }
 
         function resetUpload() {
@@ -316,16 +319,20 @@
             document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
         }
 
+        // --- AÑADIR AL CARRITO CON TODAS LAS OPCIONES ---
         function addToCart() {
             if (!uploadedFileUrl) return;
             const sizeLabel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex].text;
+            const matLabel = document.getElementById('material-select').options[document.getElementById('material-select').selectedIndex].text;
+            const turnLabel = document.getElementById('turn-select').options[document.getElementById('turn-select').selectedIndex].text;
             const qty = document.getElementById('qty-input').value;
+
             const newItem = {
                 name: "X-Stand Banner",
                 price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
                 image: "../images/Displays/SQFT-X-Stand-01_1200.png", 
-                fileUrl: uploadedFileUrl, // LINK PARA ADMIN
-                details: `SIZE: ${sizeLabel} | QTY: ${qty}`
+                fileUrl: uploadedFileUrl, 
+                details: `SIZE: ${sizeLabel} | MATERIAL: ${matLabel} | TURN: ${turnLabel} | QTY: ${qty}`
             };
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             cart.push(newItem);
@@ -340,11 +347,13 @@
             container.innerHTML = ''; let total = 0;
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
+                document.getElementById('cart-dot')?.classList.add('hidden');
             } else {
+                document.getElementById('cart-dot')?.classList.remove('hidden');
                 cart.forEach((item, i) => {
                     const priceNum = item.price || 0; total += priceNum;
                     const showDetails = item.details || item.specs || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
-                    container.innerHTML += `<div class="flex gap-4 border-b pb-6 text-black"><div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0"><img src="${item.image}" class="max-h-full max-w-full object-contain"></div><div class="flex-grow py-1 text-black"><div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black">${showDetails}</p><span class="text-lg font-black italic text-black">$${priceNum.toFixed(2)}</span></div></div>`;
+                    container.innerHTML += `<div class="flex gap-4 border-b pb-6 text-black"><div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0"><img src="${item.image}" class="max-h-full max-w-full object-contain"></div><div class="flex-grow py-1 text-black text-black"><div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black text-black">${showDetails}</p><span class="text-lg font-black italic text-black text-black">$${priceNum.toFixed(2)}</span></div></div>`;
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;

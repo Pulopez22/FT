@@ -39,13 +39,13 @@
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+           <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
                 <a href="../Displays/displays.html" class="hover:text-black transition-colors">Displays</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
                 <a href="#" class="hover:text-black transition-colors">Decals</a>
-                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors text-black">Stickers</a>
+                <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
                 <a href="#" class="hover:text-black transition-colors">Apparel</a>
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
@@ -53,7 +53,7 @@
         <div class="flex items-center gap-4">
             <div id="auth-container" class="flex items-center text-black"></div>
             <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
-                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
         </div>
@@ -61,7 +61,7 @@
 
     <div id="mobile-menu" class="p-8 flex flex-col gap-6 lg:hidden text-black">
         <div class="flex justify-between items-center border-b pb-4">
-            <span class="heavy-italic text-xl italic">Navigation</span>
+            <span class="heavy-italic text-xl italic text-black">Navigation</span>
             <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
         </div>
         <ul class="space-y-6 text-sm font-black uppercase italic">
@@ -73,13 +73,13 @@
     </div>
 
     <div class="flex flex-row flex-grow w-full text-black">
-        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
-                <li class="sidebar-item cursor-pointer active text-black"><a href="largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer active"><a href="largeprinting.html" class="block w-full">Large Format Printing</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
@@ -122,11 +122,11 @@
 
     <div id="cart-sidebar">
         <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter text-black">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
-        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
             <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black">$0.00</span></div>
             <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
         </div>
@@ -141,7 +141,7 @@
             { id: 'calendar-vinyl', name: 'Calendar Adhesive Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/AB-Vinyl-01.png', desc: 'Standard & Clear options available.', url: 'calendar-adhesive-vinyl.html' },
             { id: 'bubble-free', name: 'Bubble Free Adhesive Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/AB-Vinyl-BF-01.png', desc: 'Easy install technology.', url: 'bubble-free-adhesive-vinyl.html' },
             { id: 'window-perf', name: 'Window Perforated Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/Window-Perf-AB-Vinyl-01.png', desc: 'One-way vision film.', url: 'window-perforated-adhesive-vinyl.html' },
-            { id: 'wrap-adhesive', name: 'Wrap Adhesive Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/Cast-AB-Vinyl-BF-01.png', desc: 'Bubble free technology for vehicle wraps.', tags: ['Calendar', 'Cast'], url: 'wrap-adhesive.html' },
+            { id: 'wrap-adhesive', name: 'Wrap Adhesive Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/Cast-AB-Vinyl-BF-01.png', desc: 'Bubble free technology for vehicle wraps.', tags: ['Calendar', 'Cast'], url: 'wrapcalendar.html' },
             { id: 'rough-wall', name: 'Rough Wall HT Vinyl', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/AB-Vinyl-01.png', desc: 'High tack for brick and stucco.', url: 'roughwall.html' },
             { id: 'posters', name: 'Posters', cat: 'paper', suffix: 'sq/ft', img: '../images/Large Printing/PaperPoster-01.png', desc: 'Indoor photo quality prints.', url: 'paper-poster.html' },
             { id: 'gallery-canvas', name: 'Gallery Canvas', cat: 'paper', suffix: 'unit', img: '../images/Large Printing/GalleryCanvas-01.png', desc: '1.5" MDF stretcher frame gallery wrap.', url: 'gcanvas.html' },
@@ -153,7 +153,7 @@
             { id: 'floor-graphics', name: 'Floor Graphics', cat: 'adhesive', suffix: 'sq/ft', img: '../images/Large Printing/FloorGraphics.png', desc: 'Non-slip texture for heavy traffic.', url: 'floorgraphics.html' },
             { id: 'reflective-vinyl', name: 'Reflective Adhesive Vinyl', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/ReflectiveABVinyl.png', desc: '4 mil high visibility night film.', url: 'reflecvinyl.html' },
             { id: 'backlit-film', name: 'Polyester Back-lit Film', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/AB-Vinyl-BacklitFilm-01.png', desc: '10 mil heavy-duty translucent film.', url: 'polyesterfilm.html' },
-            { id: 'heat-press-vinyl', name: 'Heat Press T-Shirt Vinyl', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/heat-transfer-vinyl-placement.jpg', desc: 'Full color t-shirt transfers.', url: 'heat-press-vinyl.html' }
+            { id: 'heat-press-vinyl', name: 'Heat Press T-Shirt Vinyl', cat: 'specialty', suffix: 'sq/ft', img: '../images/Large Printing/heat-transfer-vinyl-placement.jpg', desc: 'Full color t-shirt transfers.', url: 'tshirtvinyl.html' }
         ];
 
         function checkAuth() {
@@ -165,7 +165,7 @@
             if (userName) {
                 authContainer.innerHTML = `<div class="flex items-center whitespace-nowrap text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span></div>`;
                 if (isWholesale) {
-                    badgeContainer.innerHTML = `<div class="wholesale-badge">✓ Wholesale Enabled</div>`;
+                    badgeContainer.innerHTML = `<div class="wholesale-badge">✓ Wholesale pricing enabled</div>`;
                 } else {
                     badgeContainer.innerHTML = `<div class="mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic border">Retail Pricing</div>`;
                 }
@@ -220,6 +220,7 @@
        function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('cart-items-container');
+            if(!container) return;
             container.innerHTML = ''; let total = 0;
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
@@ -227,10 +228,10 @@
             } else {
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    const pNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
+                    const pNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : (item.price || 0);
                     total += pNum;
                     const showDetails = item.details || item.specs || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
-                    container.innerHTML += `<div class="flex gap-4 border-b pb-6 text-black"><div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0"><img src="${item.image}" class="max-h-full max-w-full object-contain"></div><div class="flex-grow py-1 text-black"><div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p><span class="text-lg font-black italic">$${pNum.toFixed(2)}</span></div></div>`;
+                    container.innerHTML += `<div class="flex gap-4 border-b pb-6 text-black"><div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0"><img src="${item.image}" class="max-h-full max-w-full object-contain"></div><div class="flex-grow py-1 text-black"><div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black">${showDetails}</p><span class="text-lg font-black italic text-black">$${pNum.toFixed(2)}</span></div></div>`;
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
