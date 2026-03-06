@@ -55,6 +55,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // --- TEMPLATE DE CORREO ---
+// --- TEMPLATE DE CORREO CORREGIDO ---
 const emailTemplate = (orderData) => {
     const itemsHtml = orderData.order_items.map((item, i) => {
         const detailsArray = item.details ? item.details.split('\n') : [];
@@ -88,7 +89,7 @@ const emailTemplate = (orderData) => {
         <div style="max-width: 600px; margin: auto;">
             
             <div style="background: #000; padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0;">
-                <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" 
+                <img src="cid:logo_sfp" 
                      alt="SQUARE FOOT PRINTING" 
                      style="width: 300px; height: auto; display: block; margin: 0 auto;">
             </div>
@@ -142,7 +143,7 @@ app.post('/api/place-order', async (req, res) => {
         const orderData = req.body;
         console.log(`📦 Procesando Orden ${orderData.order_id}...`);
 
-        // A. Guardar en Base de Datos para el Panel de Admin
+        // A. Guardar en Base de Datos
         const newOrder = new Order({
             order_id: orderData.order_id,
             customer_name: orderData.customer_name,
@@ -152,15 +153,22 @@ app.post('/api/place-order', async (req, res) => {
         });
         await newOrder.save();
 
-        // B. Responder al cliente de inmediato
         res.status(200).json({ success: true, message: "Order stored" });
 
-        // C. Enviar correo en segundo plano
+        // B. Enviar correo con ADJUNTO CID
         transporter.sendMail({
             from: '"SFP Orders" <ventas@sfp-lasvegas.com>',
             to: `za19012245@zapopan.tecmm.edu.mx`, 
             subject: `New Order: ${orderData.order_id}`,
             html: emailTemplate(orderData),
+            attachments: [
+                {
+                    filename: 'logo.jpg',
+                    // Asegúrate de que esta ruta sea correcta en tu servidor
+                    path: 'images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg', 
+                    cid: 'logo_sfp' // Este ID debe coincidir con el src="cid:logo_sfp"
+                }
+            ]
         }).catch(err => console.error("❌ Error Mailtrap:", err.message));
 
     } catch (error) {
