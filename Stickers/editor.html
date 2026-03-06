@@ -9,96 +9,91 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; background-color: #f9fafb; color: #111827; overflow-x: hidden; }
-        body.theme-dark { background-color: #111827; color: white; }
-        .theme-dark aside { background-color: #1f2937; border-left-color: #374151; color: white; }
-        .theme-dark .option-card { background-color: #374151; border-color: #4b5563; color: white; }
-        .theme-dark input, .theme-dark select { background-color: #111827; border-color: #4b5563; color: white; }
+        
+        /* MODO OSCURO */
+        body.theme-dark { background-color: #111827; color: #ffffff; }
+        .theme-dark aside { background-color: #1f2937 !important; border-left-color: #374151 !important; color: #ffffff !important; }
+        .theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark p, .theme-dark span:not(.measure-text) { color: #ffffff !important; }
+        .theme-dark label { color: #9ca3af !important; }
+        .theme-dark input, .theme-dark select { background-color: #111827 !important; border-color: #4b5563 !important; color: #ffffff !important; }
+        
+        .theme-dark .option-card { background-color: #374151 !important; border-color: #4b5563 !important; }
+        .theme-dark .option-card span { color: #ffffff !important; }
+        .theme-dark .option-card.active { border-color: #6366f1 !important; background-color: #4b5563 !important; }
+
+        .theme-dark nav { background-color: rgba(17, 24, 39, 0.95) !important; border-bottom-color: #374151 !important; }
+        .theme-dark nav * { color: #ffffff !important; }
 
         .bg-grid { background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px); background-size: 30px 30px; }
         .theme-dark .bg-grid { background-image: radial-gradient(#374151 1.5px, transparent 1.5px); }
         
         #master-wrapper { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; perspective: 1200px; padding: 60px; }
+        #sticker-container { position: relative; display: flex; align-items: center; justify-content: center; transition: transform 0.1s ease-out; width: 100%; height: 100%; max-width: 600px; max-height: 600px; }
+        #sticker-canvas { max-width: 100%; max-height: 100%; z-index: 20; object-fit: contain; display: block; transition: all 0.4s ease; }
         
-        /* CONTENEDOR BLINDADO - PLANO MAESTRO V2 */
-        #sticker-container { position: relative; display: flex; align-items: center; justify-content: center; transition: transform 0.1s ease-out; width: 80%; height: 80%; max-width: 600px; max-height: 600px; }
-        #sticker-canvas { max-width: 100%; max-height: 100%; z-index: 20; filter: url(#smart-contour-filter) drop-shadow(0 20px 40px rgba(0,0,0,0.2)); object-contain: contain; display: block; }
-        
-        .effect-layer { position: absolute; z-index: 30; opacity: 0; transition: opacity 0.4s ease; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; mask-size: 100% 100%; -webkit-mask-size: 100% 100%; mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat; }
-        #layer-gloss { mix-blend-mode: overlay; background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%); background-size: 200% 200%; filter: brightness(1.2); }
-        .active-gloss #layer-gloss { opacity: 1; }
+        /* FILTROS */
+        .material-matte #sticker-canvas { filter: url(#matte-contour-filter) drop-shadow(0 15px 30px rgba(0,0,0,0.2)); }
+        .material-glossy #sticker-canvas { filter: url(#matte-contour-filter) drop-shadow(0 15px 30px rgba(0,0,0,0.3)); }
+        .material-clear #sticker-canvas { filter: url(#clear-contour-filter) drop-shadow(0 20px 40px rgba(0,0,0,0.15)); }
 
+        .effect-layer { position: absolute; z-index: 30; opacity: 0; transition: opacity 0.4s ease; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; mask-size: 100% 100% !important; -webkit-mask-size: 100% 100% !important; }
+        #layer-gloss { mix-blend-mode: overlay; background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%); background-size: 200% 200%; }
+        .active-gloss-brillo #layer-gloss { opacity: 1; }
+
+        /* MEDIDAS */
         .measure-line { position: absolute; border: 1px solid #6366f1; opacity: 0.6; pointer-events: none; z-index: 10; }
         .measure-text { position: absolute; font-size: 11px; font-weight: 800; color: #6366f1; background: #f9fafb; padding: 2px 8px; border-radius: 6px; border: 1px solid #e0e7ff; white-space: nowrap; }
+        .theme-dark .measure-text { background: #1f2937; border-color: #374151; color: #818cf8; }
 
-        .option-card { border: 2px solid #f3f4f6; transition: all 0.2s; cursor: pointer; background: white; }
+        .option-card { border: 2px solid #f3f4f6; transition: all 0.2s; cursor: pointer; background: white; color: black; }
         .option-card.active { border-color: #6366f1; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1); }
-        
-        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 130; display: flex; flex-direction: column; }
-        #cart-sidebar.open { transform: translateX(0); }
-        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 120; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
-        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
 
-        #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
-        #mobile-menu.open { transform: translateX(0); }
+        /* CARRITO */
+        #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 110; display: flex; flex-direction: column; }
+        #cart-sidebar.open { transform: translateX(0); }
+        #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        #cart-overlay.visible { opacity: 1; pointer-events: auto; }
+        .theme-dark #cart-sidebar { background: #111827; border-left: 1px solid #374151; }
+        .theme-dark #cart-sidebar .bg-white { background-color: #111827 !important; }
+        .theme-dark #cart-sidebar .bg-gray-50 { background-color: #1f2937 !important; }
     </style>
 </head>
-<body class="theme-light flex flex-col min-h-screen text-black">
+<body class="theme-light flex flex-col min-h-screen">
 
     <svg style="position: absolute; width: 0; height: 0;">
-        <filter id="smart-contour-filter" color-interpolation-filters="sRGB">
+        <filter id="matte-contour-filter" color-interpolation-filters="sRGB">
             <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
             <feComponentTransfer in="blur" result="limit"><feFuncA type="discrete" tableValues="0 0 0 1 1" /></feComponentTransfer>
             <feMorphology in="limit" operator="dilate" radius="15" result="border" />
-            <feFlood flood-color="white" result="white"/><feComposite in="white" in2="border" operator="in" result="final-border" />
+            <feFlood flood-color="white" flood-opacity="1" result="pure-white"/>
+            <feComposite in="pure-white" in2="border" operator="in" result="final-border" />
+            <feMerge><feMergeNode in="final-border" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        <filter id="clear-contour-filter" color-interpolation-filters="sRGB">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+            <feComponentTransfer in="blur" result="limit"><feFuncA type="discrete" tableValues="0 0 0 1 1" /></feComponentTransfer>
+            <feMorphology in="limit" operator="dilate" radius="15" result="border" />
+            <feFlood flood-color="white" flood-opacity="0.3" result="transparent-edge"/>
+            <feComposite in="transparent-edge" in2="border" operator="in" result="final-border" />
             <feMerge><feMergeNode in="final-border" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
     </svg>
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
         <div class="flex items-center gap-4 md:gap-8">
-            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
-            <div class="bg-black p-2 rounded-lg inline-block shadow-lg">
-                <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6">
-            </div>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
-                <a href="../index.html" class="hover:text-black">Wall Art</a>
-                <a href="../Banners/banners.html" class="hover:text-black">Banners</a>
-                <a href="stickers.html" class="hover:text-black">Stickers</a>
-                <a href="../Rigid Signs/rigidsigns.html" class="hover:text-black">Rigid Signs</a>
+            <div class="bg-black p-2 rounded-lg inline-block shadow-lg"><img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6"></div>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic text-black">
+                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="stickers.html" class="hover:text-black transition-colors">Stickers</a>
+                <a href="../Rigid Signs/rigidsigns.html" class="hover:text-black transition-colors">Rigid Signs</a>
             </div>
         </div>
-        <div class="flex items-center gap-4">
-            <button onclick="toggleCart()" class="relative p-2">
-                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
-                <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
-            </button>
-        </div>
+        <button onclick="toggleCart()" class="relative p-2"><i data-lucide="shopping-bag" class="w-6 h-6"></i><span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span></button>
     </nav>
 
-    <div id="mobile-menu" class="p-8 flex flex-col gap-6 xl:hidden text-black text-black">
-        <div class="flex justify-between items-center border-b pb-4">
-            <span class="heavy-italic text-xl italic text-black">Navigation</span>
-            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
-        </div>
-        <ul class="space-y-6 text-sm font-black uppercase italic text-black">
-            <li><a href="../index.html">Home</a></li>
-            <li><a href="stickers.html">Stickers</a></li>
-        </ul>
-    </div>
-
-    <div class="flex flex-grow w-full overflow-hidden text-black">
+    <div class="flex flex-grow w-full overflow-hidden">
         <main class="flex-grow bg-grid relative flex items-center justify-center overflow-hidden">
-            <div id="res-alert" class="absolute top-8 right-8 z-50 hidden">
-                <div class="bg-orange-50 border-2 border-orange-200 p-4 rounded-2xl flex items-start gap-3 shadow-xl max-w-xs relative text-black">
-                    <i data-lucide="alert-triangle" class="text-orange-500 w-6 h-6 shrink-0"></i>
-                    <div class="pr-6">
-                        <p class="text-[10px] font-black uppercase text-orange-700">Image Quality</p>
-                        <p id="res-text" class="text-[9px] font-bold text-orange-600 leading-tight">Checking...</p>
-                    </div>
-                    <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="absolute top-2 right-2 text-orange-400 hover:text-orange-600"><i data-lucide="x" class="w-4 h-4"></i></button>
-                </div>
-            </div>
-
             <div class="absolute top-8 left-8 z-50">
                 <div class="relative bg-gray-200 p-1 rounded-full flex w-36 shadow-inner cursor-pointer" onclick="toggleTheme()">
                     <div id="pill-bg" class="absolute top-1 left-1 bottom-1 w-[calc(50%-4px)] bg-black rounded-full transition-all duration-300"></div>
@@ -109,35 +104,28 @@
 
             <div id="master-wrapper">
                 <div id="sticker-container">
-                    <div id="measure-h" class="measure-line" style="width: 100%; top: -45px; left: 0; border-left: 1px solid #6366f1; border-right: 1px solid #6366f1; height: 10px; border-bottom: 0;">
-                        <span class="measure-text" id="text-h" style="top: -15px; left: 50%; transform: translateX(-50%);">1"</span>
-                    </div>
-                    <div id="measure-v" class="measure-line" style="height: 100%; left: -45px; top: 0; border-top: 1px solid #6366f1; border-bottom: 1px solid #6366f1; width: 10px; border-right: 0;">
-                        <span class="measure-text" id="text-v" style="left: -50px; top: 50%; transform: translateY(-50%) rotate(-90deg);">1"</span>
-                    </div>
+                    <div class="measure-line" style="width: 100%; top: -45px; left: 0; border-left: 1px solid #6366f1; border-right: 1px solid #6366f1; height: 10px; border-bottom: 1px solid #6366f1; opacity:0.3;"></div>
+                    <span class="measure-text" id="text-h" style="top: -60px; left: 50%; transform: translateX(-50%); position:absolute;">2"</span>
+                    <div class="measure-line" style="height: 100%; left: -45px; top: 0; border-top: 1px solid #6366f1; border-bottom: 1px solid #6366f1; width: 10px; border-right: 1px solid #6366f1; opacity:0.3;"></div>
+                    <span class="measure-text" id="text-v" style="left: -85px; top: 50%; transform: translateY(-50%) rotate(-90deg); position:absolute;">2"</span>
+                    
                     <canvas id="sticker-canvas"></canvas>
                     <div id="layer-gloss" class="effect-layer"></div>
                 </div>
             </div>
         </main>
 
-        <aside class="w-[380px] bg-white border-l p-8 flex flex-col gap-6 shadow-2xl z-40 overflow-y-auto text-black">
-            <header>
-                <h2 class="text-2xl font-[900] italic uppercase tracking-tighter text-black">Sticker Editor</h2>
-                <div class="flex gap-2 mt-2">
-                    <span id="badge-size" class="bg-black text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"></span>
-                    <span id="badge-shape" class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"></span>
-                </div>
-            </header>
-
-            <div class="grid grid-cols-2 gap-4 text-black">
+        <aside class="w-[380px] bg-white border-l p-8 flex flex-col gap-6 shadow-2xl z-40 overflow-y-auto">
+            <h2 class="text-2xl font-[900] italic uppercase tracking-tighter text-black">Sticker Editor</h2>
+            
+            <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Size (Max 11")</label>
-                    <div class="relative text-black"><input type="number" id="input-size" value="1" min="1" max="11" step="0.1" oninput="validateSize(this)" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none focus:border-indigo-500 text-black"><span class="absolute right-3 top-3 text-[10px] font-bold text-gray-400">in</span></div>
+                    <label class="text-[9px] font-black uppercase tracking-widest">Size (Max 11")</label>
+                    <input type="number" id="input-size" value="2" min="1" max="11" step="0.1" oninput="enforceLimit(this)" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold outline-none text-black">
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Cut Type</label>
-                    <select id="select-shape" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none cursor-pointer text-black">
+                    <label class="text-[9px] font-black uppercase tracking-widest">Cut Type</label>
+                    <select id="select-shape" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-black">
                         <option value="contour cut">Contour Cut</option>
                         <option value="circle">Circle Cut</option>
                         <option value="square">Square Cut</option>
@@ -145,46 +133,50 @@
                 </div>
             </div>
 
-            <div class="space-y-1">
-                <label class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Quantity</label>
-                <select id="select-qty" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 text-[11px] font-bold outline-none cursor-pointer text-black">
-                    <option value="50">50 pcs</option>
-                    <option value="100">100 pcs</option>
-                    <option value="250">250 pcs</option>
-                    <option value="500">500 pcs</option>
-                </select>
-            </div>
-
             <div class="space-y-3">
                 <p class="text-[10px] font-black uppercase text-indigo-500 tracking-widest italic">Material Finish</p>
                 <div class="grid gap-2">
-                    <button id="btn-matte" onclick="applyMaterial('matte', this)" class="option-card p-4 rounded-xl flex items-center gap-4 text-black"><div class="w-6 h-6 bg-gray-200 rounded-full border"></div><span class="text-[10px] font-black uppercase italic">Matte White</span></button>
-                    <button id="btn-gloss" onclick="applyMaterial('gloss', this)" class="option-card p-4 rounded-xl flex items-center gap-4 text-black"><div class="w-6 h-6 bg-gradient-to-tr from-white to-gray-300 rounded-full border"></div><span class="text-[10px] font-black uppercase italic">Glossy Finish</span></button>
+                    <button id="btn-matte" onclick="applyMaterial('matte', this)" class="option-card p-4 rounded-xl flex items-center gap-4">
+                        <div class="w-6 h-6 bg-gray-200 rounded-full border"></div>
+                        <span class="text-[10px] font-black uppercase italic">Matte White</span>
+                    </button>
+                    <button id="btn-gloss" onclick="applyMaterial('gloss', this)" class="option-card p-4 rounded-xl flex items-center gap-4">
+                        <div class="w-6 h-6 bg-gradient-to-tr from-white to-gray-300 rounded-full border"></div>
+                        <span class="text-[10px] font-black uppercase italic">Glossy Finish</span>
+                    </button>
+                    <button id="btn-clear" onclick="applyMaterial('clear', this)" class="option-card p-4 rounded-xl flex items-center gap-4">
+                        <div class="w-6 h-6 bg-white/20 rounded-full border border-dashed"></div>
+                        <span class="text-[10px] font-black uppercase italic">Clear (Transparent)</span>
+                    </button>
                 </div>
             </div>
 
+            <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-widest">Quantity (Pieces)</label>
+                <input type="number" id="qty-input" value="1" min="1" oninput="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold outline-none text-black">
+            </div>
+
             <div class="mt-auto pt-6 border-t flex justify-between items-baseline mb-4 text-black">
-                <span class="text-[10px] font-bold text-gray-400 italic uppercase tracking-widest">SUBTOTAL</span>
+                <span class="text-[10px] font-bold italic tracking-widest">SUBTOTAL</span>
                 <span id="price-display" class="text-4xl font-black italic tracking-tighter text-indigo-600">$0.00</span>
             </div>
             <button onclick="addToCart()" class="w-full bg-black text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest italic hover:bg-indigo-600 transition-all shadow-xl active:scale-95">Add to Bag</button>
         </aside>
     </div>
 
-    <div id="cart-sidebar" class="text-black">
+    <div id="cart-sidebar">
         <div class="p-8 border-b flex justify-between items-center bg-white sticky top-0 text-black">
             <div><h3 class="text-2xl font-black uppercase italic tracking-tighter text-black">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase mt-1" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl text-black border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
-        <div class="p-8 bg-gray-50 border-t space-y-6 text-black text-black">
-            <div class="flex justify-between items-end text-black text-black"><span class="text-[10px] font-black uppercase text-gray-400 mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase italic hover:bg-red-600 transition-all">Checkout</button>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white"></div>
+        <div class="p-8 bg-gray-50 border-t space-y-6 text-black">
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase italic hover:bg-red-600 transition-all shadow-2xl">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
     <script>
         lucide.createIcons();
         const canvas = document.getElementById('sticker-canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -194,48 +186,69 @@
 
         window.onload = function() {
             originalImg.crossOrigin = "anonymous";
-            originalImg.src = localStorage.getItem('tempStickerImage') || '';
+            originalImg.src = localStorage.getItem('tempStickerImage') || 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/star.svg';
+            
+            // CARGA DE CONFIGURACIÓN PREVIA
             const config = JSON.parse(localStorage.getItem('tempStickerConfig') || '{}');
-            
-            // Cargar configuración previa
-            document.getElementById('input-size').value = config.size || 2;
-            document.getElementById('select-qty').value = config.qty || 50;
-            document.getElementById('select-shape').value = config.shape || 'contour cut';
-            
-            if(config.details && config.details.includes('GLOSSY')) applyMaterial('gloss', document.getElementById('btn-gloss'));
-            else applyMaterial('matte', document.getElementById('btn-matte'));
+            if (config.details) {
+                // Extraer valores del string de detalles
+                const details = config.details.toUpperCase();
+                
+                // Set Shape
+                if (details.includes("SQUARE")) document.getElementById('select-shape').value = "square";
+                else if (details.includes("CIRCLE")) document.getElementById('select-shape').value = "circle";
+                else document.getElementById('select-shape').value = "contour cut";
+
+                // Set Finish
+                if (details.includes("MATTE")) applyMaterial('matte', document.getElementById('btn-matte'));
+                else if (details.includes("GLOSSY")) applyMaterial('gloss', document.getElementById('btn-gloss'));
+                else if (details.includes("CLEAR")) applyMaterial('clear', document.getElementById('btn-clear'));
+                else applyMaterial('matte', document.getElementById('btn-matte'));
+
+                // Set Size
+                if (details.includes("SIZE:")) {
+                    const sizeVal = details.split("SIZE:")[1].trim().split("X")[0];
+                    document.getElementById('input-size').value = parseFloat(sizeVal) || 2;
+                }
+
+                // Set Qty
+                if (details.includes("QTY:")) {
+                    const qtyVal = details.split("QTY:")[1].trim().split(" ")[0];
+                    document.getElementById('qty-input').value = parseInt(qtyVal) || 1;
+                }
+            } else {
+                applyMaterial('matte', document.getElementById('btn-matte'));
+            }
 
             originalImg.onload = renderAll;
             renderCart();
         };
 
-        function calculatePrice(size, qty) {
-            const prices = { "50": 36.00, "100": 52.00, "250": 95.00, "500": 160.00 };
-            const multiplier = localStorage.getItem('userTier') === 'wholesale' ? 1 : 2;
-            let base = prices[qty] || 36.00;
-            let sizeSurcharge = size > 2 ? 1 + ((size - 2) * 0.15) : 1;
-            return base * sizeSurcharge * multiplier;
+        function enforceLimit(input) {
+            if (parseFloat(input.value) > 11) input.value = 11;
+            if (parseFloat(input.value) < 1) input.value = 1;
+            renderAll();
         }
 
-        function validateSize(input) { if (parseFloat(input.value) > 11) input.value = 11; renderAll(); }
+        function toggleTheme() {
+            document.body.classList.toggle('theme-dark');
+            const isDark = document.body.classList.contains('theme-dark');
+            document.getElementById('pill-bg').style.transform = isDark ? 'translateX(100%)' : 'translateX(0%)';
+        }
 
         function renderAll() {
             if (!originalImg.width) return;
             let size = parseFloat(document.getElementById('input-size').value) || 1;
+            let qty = parseInt(document.getElementById('qty-input').value) || 1;
             let shape = document.getElementById('select-shape').value;
-            let qty = document.getElementById('select-qty').value;
-
-            // DPI CHECK
-            const dpi = Math.round(originalImg.width / size);
-            const alertBox = document.getElementById('res-alert');
-            if (dpi < 150) { alertBox.classList.remove('hidden'); document.getElementById('res-text').innerHTML = `<b class="text-red-600">CRITICAL: ${dpi} DPI</b>`; }
-            else if (dpi < 300) { alertBox.classList.remove('hidden'); document.getElementById('res-text').innerHTML = `<b class="text-orange-500">LOW: ${dpi} DPI</b>`; }
-            else alertBox.classList.add('hidden');
-
-            document.getElementById('price-display').innerText = `$${calculatePrice(size, qty).toFixed(2)}`;
-            document.getElementById('badge-size').innerText = `${size}x${size} IN`;
-            document.getElementById('badge-shape').innerText = shape.toUpperCase();
+            
             document.getElementById('text-h').innerText = document.getElementById('text-v').innerText = `${size}"`;
+            
+            const basePrice = 36;
+            const price = size > 2 ? (basePrice * (1 + (size - 2) * 0.15)) : basePrice;
+            const subtotal = price * qty;
+            
+            document.getElementById('price-display').innerText = `$${subtotal.toFixed(2)}`;
 
             const padding = 120;
             const targetSide = Math.max(originalImg.width, originalImg.height);
@@ -252,7 +265,6 @@
                 ctx.beginPath(); ctx.rect(cx - targetSide/2, cy - targetSide/2, targetSide, targetSide); ctx.clip();
                 drawCoverImage(ctx, originalImg, cx - targetSide/2, cy - targetSide/2, targetSide, targetSide);
             } else {
-                canvas.width = originalImg.width + padding; canvas.height = originalImg.height + padding;
                 ctx.drawImage(originalImg, padding/2, padding/2);
             }
             ctx.restore();
@@ -270,15 +282,17 @@
         function applyMaterial(type, btn) {
             document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
-            currentMaterialLabel = type === 'gloss' ? "GLOSSY" : "MATTE WHITE";
-            container.classList.toggle('active-gloss', type === 'gloss');
+            container.classList.remove('active-gloss-brillo', 'material-clear', 'material-matte', 'material-glossy');
+            
+            if(type === 'matte') { container.classList.add('material-matte'); currentMaterialLabel = "MATTE WHITE"; }
+            else if(type === 'gloss') { container.classList.add('material-glossy', 'active-gloss-brillo'); currentMaterialLabel = "GLOSSY"; }
+            else if(type === 'clear') { container.classList.add('material-clear'); currentMaterialLabel = "CLEAR (TRANSPARENT)"; }
             syncLayers();
         }
 
         function syncLayers() {
             const dataUrl = canvas.toDataURL();
-            const gloss = document.getElementById('layer-gloss');
-            gloss.style.maskImage = gloss.style.webkitMaskImage = `url(${dataUrl})`;
+            document.getElementById('layer-gloss').style.maskImage = document.getElementById('layer-gloss').style.webkitMaskImage = `url(${dataUrl})`;
         }
 
         function toggleCart() {
@@ -290,51 +304,59 @@
         function addToCart() {
             const size = document.getElementById('input-size').value;
             const shape = document.getElementById('select-shape').value;
-            const qty = document.getElementById('select-qty').value;
-            const price = parseFloat(document.getElementById('price-display').innerText.replace('$', ''));
+            const qty = document.getElementById('qty-input').value;
+            const priceVal = parseFloat(document.getElementById('price-display').innerText.replace(/[$,]/g, ''));
+            const details = `SHAPE: ${shape.toUpperCase()} | FINISH: ${currentMaterialLabel} | SIZE: ${size}X${size} IN | QTY: ${qty}`;
             
-            // STRING PLANO ESTANDARIZADO - PLANO MAESTRO
-            const details = `SHAPE: ${shape.toUpperCase()} | FINISH: ${currentMaterialLabel} | SIZE: ${size}X${size} | QTY: ${qty} PCS`;
-
-            const item = {
-                name: "Custom Sticker",
-                image: canvas.toDataURL('image/png', 0.5),
-                price: price,
-                details: details
-            };
-
+            const item = { name: "Custom Sticker", image: canvas.toDataURL('image/png', 0.5), price: priceVal, details: details };
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             cart.push(item);
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
             toggleCart();
         }
 
-        function renderCart() {
+         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const cont = document.getElementById('cart-items-container');
-            if(!cont) return;
-            cont.innerHTML = ''; let total = 0;
+            const container = document.getElementById('cart-items-container');
+            if (!container) return;
+            container.innerHTML = ''; let total = 0;
+
             if (cart.length === 0) {
-                cont.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
-                document.getElementById('cart-dot')?.classList.add('hidden');
+                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
+                const dot = document.getElementById('cart-dot');
+                if(dot) dot.classList.add('hidden');
             } else {
-                document.getElementById('cart-dot')?.classList.remove('hidden');
+                const dot = document.getElementById('cart-dot');
+                if(dot) dot.classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    const priceNum = item.price || 0; total += priceNum;
-                    cont.innerHTML += `
-                        <div class="flex gap-4 border-b pb-4 text-black">
-                            <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg bg-gray-50 shadow-sm">
-                            <div class="flex-grow py-1">
-                                <h4 class="text-[11px] font-black uppercase italic tracking-tighter">${item.name}</h4>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.details || "NO DETAILS"}</p>
-                                <span class="text-lg font-black italic mt-1 block">$${priceNum.toFixed(2)}</span>
+                    const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : (item.price || 0);
+                    total += priceNum;
+                    
+                    // REPARACIÓN: Detectamos si la info viene como details, specs u options
+                    const showDetails = item.details || item.specs || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
+
+                    container.innerHTML += `
+                        <div class="flex gap-4 border-b pb-6 text-black">
+                            <div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0">
+                                <img src="${item.image}" class="max-h-full max-w-full object-contain">
                             </div>
-                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <div class="flex-grow py-1 text-black">
+                                <div class="flex justify-between font-black uppercase italic text-xs">
+                                    <span>${item.name}</span>
+                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p>
+                                <span class="text-lg font-black italic">$${priceNum.toFixed(2)}</span>
+                            </div>
                         </div>`;
                 });
             }
-            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
+            const totalDisp = document.getElementById('cart-total-price');
+            if(totalDisp) totalDisp.innerText = `$${total.toFixed(2)}`;
+            const countDisp = document.getElementById('cart-count-text');
+            if(countDisp) countDisp.innerText = `${cart.length} items`;
             lucide.createIcons();
         }
 
@@ -345,16 +367,12 @@
             renderCart();
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('theme-dark');
-            document.getElementById('pill-bg').style.transform = document.body.classList.contains('theme-dark') ? 'translateX(100%)' : 'translateX(0%)';
-        }
-
         master.addEventListener('mousemove', (e) => {
             const rect = master.getBoundingClientRect();
             const x = (e.clientX - (rect.left + rect.width/2)) / (rect.width/2);
             const y = (e.clientY - (rect.top + rect.height/2)) / (rect.height/2);
             container.style.transform = `rotateX(${y * -10}deg) rotateY(${x * 10}deg) scale(1.02)`;
+            document.getElementById('layer-gloss').style.backgroundPosition = `${50 + (x * 50)}% ${50 + (y * 50)}%`;
         });
         master.addEventListener('mouseleave', () => container.style.transform = 'none');
     </script>
