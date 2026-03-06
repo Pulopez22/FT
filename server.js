@@ -86,7 +86,7 @@ const emailTemplate = (orderData) => {
         <div style="max-width: 600px; margin: auto;">
             
             <div style="background: #000; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-                <img src="images/square-foot-printing-logo.png" alt="SQUARE FOOT PRINTING" style="width: 280px; filter: brightness(0) invert(1);">
+                <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="SQUARE FOOT PRINTING" style="width: 280px; filter: brightness(0) invert(1);">
             </div>
 
             <div style="padding: 30px 10px;">
