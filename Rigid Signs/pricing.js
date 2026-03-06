@@ -10,7 +10,7 @@ window.rigidsigns = {
         "material": 25.00, 
         "type": "sqft",
         "variants": {
-            "white": 0,       
+            "white": 25,       
             "black": 10.00   
         }
     },

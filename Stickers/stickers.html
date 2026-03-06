@@ -32,109 +32,114 @@
 </head>
 <body class="bg-white text-black">
 
-    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black text-black">
         <div class="flex items-center gap-4 md:gap-8">
-            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
-            <a href="../index.html" class="flex items-center group">
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black text-black text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
+            <a href="../index.html" class="flex items-center group text-black">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
-                <a href="../index.html" class="hover:text-black transition-colors text-black">Wall Art</a>
-                <a href="../Banners/banners.html" class="hover:text-black transition-colors text-black">Banners</a>
-                <a href="../Displays/displays.html" class="hover:text-black transition-colors text-black">Displays</a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic text-black text-black text-black text-black">
+                <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="../Displays/displays.html" class="hover:text-black transition-colors">Displays</a>
                 <a href="stickers.html" class="text-black border-b-2 border-black pb-1">Stickers</a>
-                <a href="#" class="hover:text-black transition-colors text-black text-black">Marketing Materials</a>
             </div>
         </div>
-        <div class="flex gap-4 items-center">
+        <div class="flex gap-4 items-center text-black">
             <div id="auth-container" class="flex items-center text-black"></div>
-            <button onclick="toggleCart()" class="relative p-2 mr-2">
-                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+            <button onclick="toggleCart()" class="relative text-black p-2 mr-2 text-black text-black text-black">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
         </div>
     </nav>
 
-    <div id="mobile-menu" class="p-8 flex flex-col gap-6 xl:hidden text-black">
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 xl:hidden text-black text-black text-black text-black text-black text-black">
         <div class="flex justify-between items-center border-b pb-4">
-            <span class="heavy-italic text-xl italic text-black">Navigation</span>
-            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <span class="heavy-italic text-xl italic text-black text-black">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black text-black text-black"></i></button>
         </div>
-        <ul class="space-y-6 text-sm font-black uppercase italic text-black">
+        <ul class="space-y-6 text-sm font-black uppercase italic text-black text-black text-black">
             <li><a href="../index.html" onclick="toggleMobileMenu()">Wall Art</a></li>
             <li><a href="../Banners/banners.html" onclick="toggleMobileMenu()">Banners</a></li>
             <li><a href="stickers.html" class="text-red-600" onclick="toggleMobileMenu()">Stickers</a></li>
         </ul>
     </div>
 
-    <div class="flex">
+    <div class="flex text-black">
         <aside class="sidebar-fixed p-10 hidden lg:block w-64 border-r text-black">
-            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
-            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer text-black"><a href="../AdvertisingFlags/advertising-flags.html">Advertising Flags</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="../Banners/banners.html">Banners</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="../Displays/displays.html">Displays</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="../LargePrinting/largeprinting.html">Large Format</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="../PrintedFabric/printed-fabric.html">Printed Fabric</a></li>
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black text-black">Product Categories</h3>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase text-black text-black">
+                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html">Banners</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html">Displays</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html">Large Format</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html">Printed Fabric</a></li>
                 <li class="sidebar-item cursor-pointer active text-black"><a href="stickers.html">Stickers</a></li>
             </ul>
         </aside>
 
         <main class="flex-grow p-6 md:p-12 text-black">
-            <header class="mb-12">
-                <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-2 tracking-tighter">Configure your Stickers</h1>
-                <div id="price-tier-badge"></div>
+            <header class="mb-12 text-black">
+                <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-2 tracking-tighter text-black">Configure your Stickers</h1>
+                <div id="price-tier-badge" class="text-black"></div>
             </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div class="space-y-8">
-                    <section>
-                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4">1. Shape & Finish</h3>
-                        <div id="shape-options" class="options-container shadow-sm mb-4">
-                            <button onclick="selectItem(this, 'shape')" class="selectable-item item-active"><div class="icon-box">🐱</div> <span>Contour Cut</span></button>
-                            <button onclick="selectItem(this, 'shape')" class="selectable-item"><div class="icon-box">⬜</div> <span>Square</span></button>
-                            <button onclick="selectItem(this, 'shape')" class="selectable-item"><div class="icon-box">◯</div> <span>Circle</span></button>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 text-black">
+                <div class="space-y-8 text-black">
+                    <section class="text-black">
+                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4 text-black">1. Shape & Finish</h3>
+                        <div id="shape-options" class="options-container shadow-sm mb-4 text-black">
+                            <button onclick="selectItem(this, 'shape')" class="selectable-item item-active">
+                                <div class="icon-box">🐱</div> <span>Contour Cut</span>
+                            </button>
+                            <button onclick="selectItem(this, 'shape')" class="selectable-item">
+                                <div class="icon-box">⬜</div> <span>Square</span>
+                            </button>
+                            <button onclick="selectItem(this, 'shape')" class="selectable-item">
+                                <div class="icon-box">◯</div> <span>Circle</span>
+                            </button>
                         </div>
-                        <select id="finish-select" onchange="updateSummary()" class="w-full p-4 border border-gray-100 rounded-2xl bg-white font-black text-xs uppercase outline-none focus:border-black transition-all">
+                        <select id="finish-select" onchange="updateSummary()" class="w-full p-4 border border-gray-100 rounded-2xl bg-white font-black text-xs uppercase outline-none focus:border-black transition-all text-black">
                             <option value="glossy">Glossy Finish</option>
                             <option value="matte">Matte Finish</option>
                         </select>
                     </section>
                 </div>
 
-                <div class="space-y-8">
-                    <section>
-                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4">2. Size & Quantity</h3>
-                        <div id="size-options" class="options-container shadow-sm mb-6">
+                <div class="space-y-8 text-black">
+                    <section class="text-black">
+                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4 text-black">2. Size & Quantity</h3>
+                        <div id="size-options" class="options-container shadow-sm mb-6 text-black">
                             <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item item-active">2 x 2 in</button>
                             <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">4 x 4 in</button>
                             <button onclick="toggleCustomControls(true); selectItem(this, 'size')" class="selectable-item text-red-600">Custom Size (MAX 11")</button>
                             
-                            <div id="custom-size-panel" class="bg-gray-50">
-                                <div class="grid grid-cols-2 gap-4 mb-2">
-                                    <input type="number" id="custom-w" value="3.0" step="0.1" oninput="validateInputLimit(this)" class="p-3 border rounded-xl font-black text-center outline-none">
-                                    <input type="number" id="custom-h" value="3.0" step="0.1" oninput="validateInputLimit(this)" class="p-3 border rounded-xl font-black text-center outline-none">
+                            <div id="custom-size-panel" class="bg-gray-50 text-black">
+                                <div class="grid grid-cols-2 gap-4 mb-2 text-black">
+                                    <input type="number" id="custom-w" value="3.0" step="0.1" oninput="validateInputLimit(this)" class="p-3 border rounded-xl font-black text-center outline-none text-black">
+                                    <input type="number" id="custom-h" value="3.0" step="0.1" oninput="validateInputLimit(this)" class="p-3 border rounded-xl font-black text-center outline-none text-black">
                                 </div>
                             </div>
                         </div>
 
-                        <div id="qty-options" class="options-container shadow-sm"></div>
+                        <div id="qty-options" class="options-container shadow-sm text-black"></div>
                     </section>
                 </div>
 
-                <div class="lg:sticky lg:top-32 h-fit">
-                    <div class="bg-white p-8 border border-gray-100 rounded-[2.5rem] shadow-2xl">
-                        <h3 class="text-xl font-black mb-6 uppercase italic tracking-tighter">Order Summary</h3>
-                        <div id="order-summary" class="bg-gray-50 p-5 rounded-2xl mb-8 border border-gray-100 text-[10px] font-black text-gray-500 uppercase leading-relaxed tracking-widest">
+                <div class="lg:sticky lg:top-32 h-fit text-black">
+                    <div class="bg-white p-8 border border-gray-100 rounded-[2.5rem] shadow-2xl text-black">
+                        <h3 class="text-xl font-black mb-6 uppercase italic tracking-tighter text-black">Order Summary</h3>
+                        <div id="order-summary" class="bg-gray-50 p-5 rounded-2xl mb-8 border border-gray-100 text-[10px] font-black text-gray-500 uppercase leading-relaxed tracking-widest text-black">
                             Sticker / Contour Cut / Glossy / 2x2 in / 50 pcs
                         </div>
-                        <div class="flex justify-between items-end mb-10 px-2">
-                            <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest">Total</span>
-                            <span id="final-price" class="text-4xl font-black italic tracking-tighter">$0.00</span>
+                        <div class="flex justify-between items-end mb-10 px-2 text-black">
+                            <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest text-black">Total</span>
+                            <span id="final-price" class="text-4xl font-black italic tracking-tighter text-black">$0.00</span>
                         </div>
-                        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileAndRedirect(this)">
+                        <input type="file" id="file-input" class="hidden text-black" accept="image/*" onchange="handleFileAndRedirect(this)">
                         <button id="main-upload-btn" onclick="document.getElementById('file-input').click()" class="w-full bg-black hover:bg-red-600 text-white font-black py-6 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl transition-all text-center">
                             Upload & Edit ↓
                         </button>
@@ -144,22 +149,22 @@
         </main>
     </div>
 
-    <footer class="bg-white border-t py-16 px-10 text-center w-full mt-auto text-black">
-        <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
+    <footer class="bg-white border-t py-16 px-10 text-center w-full mt-auto text-black text-black text-black">
+        <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl text-black">
             <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
         </div>
         <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
     </footer>
 
-    <div id="cart-sidebar">
+    <div id="cart-sidebar" class="text-black text-black">
         <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter text-black">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
+            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
-        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
+            <div class="flex justify-between items-end text-black text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1 text-black">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none text-black">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center text-white">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
@@ -186,7 +191,7 @@
                 authContainer.innerHTML = `<div class="flex items-center whitespace-nowrap text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span></div>`;
                 badgeContainer.innerHTML = isWholesale ? `<div class="wholesale-badge">✓ Wholesale Enabled</div>` : `<div class="mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic border">Retail Pricing</div>`;
             } else {
-                authContainer.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic text-black">Login</button>`;
+                authContainer.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`;
                 badgeContainer.innerHTML = `<div class="mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic border">Public Retail Prices</div>`;
             }
 
@@ -215,26 +220,24 @@
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const cont = document.getElementById('cart-items-container');
-            const dot = document.getElementById('cart-dot');
+            if(!cont) return;
             cont.innerHTML = ''; let total = 0;
             if (cart.length === 0) {
                 cont.innerHTML = `<div class="text-center py-20 text-gray-300 font-black uppercase italic text-[11px]">Bag Empty</div>`;
-                if(dot) dot.classList.add('hidden');
+                document.getElementById('cart-dot')?.classList.add('hidden');
             } else {
-                if(dot) dot.classList.remove('hidden');
+                document.getElementById('cart-dot')?.classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : parseFloat(item.price);
-                    total += priceNum;
-                    const showDetails = item.details || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
+                    const priceNum = item.price || 0; total += priceNum;
                     cont.innerHTML += `
-                        <div class="flex gap-4 border-b pb-4 text-black">
+                        <div class="flex gap-4 border-b pb-4 text-black text-black">
                             <img src="${item.image}" class="w-16 h-16 object-contain border rounded-lg bg-gray-50">
                             <div class="flex-grow py-1">
                                 <h4 class="text-[11px] font-black uppercase italic tracking-tighter">${item.name}</h4>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black text-black text-black">${item.details || "NO DETAILS"}</p>
                                 <span class="text-lg font-black italic mt-1 block">$${priceNum.toFixed(2)}</span>
                             </div>
-                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4 text-black"></i></button>
+                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 text-black text-black text-black"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>`;
                 });
             }
@@ -280,12 +283,13 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 localStorage.setItem('tempStickerImage', e.target.result);
-                // ESTANDARIZACIÓN DE DETALLES PARA LA BOLSA
+                // ESTANDARIZACIÓN DE DETALLES: String plano para el sidebar
                 const details = `SHAPE: ${shape.toUpperCase()} | FINISH: ${finish.toUpperCase()} | SIZE: ${sizeValue.toUpperCase()} | QTY: ${qtyValue.toUpperCase()}`;
+                
                 localStorage.setItem('tempStickerConfig', JSON.stringify({
-                    name: 'CUSTOM STICKER', 
+                    name: 'Custom Sticker', 
                     details: details,
-                    price: document.getElementById('final-price').innerText
+                    price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, ''))
                 }));
                 window.location.href = 'editor.html';
             };
