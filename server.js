@@ -57,22 +57,27 @@ const transporter = nodemailer.createTransport({
 // --- TEMPLATE DE CORREO ---
 const emailTemplate = (orderData) => {
     const itemsHtml = orderData.order_items.map((item, i) => {
-        // Convertimos los detalles en una lista con bullets
         const detailsArray = item.details ? item.details.split('\n') : [];
         const detailsHtml = detailsArray
             .map(detail => `<li style="margin-bottom: 2px;">• ${detail.toUpperCase()}</li>`)
             .join('');
 
         return `
-            <div style="margin-bottom: 20px; font-family: Arial, sans-serif;">
+            <div style="margin-bottom: 30px; font-family: Arial, sans-serif;">
                 <strong style="font-size: 16px; color: #000; display: block; margin-bottom: 5px;">
                     ITEM #${i + 1}: ${item.name.toUpperCase()}
                 </strong>
                 <ul style="list-style: none; padding: 0; margin: 0; color: #666; font-size: 13px; line-height: 1.5;">
                     ${detailsHtml}
-                    <li style="margin-bottom: 2px;">• QTY: ${item.quantity || 1}</li>
                     <li style="margin-bottom: 2px;">• PRICE: $${item.price}</li>
                 </ul>
+                
+                ${item.fileUrl ? `
+                    <div style="margin-top: 15px;">
+                        <a href="${item.fileUrl}" style="display: inline-block; background: #000; color: #fff; padding: 10px 18px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 11px; letter-spacing: 0.5px;">
+                            DOWNLOAD PRINT FILE
+                        </a>
+                    </div>` : ''}
             </div>
         `;
     }).join('');
@@ -106,8 +111,8 @@ const emailTemplate = (orderData) => {
                     ${itemsHtml}
                 </div>
                 
-                <div style="text-align: right; margin-top: 20px;">
-                    <h2 style="font-size: 20px; color: #000;">TOTAL: $${orderData.total_price}</h2>
+                <div style="text-align: right; margin-top: 20px; padding-right: 10px;">
+                    <h2 style="font-size: 22px; color: #000; margin: 0;">TOTAL: $${orderData.total_price}</h2>
                 </div>
             </div>
         </div>
