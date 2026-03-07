@@ -188,8 +188,68 @@ app.get('/api/admin/orders', async (req, res) => {
 });
 
 // Rutas de Auth
-app.post('/api/auth/register', async (req, res) => { /* ... */ });
-app.post('/api/auth/login', async (req, res) => { /* ... */ });
+// --- RUTAS DE AUTENTICACIÓN ---
+
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { name, email, password, inviteCode } = req.body;
+
+        // 1. Verificar si el usuario ya existe
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            return res.status(400).json({ success: false, message: "El email ya está registrado" });
+        }
+
+        // 2. Encriptar la contraseña
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // 3. Determinar si es Wholesale (basado en el código que vimos en tu captura: sight2026)
+const isWholesale = (inviteCode && inviteCode.trim().toLowerCase() === 'sight2026');
+
+        // 4. Crear el nuevo usuario
+        const newUser = new User({
+            name,
+            email,
+            password: hashedPassword,
+            isWholesale
+        });
+
+        await newUser.save();
+
+        // 5. Enviar respuesta de éxito
+        res.status(201).json({
+            success: true,
+            message: "Usuario creado con éxito",
+            isWholesale: newUser.isWholesale
+        });
+
+    } catch (error) {
+        console.error("❌ Error en Registro:", error.message);
+        res.status(500).json({ success: false, message: "Error interno del servidor" });
+    }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) return res.status(400).json({ success: false, message: "Usuario no encontrado" });
+
+        const validPass = await bcrypt.compare(password, user.password);
+        if (!validPass) return res.status(400).json({ success: false, message: "Contraseña incorrecta" });
+
+        res.json({
+            success: true,
+            name: user.name,
+            email: user.email,
+            isWholesale: user.isWholesale
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server ready on port ${PORT}`));
