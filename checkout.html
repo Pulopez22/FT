@@ -252,8 +252,7 @@
                 const displayPrice = isTooLow ? 50.00 : pNum;
                 subtotal += displayPrice;
 
-                // Lógica de desglose profesional (Fiel a la bolsa inteligente)
-                const showDetails = item.details || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO SPECS");
+const showDetails = item.details || item.specs || "Standard Specs";
 
                 return `
                     <div class="border-b border-gray-50 pb-6 mb-6 last:border-0 text-black">
