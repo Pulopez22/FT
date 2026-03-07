@@ -230,21 +230,27 @@ const isWholesale = (inviteCode && inviteCode.trim().toLowerCase() === 'sight202
     }
 });
 
+// En tu servidor (Node.js)
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        // Buscamos ignorando mayúsculas/minúsculas y espacios
+        const user = await User.findOne({ email: email.trim().toLowerCase() });
 
         if (!user) return res.status(400).json({ success: false, message: "Usuario no encontrado" });
 
         const validPass = await bcrypt.compare(password, user.password);
         if (!validPass) return res.status(400).json({ success: false, message: "Contraseña incorrecta" });
 
+        // IMPORTANTE: Estructura la respuesta como la espera tu HTML
         res.json({
             success: true,
-            name: user.name,
-            email: user.email,
-            isWholesale: user.isWholesale
+            token: "simulated-jwt-token", // Opcional, pero tu HTML lo pide
+            user: {
+                name: user.name,
+                email: user.email,
+                isWholesale: user.isWholesale
+            }
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

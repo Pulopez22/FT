@@ -190,8 +190,9 @@
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+        // Dentro del addEventListener en login.html
+const email = document.getElementById('email').value.trim().toLowerCase();
+const password = document.getElementById('password').value.trim();
         const errorMsg = document.getElementById('errorMessage');
         const submitBtn = e.target.querySelector('.btn-login');
 
