@@ -43,6 +43,8 @@ const Order = mongoose.model('Order', new mongoose.Schema({
     total_price: String,
     order_items: Array, 
     status: { type: String, default: 'Pending' },
+    payment_status: { type: String, default: 'Pending' }, // "Paid" o "Pending"
+    transaction_id: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
 }));
 
@@ -177,7 +179,9 @@ app.post('/api/place-order', async (req, res) => {
             customer_email: orderData.customer_email,
             customer_phone: orderData.customer_phone,
             total_price: orderData.total_price,
-            order_items: orderData.order_items
+            order_items: orderData.order_items,
+            payment_status: orderData.payment_status || 'Pending',
+            transaction_id: orderData.transaction_id || ''
         });
         await newOrder.save();
 

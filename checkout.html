@@ -6,6 +6,7 @@
     <title>Checkout - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AUbkVL7-ki_DER-xXi7WUJLdmkIS2ISX7f_FLQTar5uhYycbzdEE6BcASfjqDTGJbdYrsywgkdkZ2O88"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; color: #000; overflow-x: hidden; }
@@ -18,7 +19,6 @@
         .select-button { cursor: pointer; transition: all 0.3s ease; border: 2px solid #f3f4f6; background-color: #f9fafb; color: #000; }
         .select-button.active { border-color: #000; background-color: #000 !important; color: #fff !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         .logout-btn { font-size: 8px; color: #ef4444; cursor: pointer; margin-left: 5px; text-decoration: underline; font-weight: 900; }
-        
         #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
         #mobile-menu.open { transform: translateX(0); }
     </style>
@@ -119,12 +119,15 @@
 
                         <section class="space-y-8">
                             <h2 class="heavy-italic text-2xl mb-2 flex items-center gap-3 text-black"><i data-lucide="credit-card" class="text-red-600"></i> Payment Method</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div onclick="selectPayment('card')" id="pay-card" class="select-button p-6 rounded-[1.5rem] flex items-center gap-4">
-                                    <i data-lucide="credit-card"></i><span class="heavy-italic text-sm">Credit Card</span>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div onclick="selectPayment('card')" id="pay-card" class="select-button p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
+                                    <i data-lucide="credit-card"></i><span class="heavy-italic text-[10px]">Credit Card</span>
                                 </div>
-                                <div onclick="selectPayment('zelle')" id="pay-zelle" class="select-button p-6 rounded-[1.5rem] flex items-center gap-4">
-                                    <i data-lucide="wallet"></i><span class="heavy-italic text-sm">Zelle</span>
+                                <div onclick="selectPayment('zelle')" id="pay-zelle" class="select-button p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
+                                    <i data-lucide="wallet"></i><span class="heavy-italic text-[10px]">Zelle</span>
+                                </div>
+                                <div onclick="selectPayment('paypal')" id="pay-paypal" class="select-button p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
+                                    <i data-lucide="paypal"></i><span class="heavy-italic text-[10px]">PayPal</span>
                                 </div>
                             </div>
                             <div id="card-details" class="hidden bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 space-y-6">
@@ -159,6 +162,9 @@
                                     <span class="text-[10px] font-black uppercase text-gray-400 italic">Total</span>
                                     <span id="final-price-display" class="text-5xl heavy-italic italic">$0.00</span>
                                 </div>
+
+                                <div id="paypal-button-container" class="hidden mt-4"></div>
+
                                 <button onclick="validateAndPlaceOrder()" id="place-order-btn" class="w-full bg-red-600 hover:bg-black text-white font-black py-6 rounded-2xl text-[12px] uppercase tracking-[0.3em] italic transition-all shadow-xl">
                                     Place Order Now
                                 </button>
@@ -170,7 +176,7 @@
 
             <footer class="mt-24 py-16 text-center border-t border-gray-100">
                 <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl text-black">
-                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 w-auto">
+                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
                 </div>
                 <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
@@ -181,6 +187,7 @@
         lucide.createIcons();
         let currentMethod = 'pickup', currentPayment = '';
         const UPS_SHIPPING_FEE = 15.00;
+        let paypalRendered = false;
 
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
         function logout() { localStorage.clear(); window.location.reload(); }
@@ -211,7 +218,38 @@
             currentPayment = method;
             document.getElementById('pay-card').classList.toggle('active', method === 'card');
             document.getElementById('pay-zelle').classList.toggle('active', method === 'zelle');
+            document.getElementById('pay-paypal').classList.toggle('active', method === 'paypal');
             document.getElementById('card-details').classList.toggle('hidden', method !== 'card');
+
+            const paypalBtn = document.getElementById('paypal-button-container');
+            const placeBtn = document.getElementById('place-order-btn');
+
+            if (method === 'paypal') {
+                paypalBtn.classList.remove('hidden');
+                placeBtn.classList.add('hidden');
+                renderPayPalButtons();
+            } else {
+                paypalBtn.classList.add('hidden');
+                placeBtn.classList.remove('hidden');
+            }
+        }
+
+        function renderPayPalButtons() {
+            if (paypalRendered) return;
+            paypal.Buttons({
+                createOrder: (data, actions) => {
+                    const total = document.getElementById('final-price-display').innerText.replace('$', '');
+                    return actions.order.create({
+                        purchase_units: [{ amount: { value: total } }]
+                    });
+                },
+                onApprove: (data, actions) => {
+                    return actions.order.capture().then(details => {
+                        validateAndPlaceOrder(true); 
+                    });
+                }
+            }).render('#paypal-button-container');
+            paypalRendered = true;
         }
 
         function formatExpiry(el) {
@@ -252,7 +290,7 @@
                 const displayPrice = isTooLow ? 50.00 : pNum;
                 subtotal += displayPrice;
 
-const showDetails = item.details || item.specs || "Standard Specs";
+                const showDetails = item.details || item.specs || "Standard Specs";
 
                 return `
                     <div class="border-b border-gray-50 pb-6 mb-6 last:border-0 text-black">
@@ -286,64 +324,63 @@ const showDetails = item.details || item.specs || "Standard Specs";
             lucide.createIcons();
         }
 
-        // REEMPLAZA TU FUNCIÓN validateAndPlaceOrder POR ESTA:
-async function validateAndPlaceOrder() {
-    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    if (cart.length === 0) return alert("Bag is empty");
+        async function validateAndPlaceOrder(isPaid = false) {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            if (cart.length === 0) return alert("Bag is empty");
 
-    const name = document.getElementById('fullName').value;
-    const email = document.getElementById('emailAddress').value;
-    if (!name || !email) return alert("Please fill in contact information");
+            const name = document.getElementById('fullName').value;
+            const email = document.getElementById('emailAddress').value;
+            if (!name || !email) return alert("Please fill in contact information");
 
-    const btn = document.getElementById('place-order-btn');
-    btn.innerText = "SENDING ORDER...";
-    btn.disabled = true;
+            const btn = document.getElementById('place-order-btn');
+            btn.innerText = "SENDING ORDER...";
+            btn.disabled = true;
 
-    const oNum = 'ORD-' + Math.floor(Math.random() * 900000);
+            const oNum = 'ORD-' + Math.floor(Math.random() * 900000);
 
-    // Mapeamos los items para que incluyan el link de Cloudinary en el texto del correo
-    const orderItemsStructured = cart.map((item) => {
-        const cleanDetails = item.details ? item.details.split('|').map(d => d.trim()).join('\n') : "No details";
-        const fileLink = item.fileUrl ? `\nPRINT FILE: ${item.fileUrl}` : "\nNo file attached";
-        
-        return {
-            name: item.name.toUpperCase(),
-            details: cleanDetails,
-            price: item.price,
-            fileUrl: item.fileUrl || "" // Pasamos la URL por separado para que el server la reconozca
-        };
-    });
+            const orderItemsStructured = cart.map((item) => {
+                const cleanDetails = item.details ? item.details.split('|').map(d => d.trim()).join('\n') : "No details";
+                return {
+                    name: item.name.toUpperCase(),
+                    details: cleanDetails,
+                    price: item.price,
+                    fileUrl: item.fileUrl || "",
+                    image: item.image
+                };
+            });
 
-    const oInfo = {
-        order_id: oNum,
-        customer_name: name,
-        customer_email: email,
-        total_price: document.getElementById('final-price-display').innerText,
-        order_items: orderItemsStructured // Ahora enviamos un objeto estructurado
-    };
+            const oInfo = {
+                order_id: oNum,
+                customer_name: name,
+                customer_email: email,
+                customer_phone: document.getElementById('phoneNumber').value,
+                total_price: document.getElementById('final-price-display').innerText,
+                order_items: orderItemsStructured,
+                status: isPaid ? "Paid" : "Pending"
+            };
 
-    try {
-        // Ahora enviamos un JSON normal, mucho más rápido y seguro
-        const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(oInfo) 
-        });
-        
-        if (res.ok) {
-            localStorage.removeItem('sqft_cart');
-            window.location.href = `order.html?id=${oNum}`;
-        } else { 
-            const errorText = await res.json();
-            alert("Order Error: " + errorText.error); 
+            try {
+                const res = await fetch('https://ft-f34l.onrender.com/api/place-order', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(oInfo) 
+                });
+                
+                if (res.ok) {
+                    localStorage.removeItem('sqft_cart');
+                    window.location.href = `order.html?id=${oNum}`;
+                } else { 
+                    const errorText = await res.json();
+                    alert("Order Error: " + errorText.error); 
+                }
+            } catch (e) { 
+                alert("Connection failed. Check your server status."); 
+            } finally {
+                btn.innerText = "Place Order Now";
+                btn.disabled = false;
+            }
         }
-    } catch (e) { 
-        alert("Connection failed. Check your server status."); 
-    } finally {
-        btn.innerText = "Place Order Now";
-        btn.disabled = false;
-    }
-}
+
         window.onload = () => {
             checkAuth();
             loadCheckoutData();
