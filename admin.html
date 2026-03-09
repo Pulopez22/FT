@@ -65,7 +65,6 @@
             <header class="mb-12">
                 <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter">Orders History</h1>
                 <div class="h-2 w-24 bg-red-600 rounded-full mb-8"></div>
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Real-time database records from Square Foot Printing</p>
             </header>
 
             <div class="overflow-x-auto">
@@ -134,31 +133,71 @@
             return;
         }
 
-        tbody.innerHTML = orders.map(order => `
-            <tr class="order-row">
-                <td class="font-black">#${order.order_id || order._id.substring(0,8)}</td>
-                <td>
-                    <div class="font-bold uppercase">${order.customer_name}</div>
-                    <div class="text-[10px] text-gray-400">${order.customer_email}</div>
-                </td>
-                <td class="text-gray-500 uppercase font-bold text-[10px]">
-                    ${order.order_items ? order.order_items.length : 0} Products
-                </td>
-                <td class="text-lg font-black italic">$${order.total_price || '0.00'}</td>
-                <td>
-                    <select onchange="updateStatus('${order._id}', this.value)" 
-                            class="status-badge ${getStatusClass(order.status)} outline-none cursor-pointer border-none bg-transparent">
-                        <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                        <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>Printing</option>
-                        <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                        <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
-                    </select>
-                </td>
-                <td class="text-gray-400 font-medium">
-                    ${new Date(order.createdAt).toLocaleDateString()}
-                </td>
-            </tr>
-        `).join('');
+        // Dentro del .map de fetchOrders:
+tbody.innerHTML = orders.map(order => `
+    <tr class="order-row cursor-pointer hover:bg-gray-50" onclick="toggleDetails('details-${order._id}')">
+        <td class="font-black">#${order.order_id || order._id.substring(0,8)}</td>
+        <td>
+            <div class="font-bold uppercase">${order.customer_name}</div>
+            <div class="text-[10px] text-gray-400">${order.customer_email}</div>
+        </td>
+        <td class="text-gray-500 uppercase font-bold text-[10px]">
+            <span class="flex items-center gap-1">
+                // Busca esta línea dentro de tu .map:
+${order.order_items ? order.order_items.map(item => ` ... `).join('') : '<p>...</p>'}
+                <i data-lucide="chevron-down" class="w-3 h-3"></i>
+            </span>
+        </td>
+        <td class="text-lg font-black italic">$${order.total_price || '0.00'}</td>
+        <td>
+            <select onchange="event.stopPropagation(); updateStatus('${order._id}', this.value)" 
+                    class="status-badge ${getStatusClass(order.status)} outline-none cursor-pointer border-none bg-transparent font-black">
+                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>Printing</option>
+                <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+            </select>
+        </td>
+        <td class="text-gray-400 font-medium">${new Date(order.createdAt).toLocaleDateString()}</td>
+    </tr>
+
+    <tr id="details-${order._id}" class="hidden bg-gray-50/50">
+        <td colspan="6" class="p-6 border-x border-b rounded-b-[2rem]">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                ${order.order_items ? order.order_items.map(item => `
+                    <div class="flex gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
+                        <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 border border-gray-100">
+                            <img src="${item.image || '../images/placeholder.png'}" class="max-h-full max-w-full object-contain">
+                        </div>
+                        
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-black text-xs uppercase italic">${item.name}</h4>
+                                <span class="text-[10px] font-black text-gray-400">$${item.price}</span>
+                            </div>
+                            
+                            <p class="text-[9px] text-gray-500 font-bold uppercase leading-relaxed mb-4">
+                                ${item.details ? item.details.replace(/\n/g, ' | ') : 'No special specs'}
+                            </p>
+
+                            <div class="flex gap-3 mt-auto">
+                                ${item.fileUrl ? `
+                                    <a href="${item.fileUrl}" target="_blank" 
+                                       class="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase italic hover:bg-red-600 transition-colors">
+                                        <i data-lucide="download" class="w-3 h-3"></i> Download Art
+                                    </a>
+                                ` : `
+                                    <span class="text-[9px] font-black text-gray-300 uppercase italic flex items-center gap-2">
+                                        <i data-lucide="file-x" class="w-3 h-3"></i> No file provided
+                                    </span>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `).join('') : '<p class="text-center py-4 italic text-gray-400">Data mismatch: order_items is empty</p>'}
+            </div>
+        </td>
+    </tr>
+`).join('');
         lucide.createIcons();
     } catch (err) {
         console.error("Error fetching orders:", err);
@@ -207,6 +246,11 @@ function getStatusClass(status) {
     window.onload = () => {
         fetchOrders();
     };
+
+    function toggleDetails(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('hidden');
+}
 </script>
 </body>
 </html>
