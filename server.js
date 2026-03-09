@@ -71,14 +71,32 @@ const authMiddleware = (req, res, next) => {
 
 // --- TEMPLATE DE CORREO CON LOGO ---
 const emailTemplate = (orderData) => {
-    const itemsHtml = orderData.order_items.map((item, i) => `
-        <div style="margin-bottom: 20px; font-family: Arial, sans-serif; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-            <strong style="font-size: 14px; color: #000;">ITEM #${i + 1}: ${item.name.toUpperCase()}</strong>
-            <p style="font-size: 12px; color: #666; margin: 5px 0;">Specs: ${item.details || 'Standard'}</p>
-            <p style="font-size: 12px; font-weight: bold;">Price: $${item.price}</p>
-            ${item.fileUrl ? `<div style="margin-top: 10px;"><a href="${item.fileUrl}" style="background: #000; color: #fff; padding: 8px 12px; text-decoration: none; border-radius: 4px; font-size: 10px; font-weight: bold;">DOWNLOAD ART FILE</a></div>` : ''}
-        </div>
-    `).join('');
+    const itemsHtml = orderData.order_items.map((item, i) => {
+        // Convertimos el string de detalles en una lista con puntos
+        const detailsArray = item.details ? item.details.split(/[|\n]/) : [];
+        const detailsHtml = detailsArray
+            .map(detail => detail.trim())
+            .filter(detail => detail.length > 0)
+            .map(detail => `<li style="margin-bottom: 2px;">• ${detail.toUpperCase()}</li>`)
+            .join('');
+
+        return `
+            <div style="margin-bottom: 30px; font-family: Arial, sans-serif; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                <strong style="font-size: 16px; color: #000; display: block; margin-bottom: 5px;">
+                    ITEM #${i + 1}: ${item.name.toUpperCase()}
+                </strong>
+                <ul style="list-style: none; padding: 0; margin: 0; color: #666; font-size: 13px; line-height: 1.5;">
+                    ${detailsHtml}
+                    <li style="margin-bottom: 2px; font-weight: bold; color: #000;">• PRICE: $${item.price}</li>
+                </ul>
+                ${item.fileUrl ? `
+                    <div style="margin-top: 15px;">
+                        <a href="${item.fileUrl}" style="display: inline-block; background: #000; color: #fff; padding: 10px 18px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 11px;">
+                            DOWNLOAD PRINT FILE
+                        </a>
+                    </div>` : ''}
+            </div>`;
+    }).join('');
 
     return `
     <html>
@@ -216,6 +234,29 @@ app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
         });
         if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
         res.json({ success: true, url: result.secure_url });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// --- BUSCA ESTA RUTA AL FINAL DE TU ARCHIVO Y REEMPLÁZALA ---
+app.get('/api/orders/track/:orderId', async (req, res) => {
+    try {
+        const order = await Order.findOne({ order_id: req.params.orderId });
+        
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        // CAMBIO AQUÍ: Enviamos 'order_items' completo, no solo el .length
+        res.json({
+            success: true,
+            status: order.status,
+            customer_name: order.customer_name,
+            total_price: order.total_price, // Agregado para mostrar en el resumen
+            items: order.order_items,      // Enviamos todo el array con fotos y specs
+            createdAt: order.createdAt
+        });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }

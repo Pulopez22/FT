@@ -18,7 +18,8 @@
         .order-row td:first-child { border-left: 1px solid #f3f4f6; border-top-left-radius: 1.5rem; border-bottom-left-radius: 1.5rem; }
         .order-row td:last-child { border-right: 1px solid #f3f4f6; border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem; }
         .status-badge { padding: 4px 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; border-radius: 20px; }
-        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-pending { background: #fef3c7; color: #d90606; }
+        .status-shipping { background: #e0f2fe; color: #0284c7; }
         .status-completed { background: #dcfce7; color: #16a34a; }
         #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
         #mobile-menu.open { transform: translateX(0); }
@@ -37,6 +38,7 @@
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-black tracking-widest italic">
                 <span class="border-b-2 border-red-600 pb-1 text-red-600">ADMIN PANEL</span>
                 <a href="index.html" class="hover:text-red-600 transition-colors">View Store</a>
+                
             </div>
         </div>
         <div class="flex gap-4 items-center italic font-black text-[10px]">
@@ -51,6 +53,14 @@
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer text-black font-black"><i data-lucide="layout-dashboard" class="w-4 h-4 inline mr-2"></i> Orders History</li>
                 <li class="sidebar-item cursor-pointer hover:text-black transition-colors"><i data-lucide="tags" class="w-4 h-4 inline mr-2"></i> Edit Pricing</li>
+                  <li class="sidebar-item cursor-pointer text-black"><a href="AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Displays/displays.html" class="block w-full">Displays</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+           
             </ul>
         </aside>
 
@@ -123,11 +133,12 @@
                         <td class="text-lg font-black italic">$${order.total_price || '0.00'}</td>
                         <td>
                             <select onchange="event.stopPropagation(); updateStatus('${order._id}', this.value)" 
-                                    class="status-badge ${getStatusClass(order.status)} outline-none cursor-pointer border-none bg-transparent">
-                                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>Printing</option>
-                                <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                            </select>
+        class="status-badge ${getStatusClass(order.status)} outline-none cursor-pointer border-none bg-transparent font-black">
+    <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>RECEIVED</option>
+    <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>PRINTING</option>
+    <option value="Shipping" ${order.status === 'Shipping' ? 'selected' : ''}>SHIPPING</option>
+    <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>COMPLETED</option>
+</select>
                         </td>
                         <td class="text-gray-400 font-medium">${new Date(order.createdAt).toLocaleDateString()}</td>
                     </tr>
@@ -136,16 +147,25 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 ${order.order_items ? order.order_items.map(item => `
                                     <div class="flex gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-                                        <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0">
-                                            <img src="${item.image || 'images/placeholder.png'}" class="max-h-full max-w-full object-contain">
-                                        </div>
+                                       
                                         <div class="flex-grow">
-                                            <h4 class="font-black text-xs uppercase italic">${item.name}</h4>
-                                            <p class="text-[9px] text-gray-500 font-bold uppercase leading-tight mb-4">${item.details || ''}</p>
-                                            <div class="flex gap-3">
-                                                ${item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="bg-black text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase italic hover:bg-red-600">Download Art</a>` : ''}
-                                            </div>
-                                        </div>
+    <div class="flex justify-between items-start mb-2">
+        <h4 class="font-black text-xs uppercase italic">${item.name}</h4>
+        <span class="text-[10px] font-black text-gray-400">$${item.price}</span>
+    </div>
+    
+    <ul class="text-[9px] text-gray-500 font-bold uppercase space-y-1 mb-4">
+        ${item.details ? item.details.split(/[|\n]/).map(d => d.trim()).filter(d => d).map(d => `
+            <li class="flex items-start gap-1">
+                <span class="text-red-600">•</span> ${d}
+            </li>
+        `).join('') : '<li>Standard Specs</li>'}
+    </ul>
+
+    <div class="flex gap-3">
+        ${item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="bg-black text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase italic hover:bg-red-600 transition-colors">Download Art</a>` : ''}
+    </div>
+</div>
                                     </div>
                                 `).join('') : ''}
                             </div>
@@ -172,6 +192,7 @@
 
         function getStatusClass(status) {
             if (status === 'Pending') return 'status-pending';
+            if (status === 'Shipping') return 'status-shipping';
             if (status === 'Completed') return 'status-completed';
             return 'text-blue-600 bg-blue-50';
         }
