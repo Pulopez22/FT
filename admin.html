@@ -10,24 +10,18 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-x: hidden; color: #000; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
-        
-        /* Estilos de la Tabla */
         .admin-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
         .admin-table th { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.1em; padding: 0 20px; text-align: left; }
-        .admin-table tr { transition: all 0.3s ease; }
-        .order-row { background: white; border: 1px solid #f3f4f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .order-row { background: white; border: 1px solid #f3f4f6; transition: all 0.3s ease; }
         .order-row:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #000; }
         .order-row td { padding: 20px; font-size: 12px; border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; }
         .order-row td:first-child { border-left: 1px solid #f3f4f6; border-top-left-radius: 1.5rem; border-bottom-left-radius: 1.5rem; }
         .order-row td:last-child { border-right: 1px solid #f3f4f6; border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem; }
-
-        .status-badge { padding: 4px 12px; rounded-full: 9999px; font-size: 9px; font-weight: 900; text-transform: uppercase; border-radius: 20px; }
+        .status-badge { padding: 4px 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; border-radius: 20px; }
         .status-pending { background: #fef3c7; color: #d97706; }
         .status-completed { background: #dcfce7; color: #16a34a; }
-
         #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
         #mobile-menu.open { transform: translateX(0); }
-        .sidebar-item:hover { color: #000; padding-left: 6px; transition: all 0.2s ease; }
     </style>
 </head>
 <body class="bg-white text-black">
@@ -57,7 +51,6 @@
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer text-black font-black"><i data-lucide="layout-dashboard" class="w-4 h-4 inline mr-2"></i> Orders History</li>
                 <li class="sidebar-item cursor-pointer hover:text-black transition-colors"><i data-lucide="tags" class="w-4 h-4 inline mr-2"></i> Edit Pricing</li>
-                <li class="sidebar-item cursor-pointer hover:text-black transition-colors"><i data-lucide="users" class="w-4 h-4 inline mr-2"></i> Customers</li>
             </ul>
         </aside>
 
@@ -80,7 +73,7 @@
                         </tr>
                     </thead>
                     <tbody id="orders-tbody">
-                        <tr><td colspan="6" class="text-center py-20 text-gray-400 italic">Fetching orders from MongoDB...</td></tr>
+                        <tr><td colspan="6" class="text-center py-20 text-gray-400 italic">Fetching orders...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -88,169 +81,106 @@
     </div>
 
     <script>
-    // --- 1. UNIFICACIÓN DE SEGURIDAD Y CONTROL DE ACCESO ---
-    (function verifyAccess() {
-        const token = localStorage.getItem('token');
-        const userStr = localStorage.getItem('user');
+        (function verifyAccess() {
+            const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            if (!token || !userStr) { window.location.href = 'login.html'; return; }
+            const user = JSON.parse(userStr);
+            if (user.role !== 'admin') { alert("No access."); window.location.href = 'index.html'; return; }
+            window.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('admin-name').innerText = `ADMIN: ${user.name.toUpperCase()}`;
+            });
+        })();
 
-        if (!token || !userStr) {
-            window.location.href = 'login.html';
-            return;
-        }
-
-        const user = JSON.parse(userStr);
-        if (user.role !== 'admin') {
-            alert("No tienes permisos de administrador.");
-            window.location.href = 'index.html';
-            return;
-        }
-
-        // Si pasó las pruebas, mostramos su nombre en el navbar
-        // Usamos un pequeño delay o esperamos a que el DOM esté listo
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('admin-name').innerText = `ADMIN: ${user.name.toUpperCase()}`;
-        });
-    })();
-
-    lucide.createIcons();
-
-   async function fetchOrders() {
-    const token = localStorage.getItem('token');
-    const tbody = document.getElementById('orders-tbody');
-    
-    try {
-        // IMPORTANTE: Verifica que esta URL sea la de tu backend en Render
-        const response = await fetch('https://ft-f34l.onrender.com/api/admin/orders', {
-            headers: { 'x-auth-token': token }
-        });
-        
-        if (!response.ok) throw new Error("Error en la respuesta del servidor");
-
-        const orders = await response.json();
-        
-        if (orders.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-gray-400 italic">No orders found.</td></tr>`;
-            return;
-        }
-
-        // Dentro del .map de fetchOrders:
-tbody.innerHTML = orders.map(order => `
-    <tr class="order-row cursor-pointer hover:bg-gray-50" onclick="toggleDetails('details-${order._id}')">
-        <td class="font-black">#${order.order_id || order._id.substring(0,8)}</td>
-        <td>
-            <div class="font-bold uppercase">${order.customer_name}</div>
-            <div class="text-[10px] text-gray-400">${order.customer_email}</div>
-        </td>
-        <td class="text-gray-500 uppercase font-bold text-[10px]">
-            <span class="flex items-center gap-1">
-                // Busca esta línea dentro de tu .map:
-${order.order_items ? order.order_items.map(item => ` ... `).join('') : '<p>...</p>'}
-                <i data-lucide="chevron-down" class="w-3 h-3"></i>
-            </span>
-        </td>
-        <td class="text-lg font-black italic">$${order.total_price || '0.00'}</td>
-        <td>
-            <select onchange="event.stopPropagation(); updateStatus('${order._id}', this.value)" 
-                    class="status-badge ${getStatusClass(order.status)} outline-none cursor-pointer border-none bg-transparent font-black">
-                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>Printing</option>
-                <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
-            </select>
-        </td>
-        <td class="text-gray-400 font-medium">${new Date(order.createdAt).toLocaleDateString()}</td>
-    </tr>
-
-    <tr id="details-${order._id}" class="hidden bg-gray-50/50">
-        <td colspan="6" class="p-6 border-x border-b rounded-b-[2rem]">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                ${order.order_items ? order.order_items.map(item => `
-                    <div class="flex gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
-                        <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 border border-gray-100">
-                            <img src="${item.image || '../images/placeholder.png'}" class="max-h-full max-w-full object-contain">
-                        </div>
-                        
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="font-black text-xs uppercase italic">${item.name}</h4>
-                                <span class="text-[10px] font-black text-gray-400">$${item.price}</span>
-                            </div>
-                            
-                            <p class="text-[9px] text-gray-500 font-bold uppercase leading-relaxed mb-4">
-                                ${item.details ? item.details.replace(/\n/g, ' | ') : 'No special specs'}
-                            </p>
-
-                            <div class="flex gap-3 mt-auto">
-                                ${item.fileUrl ? `
-                                    <a href="${item.fileUrl}" target="_blank" 
-                                       class="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase italic hover:bg-red-600 transition-colors">
-                                        <i data-lucide="download" class="w-3 h-3"></i> Download Art
-                                    </a>
-                                ` : `
-                                    <span class="text-[9px] font-black text-gray-300 uppercase italic flex items-center gap-2">
-                                        <i data-lucide="file-x" class="w-3 h-3"></i> No file provided
-                                    </span>
-                                `}
-                            </div>
-                        </div>
-                    </div>
-                `).join('') : '<p class="text-center py-4 italic text-gray-400">Data mismatch: order_items is empty</p>'}
-            </div>
-        </td>
-    </tr>
-`).join('');
         lucide.createIcons();
-    } catch (err) {
-        console.error("Error fetching orders:", err);
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-red-500 font-bold">Error connecting to server. Make sure you are logged in as Admin.</td></tr>`;
-    }
-}
 
-// Nueva función para cambiar el estado con un clic
-async function updateStatus(orderId, newStatus) {
-    const token = localStorage.getItem('token');
-    try {
-        const res = await fetch(`https://ft-f34l.onrender.com/api/admin/orders/${orderId}/status`, {
-            method: 'PATCH',
-            headers: { 
-                'Content-Type': 'application/json',
-                'x-auth-token': token 
-            },
-            body: JSON.stringify({ status: newStatus })
-        });
-        if (res.ok) {
-            console.log("Estado actualizado");
-            fetchOrders(); // Recargar la tabla
+        async function fetchOrders() {
+            const token = localStorage.getItem('token');
+            const tbody = document.getElementById('orders-tbody');
+            try {
+                const response = await fetch('https://ft-f34l.onrender.com/api/admin/orders', {
+                    headers: { 'x-auth-token': token }
+                });
+                const orders = await response.json();
+                
+                if (orders.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-gray-400">No orders found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = orders.map(order => `
+                    <tr class="order-row cursor-pointer" onclick="toggleDetails('details-${order._id}')">
+                        <td class="font-black">#${order.order_id || order._id.substring(0,8)}</td>
+                        <td>
+                            <div class="font-bold uppercase">${order.customer_name}</div>
+                            <div class="text-[10px] text-gray-400">${order.customer_email}</div>
+                        </td>
+                        <td class="text-gray-500 uppercase font-bold text-[10px]">
+                            <span class="flex items-center gap-1">
+                                ${order.order_items ? order.order_items.length : 0} Items <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                            </span>
+                        </td>
+                        <td class="text-lg font-black italic">$${order.total_price || '0.00'}</td>
+                        <td>
+                            <select onchange="event.stopPropagation(); updateStatus('${order._id}', this.value)" 
+                                    class="status-badge ${getStatusClass(order.status)} outline-none cursor-pointer border-none bg-transparent">
+                                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>Printing</option>
+                                <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                        </td>
+                        <td class="text-gray-400 font-medium">${new Date(order.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                    <tr id="details-${order._id}" class="hidden bg-gray-50/50">
+                        <td colspan="6" class="p-6 border-x border-b rounded-b-[2rem]">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                ${order.order_items ? order.order_items.map(item => `
+                                    <div class="flex gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                                        <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0">
+                                            <img src="${item.image || 'images/placeholder.png'}" class="max-h-full max-w-full object-contain">
+                                        </div>
+                                        <div class="flex-grow">
+                                            <h4 class="font-black text-xs uppercase italic">${item.name}</h4>
+                                            <p class="text-[9px] text-gray-500 font-bold uppercase leading-tight mb-4">${item.details || ''}</p>
+                                            <div class="flex gap-3">
+                                                ${item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="bg-black text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase italic hover:bg-red-600">Download Art</a>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('') : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+                lucide.createIcons();
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-red-500">Error connecting to server.</td></tr>`;
+            }
         }
-    } catch (e) {
-        alert("Error updating status");
-    }
-}
 
-// Helper para colores del estado
-function getStatusClass(status) {
-    if (status === 'Pending') return 'status-pending';
-    if (status === 'Completed') return 'status-completed';
-    return 'text-blue-600 bg-blue-50'; // Para otros estados
-}
+        async function updateStatus(orderId, newStatus) {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`https://ft-f34l.onrender.com/api/admin/orders/${orderId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (res.ok) fetchOrders();
+            } catch (e) { alert("Error updating status"); }
+        }
 
-    function logout() { 
-        localStorage.clear(); 
-        window.location.href = 'login.html'; 
-    }
+        function getStatusClass(status) {
+            if (status === 'Pending') return 'status-pending';
+            if (status === 'Completed') return 'status-completed';
+            return 'text-blue-600 bg-blue-50';
+        }
 
-    function toggleMobileMenu() { 
-        document.getElementById('mobile-menu').classList.toggle('open'); 
-    }
+        function toggleDetails(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
 
-    // Al cargar la ventana, ejecutamos la carga de datos
-    window.onload = () => {
-        fetchOrders();
-    };
-
-    function toggleDetails(id) {
-    const el = document.getElementById(id);
-    el.classList.toggle('hidden');
-}
-</script>
+        window.onload = fetchOrders;
+    </script>
 </body>
 </html>
