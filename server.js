@@ -193,6 +193,23 @@ app.get('/api/admin/orders', authMiddleware, async (req, res) => {
     }
 });
 
+app.patch('/api/admin/orders/:id/status', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ msg: "No autorizado" });
+        
+        const { status } = req.body;
+        const updatedOrder = await Order.findByIdAndUpdate(
+            req.params.id, 
+            { status: status }, 
+            { new: true }
+        );
+        
+        res.json(updatedOrder);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // 5. Carga de Archivos
 app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
     try {
