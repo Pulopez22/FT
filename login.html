@@ -211,18 +211,26 @@ const password = document.getElementById('password').value.trim();
             const data = await response.json();
 
             if (data.success) {
-                // --- 1, 2 y 5. GUARDAR DATOS DE SESIÓN Y AUTORIZACIÓN ---
+                // 1. Guardamos los datos esenciales en localStorage
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('userName', data.user.name);
                 localStorage.setItem('userEmail', data.user.email);
+                
+                // Guardamos el objeto usuario completo para tener acceso al rol en otras páginas
+                localStorage.setItem('user', JSON.stringify(data.user));
 
-                // Detectamos si el servidor dice que es mayorista
-                // Guardamos 'wholesale' para reducir precio a la mitad o 'retail' para duplicarlo
+                // 2. Definimos el tier de precios
                 const tier = data.user.isWholesale ? 'wholesale' : 'retail';
                 localStorage.setItem('userTier', tier);
                 
-                // Redirigir a la tienda
-                window.location.href = "checkout.html"; 
+                // 3. LÓGICA DE REDIRECCIÓN POR ROL
+                // Si el rol es 'admin', lo mandamos al panel de administración
+                if (data.user.role === 'admin') {
+                    window.location.href = "admin.html";
+                } else {
+                    // Si es un cliente normal, lo mandamos al checkout o index
+                    window.location.href = "index.html"; 
+                }
             } else {
                 errorMsg.style.display = 'block';
                 errorMsg.innerText = data.message || "Invalid credentials.";

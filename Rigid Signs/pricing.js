@@ -1,7 +1,7 @@
 window.rigidsigns = {
     "PVC": { "material": 3.00, "type": "sqft" },
     "Foamboard": { "material": 3.50, "type": "sqft" },
-    "Coroplast": { "material": 2.50, "type": "sqft" },
+    "Coroplast": { "material": 3.50, "type": "sqft" },
     "Styrene": { "material": 3.50, "type": "sqft" },
     "Ultraboard": { "material": 5.00, "type": "sqft" },
     "Aluminum Signs": { "material": 4.50, "type": "sqft" },

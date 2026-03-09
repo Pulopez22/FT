@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Square Foot Printing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-x: hidden; color: #000; }
+        .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
+        
+        /* Estilos de la Tabla */
+        .admin-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .admin-table th { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.1em; padding: 0 20px; text-align: left; }
+        .admin-table tr { transition: all 0.3s ease; }
+        .order-row { background: white; border: 1px solid #f3f4f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .order-row:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #000; }
+        .order-row td { padding: 20px; font-size: 12px; border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; }
+        .order-row td:first-child { border-left: 1px solid #f3f4f6; border-top-left-radius: 1.5rem; border-bottom-left-radius: 1.5rem; }
+        .order-row td:last-child { border-right: 1px solid #f3f4f6; border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem; }
+
+        .status-badge { padding: 4px 12px; rounded-full: 9999px; font-size: 9px; font-weight: 900; text-transform: uppercase; border-radius: 20px; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-completed { background: #dcfce7; color: #16a34a; }
+
+        #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        #mobile-menu.open { transform: translateX(0); }
+        .sidebar-item:hover { color: #000; padding-left: 6px; transition: all 0.2s ease; }
+    </style>
+</head>
+<body class="bg-white text-black">
+
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
+        <div class="flex items-center gap-8">
+            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
+            <a href="index.html" class="flex items-center group">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
+                </div>
+            </a>
+            <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-black tracking-widest italic">
+                <span class="border-b-2 border-red-600 pb-1 text-red-600">ADMIN PANEL</span>
+                <a href="index.html" class="hover:text-red-600 transition-colors">View Store</a>
+            </div>
+        </div>
+        <div class="flex gap-4 items-center italic font-black text-[10px]">
+            <span id="admin-name">ADMIN</span>
+            <button onclick="logout()" class="text-red-600 underline">LOGOUT</button>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <aside class="w-72 border-r h-[calc(100vh-73px)] sticky top-[73px] p-8 hidden lg:block bg-white overflow-y-auto">
+            <h3 class="text-[10px] font-black uppercase mb-8 text-gray-300 tracking-widest border-b pb-2">Management</h3>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
+                <li class="sidebar-item cursor-pointer text-black font-black"><i data-lucide="layout-dashboard" class="w-4 h-4 inline mr-2"></i> Orders History</li>
+                <li class="sidebar-item cursor-pointer hover:text-black transition-colors"><i data-lucide="tags" class="w-4 h-4 inline mr-2"></i> Edit Pricing</li>
+                <li class="sidebar-item cursor-pointer hover:text-black transition-colors"><i data-lucide="users" class="w-4 h-4 inline mr-2"></i> Customers</li>
+            </ul>
+        </aside>
+
+        <main class="flex-grow p-6 md:p-12">
+            <header class="mb-12">
+                <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter">Orders History</h1>
+                <div class="h-2 w-24 bg-red-600 rounded-full mb-8"></div>
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Real-time database records from Square Foot Printing</p>
+            </header>
+
+            <div class="overflow-x-auto">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-tbody">
+                        <tr><td colspan="6" class="text-center py-20 text-gray-400 italic">Fetching orders from MongoDB...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    // --- 1. UNIFICACIÓN DE SEGURIDAD Y CONTROL DE ACCESO ---
+    (function verifyAccess() {
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+
+        if (!token || !userStr) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const user = JSON.parse(userStr);
+        if (user.role !== 'admin') {
+            alert("No tienes permisos de administrador.");
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // Si pasó las pruebas, mostramos su nombre en el navbar
+        // Usamos un pequeño delay o esperamos a que el DOM esté listo
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('admin-name').innerText = `ADMIN: ${user.name.toUpperCase()}`;
+        });
+    })();
+
+    lucide.createIcons();
+
+    // 2. Cargar órdenes desde el Backend
+    async function fetchOrders() {
+        const token = localStorage.getItem('token');
+        try {
+            // Asegúrate de que esta URL sea la de tu backend (localhost o Render)
+            const response = await fetch('http://localhost:3000/api/admin/orders', {
+                headers: { 'x-auth-token': token }
+            });
+            
+            if (!response.ok) throw new Error("Failed to fetch");
+
+            const orders = await response.json();
+            const tbody = document.getElementById('orders-tbody');
+            
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-gray-400 italic">No orders found in database.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => `
+                <tr class="order-row">
+                    <td class="font-black">#${order.order_id || order._id.substring(0,8)}</td>
+                    <td>
+                        <div class="font-bold uppercase">${order.customer_name}</div>
+                        <div class="text-[10px] text-gray-400">${order.customer_email}</div>
+                    </td>
+                    <td class="text-gray-500 uppercase font-bold text-[10px]">
+                        ${order.items ? order.items.length : 0} Products
+                    </td>
+                    <td class="text-lg font-black italic">$${order.total_price || '0.00'}</td>
+                    <td>
+                        <span class="status-badge ${order.status === 'Pending' ? 'status-pending' : 'status-completed'}">
+                            ${order.status}
+                        </span>
+                    </td>
+                    <td class="text-gray-400 font-medium">
+                        ${new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        } catch (err) {
+            console.error("Error fetching orders:", err);
+            document.getElementById('orders-tbody').innerHTML = `<tr><td colspan="6" class="text-center py-20 text-red-500 font-bold">Error connecting to server.</td></tr>`;
+        }
+    }
+
+    function logout() { 
+        localStorage.clear(); 
+        window.location.href = 'login.html'; 
+    }
+
+    function toggleMobileMenu() { 
+        document.getElementById('mobile-menu').classList.toggle('open'); 
+    }
+
+    // Al cargar la ventana, ejecutamos la carga de datos
+    window.onload = () => {
+        fetchOrders();
+    };
+</script>
+</body>
+</html>
