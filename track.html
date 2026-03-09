@@ -12,12 +12,17 @@
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         .sidebar-item:hover { color: #000; padding-left: 6px; transition: all 0.2s ease; }
         
-        /* Estilos de Tracking */
-        .step-active { color: #ef4444 !important; opacity: 1 !important; transform: scale(1.05); }
-        .step-active .icon-box { background-color: #fef2f2; border-color: #fee2e2; color: #ef4444; }
-        .step-inactive { color: #d1d5db; opacity: 0.5; }
+        /* --- ESTILOS DE PROGRESO ACUMULATIVO --- */
+        .step-active { color: #ef4444 !important; opacity: 1 !important; }
+        .step-active .icon-box { background-color: #000 !important; color: #fff !important; border-color: #000 !important; }
         
-        .input-field { width: 100%; padding: 1.25rem; border-radius: 1.5rem; border: 1px solid #e5e7eb; outline: none; transition: all 0.3s; font-size: 14px; font-weight: 900; background-color: #f9fafb; text-transform: uppercase; font-style: italic; }
+        /* Brillo para el estado actual */
+        .step-current { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.4)); }
+        
+        .step-inactive { color: #d1d5db; opacity: 0.4; }
+        .icon-box { transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .input-field { width: 100%; padding: 1.25rem; border-radius: 1.5rem; border: 1px solid #e5e7eb; outline: none; transition: all 0.3s; font-size: 14px; font-weight: 900; background-color: #f9fafb; font-style: italic; }
         .input-field:focus { border-color: #000; background-color: #fff; box-shadow: 0 0 0 4px rgba(0,0,0,0.05); }
         
         #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
@@ -35,80 +40,96 @@
                 </div>
             </a>
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic text-black">
-                <a href="index.html" class="hover:text-black transition-colors">Wall Art</a>
+                <a href="index.html" class="text-black border-b-2 border-black pb-1">Wall Art</a>
                 <a href="Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
+                <a href="#" class="hover:text-black transition-colors">Trade Show</a>
+                <a href="#" class="hover:text-black transition-colors">Decals</a>
                 <a href="Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
-                <span class="text-black border-b-2 border-black pb-1">Track Order</span>
+                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
         <div id="auth-container"></div>
     </nav>
 
+     <div id="mobile-menu" class="p-8 flex flex-col gap-6 xl:hidden text-black">
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic text-black">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+        </div>
+        <ul class="space-y-6 text-sm font-black uppercase italic text-black">
+            <li><a href="index.html" onclick="toggleMobileMenu()">Wall Art</a></li>
+            <li><a href="Banners/banners.html" onclick="toggleMobileMenu()">Banners</a></li>
+            <li><a href="Stickers/stickers.html" onclick="toggleMobileMenu()">Stickers</a></li>
+            <li><a href="Rigid Signs/rigidsigns.html" onclick="toggleMobileMenu()">Rigid Signs</a></li>
+        </ul>
+    </div>
+
     <div class="flex">
-        <aside class="w-72 border-r h-[calc(100vh-73px)] sticky top-[73px] p-8 hidden lg:block bg-white overflow-y-auto">
-            <h3 class="text-[10px] font-black uppercase mb-8 text-gray-300 tracking-widest border-b pb-2">Support</h3>
-            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer text-black"><a href="index.html">Back to Store</a></li>
-                <li class="sidebar-item cursor-pointer text-black font-black italic text-red-600">Track Order Status</li>
-                <li class="sidebar-item cursor-pointer text-black">Contact Us</li>
+        <aside class="w-72 border-r h-[calc(100vh-73px)] sticky top-[73px] p-8 hidden lg:block bg-white overflow-y-auto text-black">
+            <h3 class="text-[10px] font-black uppercase mb-8 text-gray-300 tracking-widest border-b pb-2">Product Categories</h3>
+            <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase text-black">
+                <li class="sidebar-item cursor-pointer text-black"><a href="AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Displays/displays.html" class="block w-full">Displays</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
 
         <main class="flex-grow p-6 md:p-12 text-black">
             <header class="mb-12 max-w-4xl">
-                <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter">Track Your Order</h1>
+                <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter uppercase">Track Your Order</h1>
                 <div class="h-2 w-24 bg-black rounded-full mb-8"></div>
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-loose">
-                    Real-time production monitoring for Square Foot Printing orders.
-                </p>
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-loose">Check real-time production status and order details.</p>
             </header>
 
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-12">
                 <div class="xl:col-span-7 space-y-8">
                     <section class="flex flex-col md:flex-row gap-4">
                         <input type="text" id="orderIdInput" placeholder="ENTER ORDER ID (ORD-XXXXXX)" class="input-field tracking-widest flex-grow shadow-sm">
-                        <button onclick="trackOrder()" id="trackBtn" class="bg-black text-white px-10 py-4 rounded-2xl heavy-italic italic text-xs tracking-widest hover:bg-red-600 transition-all shadow-xl">
-                            SEARCH
-                        </button>
+                        <button onclick="trackOrder()" id="trackBtn" class="bg-black text-white px-10 py-4 rounded-2xl heavy-italic italic text-xs tracking-widest hover:bg-red-600 transition-all shadow-xl">SEARCH</button>
                     </section>
 
                     <div id="statusResult" class="hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        <div class="bg-white border border-gray-100 p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden">
-                            <div class="flex justify-between items-center border-b pb-6 mb-8">
+                        <div class="bg-white border border-gray-100 p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden">
+                            <div class="flex justify-between items-center border-b pb-6 mb-12">
                                 <div>
                                     <p class="text-[10px] font-black text-gray-400 uppercase">Order ID</p>
                                     <h2 id="displayOrderId" class="text-2xl heavy-italic italic">#000000</h2>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-[10px] font-black text-gray-400 uppercase">Current Status</p>
+                                    <p class="text-[10px] font-black text-gray-400 uppercase">Status</p>
                                     <span id="statusBadge" class="bg-red-50 text-red-600 px-4 py-1 rounded-full text-[10px] font-black italic uppercase">---</span>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div id="step-Pending" class="flex flex-col items-center text-center gap-2 step-inactive">
-                                    <div class="icon-box p-5 rounded-2xl border bg-gray-50 mb-2 transition-all"><i data-lucide="clock"></i></div>
+                            <div class="relative flex justify-between items-center">
+                                <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-8 z-0"></div>
+                                
+                                <div id="step-Pending" class="z-10 flex flex-col items-center gap-2 step-inactive">
+                                    <div class="icon-box p-5 rounded-2xl border bg-gray-50 mb-2"><i data-lucide="clock" class="w-6 h-6"></i></div>
                                     <span class="text-[9px] font-black uppercase italic">Received</span>
                                 </div>
-                                <div id="step-Printing" class="flex flex-col items-center text-center gap-2 step-inactive">
-                                    <div class="icon-box p-5 rounded-2xl border bg-gray-50 mb-2 transition-all"><i data-lucide="printer"></i></div>
+                                <div id="step-Printing" class="z-10 flex flex-col items-center gap-2 step-inactive">
+                                    <div class="icon-box p-5 rounded-2xl border bg-gray-50 mb-2"><i data-lucide="printer" class="w-6 h-6"></i></div>
                                     <span class="text-[9px] font-black uppercase italic">Printing</span>
                                 </div>
-                                <div id="step-Ready" class="flex flex-col items-center text-center gap-2 step-inactive">
-                                    <div class="icon-box p-5 rounded-2xl border bg-gray-50 mb-2 transition-all"><i data-lucide="package"></i></div>
+                                <div id="step-Ready" class="z-10 flex flex-col items-center gap-2 step-inactive">
+                                    <div class="icon-box p-5 rounded-2xl border bg-gray-50 mb-2"><i data-lucide="package" class="w-6 h-6"></i></div>
                                     <span class="text-[9px] font-black uppercase italic">Ready</span>
                                 </div>
-                                <div id="step-Completed" class="flex flex-col items-center text-center gap-2 step-inactive">
-                                    <div class="icon-box p-5 rounded-2xl border bg-gray-50 mb-2 transition-all"><i data-lucide="check-circle"></i></div>
-                                    <span class="text-[9px] font-black uppercase italic">Completed</span>
+                                <div id="step-Completed" class="z-10 flex flex-col items-center gap-2 step-inactive">
+                                    <div class="icon-box p-5 rounded-2xl border bg-gray-50 mb-2"><i data-lucide="check-circle" class="w-6 h-6"></i></div>
+                                    <span class="text-[9px] font-black uppercase italic">Done</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 shadow-inner">
-                            <h3 class="heavy-italic text-sm mb-6 italic tracking-tight">Included in this order</h3>
-                            <div id="orderItemsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                </div>
+                            <h3 class="heavy-italic text-sm mb-6 italic">Included in this order</h3>
+                            <div id="orderItemsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                         </div>
                     </div>
                 </div>
@@ -117,29 +138,49 @@
                     <div class="bg-black text-white p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
                         <h3 class="heavy-italic text-xl italic mb-2 relative z-10">Production Support</h3>
                         <p class="text-[10px] font-bold text-gray-400 uppercase mb-8 relative z-10">Need an update or change?</p>
-                        <div class="space-y-3 relative z-10">
-                            <a href="mailto:ventas@sfp-lasvegas.com" class="flex items-center gap-4 bg-white/10 p-5 rounded-2xl hover:bg-red-600 transition-all border border-white/5">
-                                <i data-lucide="mail" class="w-5 h-5 text-red-500"></i>
-                                <span class="text-[10px] font-black uppercase italic tracking-widest">ventas@sfp-lasvegas.com</span>
-                            </a>
-                        </div>
+                        <a href="mailto:ventas@sfp-lasvegas.com" class="flex items-center gap-4 bg-white/10 p-5 rounded-2xl hover:bg-red-600 transition-all border border-white/5 relative z-10">
+                            <i data-lucide="mail" class="w-5 h-5 text-red-500"></i>
+                            <span class="text-[10px] font-black uppercase italic tracking-widest">ventas@sfp-lasvegas.com</span>
+                        </a>
                         <i data-lucide="help-circle" class="absolute -bottom-10 -right-10 w-40 h-40 text-white/5 rotate-12"></i>
                     </div>
 
-                    <div class="p-8 border border-gray-100 rounded-[2.5rem] bg-white">
-                        <h3 class="heavy-italic text-sm mb-6 italic">Turnaround Times</h3>
-                        <div class="space-y-4 text-[10px] font-bold uppercase tracking-tight">
-                            <div class="border-b border-gray-50 pb-4">
-                                <p class="text-red-600 mb-1">Standard Banners</p>
-                                <p class="text-gray-400">24-48 Business Hours</p>
-                            </div>
-                            <div class="border-b border-gray-50 pb-4">
-                                <p class="text-red-600 mb-1">Rigid Signs</p>
-                                <p class="text-gray-400">2-3 Business Days</p>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="p-8 border border-gray-100 rounded-[2.5rem] bg-white shadow-sm">
+    <h3 class="heavy-italic text-sm mb-6 italic">Quick Information</h3>
+    <div class="space-y-6 text-[10px] font-bold uppercase tracking-tight">
+        
+        <div class="border-b border-gray-50 pb-4">
+            <p class="text-red-600 mb-1 flex items-center gap-2">
+                <i data-lucide="clock" class="w-3 h-3"></i> When will it be ready?
+            </p>
+            <p class="text-gray-400 leading-relaxed">
+                Most orders are completed within 24-48 business hours after the "Printing" stage begins.
+            </p>
+        </div>
+
+        <div class="border-b border-gray-50 pb-4">
+            <p class="text-red-600 mb-1 flex items-center gap-2">
+                <i data-lucide="truck" class="w-3 h-3"></i> Shipping & Pickup
+            </p>
+            <p class="text-gray-400 leading-relaxed">
+                Once status is "READY", you can pick up at our Las Vegas location or expect your tracking number via email.
+            </p>
+        </div>
+
+        <div>
+            <p class="text-red-600 mb-1 flex items-center gap-2">
+                <i data-lucide="file-check" class="w-3 h-3"></i> Artwork Quality
+            </p>
+            <p class="text-gray-400 leading-relaxed">
+                If there's an issue with your file, our team will contact you and the status will remain "Pending".
+            </p>
+        </div>
+
+    </div>
+</div>
                 </div>
+
+                
             </div>
         </main>
     </div>
@@ -148,7 +189,7 @@
         <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
             <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
         </div>
-        <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
+        <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing</p>
     </footer>
 
     <script>
@@ -157,11 +198,8 @@
         function checkAuth() {
             const userName = localStorage.getItem('userName');
             const authDiv = document.getElementById('auth-container');
-            if (userName) {
-                authDiv.innerHTML = `<span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span>`;
-            } else {
-                authDiv.innerHTML = `<button onclick="window.location.href='login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`;
-            }
+            if (userName) authDiv.innerHTML = `<span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span>`;
+            else authDiv.innerHTML = `<button onclick="window.location.href='login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`;
         }
 
         async function trackOrder() {
@@ -181,27 +219,42 @@
                     document.getElementById('displayOrderId').innerText = `#${id}`;
                     document.getElementById('statusBadge').innerText = data.status;
 
-                    // Render items
-                    const itemsContainer = document.getElementById('orderItemsContainer');
-                    itemsContainer.innerHTML = data.items.map(item => `
-                        <div class="flex items-center gap-4 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm transition-transform hover:scale-[1.02]">
-                            <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center p-1 border border-gray-50">
-                                <img src="${item.image || 'images/placeholder.png'}" class="max-h-full max-w-full object-contain">
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-black uppercase italic leading-none">${item.name}</p>
-                                <p class="text-[8px] text-gray-400 font-bold uppercase mt-1 leading-tight line-clamp-2">${item.details || 'Standard Specs'}</p>
-                            </div>
-                        </div>
-                    `).join('');
+                    // Dentro de trackOrder, cuando recibes los datos exitosamente:
+const itemsContainer = document.getElementById('orderItemsContainer');
+
+itemsContainer.innerHTML = data.items.map(item => {
+    // Procesamos el string de detalles para convertirlo en lista vertical
+    // Separamos por '|' o por saltos de línea
+    const detailsList = item.details 
+        ? item.details.split(/[|\n]/).map(d => d.trim()).filter(d => d)
+        : ["Custom Product"];
+
+    return `
+        <div class="flex items-start gap-5 bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm transition-transform hover:scale-[1.02]">
+           
+            
+            <div class="flex-grow">
+                <h4 class="font-black text-xs uppercase italic mb-2 tracking-tight">${item.name}</h4>
+                
+                <ul class="space-y-1">
+                    ${detailsList.map(detail => `
+                        <li class="text-[9px] font-bold uppercase text-gray-500 flex items-start gap-1">
+                            <span class="text-red-600">•</span> ${detail}
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        </div>
+    `;
+}).join('');
 
                     updateVisualStatus(data.status);
                     lucide.createIcons();
                 } else {
-                    alert("Order ID not found. Make sure to include ORD- prefix.");
+                    alert("Order not found.");
                 }
             } catch (e) {
-                alert("Server Connection Error.");
+                alert("Server Error.");
             } finally {
                 btn.innerText = "SEARCH";
                 btn.disabled = false;
@@ -210,16 +263,24 @@
 
         function updateVisualStatus(currentStatus) {
             const steps = ['Pending', 'Printing', 'Ready', 'Completed'];
-            steps.forEach(s => {
-                document.getElementById(`step-${s}`).className = 'flex flex-col items-center text-center gap-2 step-inactive';
-            });
+            const currentIndex = steps.indexOf(currentStatus);
 
-            const activeStep = document.getElementById(`step-${currentStatus}`);
-            if(activeStep) activeStep.className = 'flex flex-col items-center text-center gap-2 step-active';
+            steps.forEach((s, index) => {
+                const el = document.getElementById(`step-${s}`);
+                if (el) {
+                    el.classList.remove('step-active', 'step-current', 'step-inactive');
+                    if (index <= currentIndex) {
+                        el.classList.add('step-active');
+                        if (index === currentIndex) el.classList.add('step-current');
+                    } else {
+                        el.classList.add('step-inactive');
+                    }
+                }
+            });
+            lucide.createIcons();
         }
 
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
-
         window.onload = checkAuth;
     </script>
 </body>

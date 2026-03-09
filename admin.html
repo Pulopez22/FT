@@ -19,7 +19,7 @@
         .order-row td:last-child { border-right: 1px solid #f3f4f6; border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem; }
         .status-badge { padding: 4px 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; border-radius: 20px; }
         .status-pending { background: #fef3c7; color: #d90606; }
-        .status-shipping { background: #e0f2fe; color: #0284c7; }
+        .status-ready { background: #e0f2fe; color: #0284c7; }
         .status-completed { background: #dcfce7; color: #16a34a; }
         #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
         #mobile-menu.open { transform: translateX(0); }
@@ -136,7 +136,7 @@
         class="status-badge ${getStatusClass(order.status)} outline-none cursor-pointer border-none bg-transparent font-black">
     <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>RECEIVED</option>
     <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>PRINTING</option>
-    <option value="Shipping" ${order.status === 'Shipping' ? 'selected' : ''}>SHIPPING</option>
+    <option value="Ready" ${order.status === 'Ready' ? 'selected' : ''}>READY</option>
     <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>COMPLETED</option>
 </select>
                         </td>
@@ -192,7 +192,7 @@
 
         function getStatusClass(status) {
             if (status === 'Pending') return 'status-pending';
-            if (status === 'Shipping') return 'status-shipping';
+            if (status === 'Ready') return 'status-ready';
             if (status === 'Completed') return 'status-completed';
             return 'text-blue-600 bg-blue-50';
         }
