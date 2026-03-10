@@ -75,12 +75,15 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <div class="flex items-center gap-4 text-black">
+       <div class="flex items-center gap-4">
             <div id="auth-container" class="flex items-center"></div>
             <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
-                <i data-lucide="shopping-bag" class="w-6 h-6 text-black"></i>
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
+            <a href="../track.html" class="hidden md:block text-[10px] font-black uppercase text-black hover:text-red-600 transition-colors border-b-2 border-black pb-0.5">
+                Track Order
+            </a>
         </div>
     </nav>
 
@@ -289,39 +292,29 @@
 function autoFitImage() {
     const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
     const statusTitle = document.getElementById('status-title');
+    const targetW = parseFloat(document.getElementById('w-input').value) || 1;
+    const targetH = parseFloat(document.getElementById('h-input').value) || 1;
     
-    const targetW = parseFloat(document.getElementById('w-input').value);
-    const targetH = parseFloat(document.getElementById('h-input').value);
-    
-    const isImageHorizontal = originalW > originalH;
-    const isOrderHorizontal = targetW > targetH;
-
-    // Reset de estilos previos
-    el.style.transform = "none";
-    el.style.position = "relative";
+    // Forzamos a que ocupe el 100% del contenedor naranja
     el.style.width = "100%";
     el.style.height = "100%";
     el.style.objectFit = "cover";
+    el.style.transform = "none";
+    el.style.position = "relative";
 
-    // Si la imagen no coincide con la orientación del pedido, la rotamos
-    if (isImageHorizontal !== isOrderHorizontal) {
+    // Rotación inteligente: si la imagen es horizontal y el pedido vertical (o viceversa)
+    if ((originalW > originalH) !== (targetW > targetH)) {
         el.style.transform = "rotate(90deg)";
-        
-        // Ajustamos dimensiones para que al rotar cubra todo el cuadro
-        // La técnica es que el ancho de la imagen sea el alto del cuadro y viceversa
         const areaBox = document.getElementById('printing-area');
-        const boxW = areaBox.offsetWidth;
-        const boxH = areaBox.offsetHeight;
-        
-        el.style.width = boxH + "px";
-        el.style.height = boxW + "px";
+        // Ajuste de proporciones para que al girar siga llenando el fondo
+        el.style.width = areaBox.offsetHeight + "px";
+        el.style.height = areaBox.offsetWidth + "px";
         el.style.position = "absolute";
         statusTitle.innerText = "AUTO-ROTATED & FITTED ✓";
     } else {
         statusTitle.innerText = "AUTO-FITTED ✓";
     }
-    
-    statusTitle.className = "text-[10px] font-black uppercase text-blue-600 italic";
+    statusTitle.className = "text-[10px] font-black uppercase text-blue-600 italic text-center";
 }
 
         function checkAuth() {
@@ -358,60 +351,68 @@ function autoFitImage() {
             document.getElementById('final-price').innerText = `$${globalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
-        async function processFile(input) {
-            if (!input.files || !input.files[0]) return;
-            const file = input.files[0];
-            isPdf = file.type === "application/pdf";
-            
-            document.getElementById('drop-zone').classList.add('hidden');
-            document.getElementById('validation-panel').classList.remove('hidden');
-            const statusTitle = document.getElementById('status-title');
-            statusTitle.innerText = "PROCESSING...";
+       async function processFile(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    isPdf = file.type === "application/pdf";
+    
+    document.getElementById('drop-zone').classList.add('hidden');
+    document.getElementById('validation-panel').classList.remove('hidden');
+    updateOrderedLabels(); // Esto ajusta el cuadro naranja primero
 
-            const previewImg = document.getElementById('preview-thumb');
-            const canvas = document.getElementById('pdf-canvas');
-            updateOrderedLabels();
+    const targetW = parseFloat(document.getElementById('w-input').value) || 1;
+    const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+    const previewImg = document.getElementById('preview-thumb');
+    const canvas = document.getElementById('pdf-canvas');
+    const areaBox = document.getElementById('printing-area');
 
-            if (isPdf) {
-                previewImg.style.display = "none";
-                canvas.classList.remove('hidden');
-                const reader = new FileReader();
-                reader.onload = async function() {
-                    const typedarray = new Uint8Array(this.result);
-                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                    const page = await pdf.getPage(1);
-                    const viewport = page.getViewport({ scale: 2.0 });
-                    const context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-                    originalW = viewport.width; originalH = viewport.height;
-                    await page.render({ canvasContext: context, viewport: viewport }).promise;
-                    canvas.style.width = (originalW * 0.04) + "px";
-                    canvas.style.height = (originalH * 0.04) + "px";
-                    canvas.style.display = "block";
-                    updateUIInfo(originalW, originalH);
-                };
-                reader.readAsArrayBuffer(file);
-            } else {
-                canvas.style.display = "none";
-                previewImg.classList.remove('hidden');
-                previewImg.style.display = "block";
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = function() {
-                        previewImg.src = e.target.result;
-                        originalW = this.width; originalH = this.height;
-                        previewImg.style.width = (originalW * 0.04) + "px";
-                        previewImg.style.height = (originalH * 0.04) + "px";
-                        updateUIInfo(originalW, originalH);
-                    };
-                };
-                reader.readAsDataURL(file);
-            }
-            uploadToRender(file);
-        }
+    const renderArt = (w, h, contentUrl, isPdfType) => {
+        originalW = w; 
+        originalH = h;
+        
+        // CÁLCULO DE ESCALA RELATIVA AL PEDIDO
+        // Convertimos los píxeles a pulgadas (píxel / 100) y comparamos con el pedido
+        const fileInchesW = w / 100;
+        const fileInchesH = h / 100;
+
+        const el = isPdfType ? canvas : previewImg;
+        if (!isPdfType) el.src = contentUrl;
+        
+        // Calculamos el % que debe ocupar la imagen dentro del cuadro naranja
+        // Si mide 20" y el banner es 25", ocupará el 80% del contenedor naranja
+        el.style.width = (fileInchesW / targetW * 100) + "%";
+        el.style.height = (fileInchesH / targetH * 100) + "%";
+        el.style.display = "block";
+        
+        updateUIInfo(w, h);
+    };
+
+    if (isPdf) {
+        previewImg.style.display = "none";
+        canvas.classList.remove('hidden');
+        const reader = new FileReader();
+        reader.onload = async function() {
+            const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 2.0 });
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height; canvas.width = viewport.width;
+            await page.render({ canvasContext: context, viewport }).promise;
+            renderArt(viewport.width, viewport.height, null, true);
+        };
+        reader.readAsArrayBuffer(file);
+    } else {
+        canvas.style.display = "none";
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => renderArt(img.width, img.height, e.target.result, false);
+        };
+        reader.readAsDataURL(file);
+    }
+    uploadToRender(file);
+}
 
         function updateUIInfo(w, h) {
             const inchW = (w / 100).toFixed(2);

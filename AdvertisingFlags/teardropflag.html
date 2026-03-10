@@ -64,12 +64,15 @@
                 <a href="#" class="hover:text-black transition-colors text-black">Marketing Materials</a>
             </div>
         </div>
-        <div class="flex items-center gap-4">
+       <div class="flex items-center gap-4">
             <div id="auth-container" class="flex items-center"></div>
-            <button onclick="toggleCart()" class="relative text-black p-2">
+            <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
+            <a href="../track.html" class="hidden md:block text-[10px] font-black uppercase text-black hover:text-red-600 transition-colors border-b-2 border-black pb-0.5">
+                Track Order
+            </a>
         </div>
     </nav>
 
