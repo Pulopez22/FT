@@ -8,7 +8,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=AUbkVL7-ki_DER-xXi7WUJLdmkIS2ISX7f_FLQTar5uhYycbzdEE6BcASfjqDTGJbdYrsywgkdkZ2O88"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+   <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; color: #000; overflow-x: hidden; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         .input-field { width: 100%; padding: 1rem; border-radius: 1.25rem; border: 1px solid #e5e7eb; outline: none; transition: all 0.3s; font-size: 14px; font-weight: 600; background-color: #f9fafb; color: #000; }
@@ -126,9 +127,10 @@
                                 <div onclick="selectPayment('zelle')" id="pay-zelle" class="select-button p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
                                     <i data-lucide="wallet"></i><span class="heavy-italic text-[10px]">Zelle</span>
                                 </div>
-                                <div onclick="selectPayment('paypal')" id="pay-paypal" class="select-button p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
-                                    <i data-lucide="paypal"></i><span class="heavy-italic text-[10px]">PayPal</span>
-                                </div>
+                               <div onclick="selectPayment('paypal')" id="pay-paypal" class="select-button p-6 rounded-[1.5rem] flex flex-col items-center justify-center gap-3">
+    <i class="fa-brands fa-paypal text-2xl"></i>
+    <span class="heavy-italic text-[10px] tracking-widest">PAYPAL</span>
+</div>
                             </div>
                             <div id="card-details" class="hidden bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 space-y-6">
                                 <div><label>Card Number</label><input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" class="input-field"></div>
