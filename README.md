@@ -13,15 +13,15 @@ Square Foot Printin
             </a>
         </div>
 
-<div class="pt-8 border-t border-gray-100">
-                            <h2 class="text-3xl md:text-4xl heavy-italic mb-6 italic text-black">EZ Tube Tension Stand</h2>
-                            <div class="text-[14px] leading-[1.8] space-y-6 font-medium text-black">
-                                <p>Professional tension fabric display with interlocking aluminum frame. Tool-free assembly for a modern, wrinkle-free trade show presence.</p>
-                                <ul class="list-disc pl-5 space-y-3 text-[13px] text-black">
-                                    <li>Lightweight interlocking aluminum frame</li>
-                                    <li>Premium 9oz Stretch Polyester Fabric</li>
-                                    <li>Available in Straight or Curved shapes</li>
-                                    <li>Padded travel bag included with kits</li>
+ <div class="pt-8 border-t border-gray-100 space-y-6">
+                            <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">Window Perforated Adhesive Vinyl</h2>
+                            <p class="text-[14px] text-gray-600 leading-relaxed font-medium">Adhesive Window Perf is a <strong>white perforated film</strong> with a black adhesive backing. It has a <strong>perforated 60% printable area and 40% open area</strong>.</p>
+                            <div class="space-y-4">
+                                <h4 class="text-[11px] font-black uppercase tracking-widest text-black">Features:</h4>
+                                <ul class="text-[13px] text-gray-700 space-y-2 font-medium">
+                                    <li>• Maximum Width: 53.5" Wide</li>
+                                    <li>• Resolution: 720 x 720</li>
+                                    <li>• Usage: Indoor or Outdoor; UV safe</li>
                                 </ul>
                             </div>
                         </div>
