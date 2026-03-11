@@ -6,6 +6,7 @@
     <title>Coroplast Signs - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; color: #000; }
@@ -23,13 +24,6 @@
         .progress-bar { width: 0%; height: 6px; background: #00ab66; transition: width 0.6s ease; border-radius: 3px; }
         .canvas-bg-grid { background-color: #f3f4f6; background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%); background-size: 20px 20px; }
         
-        /* VALIDADOR UNIFICADO Y BLINDADO */
-        .art-canvas-refined { background-color: #e5e7eb; border-radius: 1.5rem; position: relative; padding: 2.5rem; display: flex; align-items: center; justify-content: center; min-height: 350px; overflow: hidden; width: 100%; }
-        .measure-capsule { background: white; padding: 4px 14px; border-radius: 8px; font-size: 13px; font-weight: 900; color: black; position: absolute; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 20; }
-        .capsule-bottom { bottom: 15px; left: 50%; transform: translateX(-50%); }
-        .capsule-right { right: 15px; top: 50%; transform: translateY(-50) rotate(90deg); }
-        .scale-badge-red { position: absolute; bottom: 15px; right: 15px; background: #e31e24; color: white; padding: 6px 12px; border-radius: 8px; font-weight: 900; font-style: italic; font-size: 11px; z-index: 30; }
-
         #cart-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 450px; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 110; display: flex; flex-direction: column; }
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
@@ -38,12 +32,14 @@
         #mobile-menu.open { transform: translateX(0); }
         .wholesale-badge { display: inline-flex; align-items: center; background-color: #f0fdf4; color: #16a34a; padding: 6px 16px; border-radius: 9999px; font-size: 10px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; border: 1px solid #dcfce7; margin-top: 10px; }
         .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
+        
+        .measure-label { position: absolute; background: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 30; color: black; white-space: nowrap; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
-        <div class="flex items-center gap-8">
+        <div class="flex items-center gap-8 text-black">
             <button onclick="toggleMobileMenu()" class="xl:hidden p-1"><i data-lucide="menu" class="w-6 h-6"></i></button>
             <a href="../index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
@@ -57,33 +53,37 @@
                 <a href="#" class="hover:text-black transition-colors">Decals</a>
                 <a href="../Stickers/stickers.html" class="hover:text-black transition-colors">Stickers</a>
                 <a href="#" class="hover:text-black transition-colors">Apparel</a>
-                <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
+                <a href="#" class="hover:text-black transition-colors text-black">Marketing Materials</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <div id="auth-container" class="text-black"></div>
-            <button onclick="toggleCart()" class="relative p-2 mr-2">
+            <div id="auth-container" class="flex items-center"></div>
+            <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
+            <a href="../track.html" class="hidden md:block text-[10px] font-black uppercase text-black hover:text-red-600 transition-colors border-b-2 border-black pb-0.5">
+                Track Order
+            </a>
         </div>
     </nav>
 
-    <div id="mobile-menu" class="p-8 flex flex-col gap-6 xl:hidden text-black">
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden text-black">
         <div class="flex justify-between items-center border-b pb-4">
             <span class="heavy-italic text-xl italic">Navigation</span>
-            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
         </div>
         <ul class="space-y-6 text-sm font-black uppercase italic">
-            <li><a href="../index.html" onclick="toggleMobileMenu()">Wall Art</a></li>
-            <li><a href="../Banners/banners.html" onclick="toggleMobileMenu()">Banners</a></li>
-            <li><a href="rigidsigns.html" class="text-red-600" onclick="toggleMobileMenu()">Rigid Signs</a></li>
+            <li><a href="../index.html">Wall Art</a></li>
+            <li><a href="../Banners/banners.html">Banners</a></li>
+            <li><a href="../Displays/displays.html">Displays</a></li>
+            <li><a href="largeprinting.html" class="text-red-600">Large Format</a></li>
         </ul>
     </div>
 
-   <div class="flex flex-row flex-grow w-full text-black">
-        <aside class="sidebar-fixed p-10 hidden lg:block text-black">
-            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black">Product Categories</h3>
+    <div class="flex flex-row flex-grow w-full text-black">
+        <aside class="sidebar-fixed p-10 hidden lg:block">
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
@@ -109,7 +109,7 @@
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    <h3 class="text-[11px] font-black uppercase tracking-widest mb-4 text-black">Features:</h3>
+                                    <h3 class="text-[11px] font-black uppercase tracking-widest mb-4">Features:</h3>
                                     <ul class="space-y-2 text-[12px] text-gray-500 font-medium">
                                         <li>Maximum size 48" x 96"</li>
                                         <li>High resolution digitally printed at 720 x 720</li>
@@ -117,7 +117,7 @@
                                     </ul>
                                 </div>
                                 <div>
-                                    <h3 class="text-[11px] font-black uppercase tracking-widest mb-4 text-black">Material Options:</h3>
+                                    <h3 class="text-[11px] font-black uppercase tracking-widest mb-4">Material Options:</h3>
                                     <ul class="space-y-2 text-[12px] text-gray-500 font-medium">
                                         <li>4mm White Coroplast</li>
                                         <li>10mm White Coroplast</li>
@@ -131,7 +131,7 @@
                         <header>
                             <h1 id="prod-title" class="text-4xl heavy-italic italic">COROPLAST SIGNS</h1>
                             <div id="wholesale-badge-container"></div>
-                            <p class="text-xl font-black text-gray-400 italic mt-6" id="prod-range">$2.50 – $6.50 sq/ft</p>
+                            <p class="text-xl font-black text-gray-400 italic mt-6" id="prod-range">$3.50 – $8.50 sq/ft</p>
                         </header>
 
                         <div class="space-y-6">
@@ -160,7 +160,7 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-4 text-black">
                                 <div>
                                     <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Grommets</label>
                                     <select id="grom-select" onchange="calculatePrice()" class="custom-dropdown text-black">
@@ -169,7 +169,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Turnaround</label>
+                                    <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1 text-black">Turnaround</label>
                                     <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                         <option value="Standard">Standard</option>
                                         <option value="Next Day">Next Day (+$50.00)</option>
@@ -177,38 +177,55 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-4 text-black">
                                 <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Width (Max 48")</label><input type="number" id="w-input" value="18" oninput="validateSize()" class="custom-input"></div>
                                 <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Height (Max 96")</label><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input"></div>
                             </div>
 
-                            <div id="validation-panel" class="hidden bg-[#f9fafb] border border-gray-100 rounded-[2.5rem] p-8 shadow-2xl space-y-6">
-                                <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic text-center">Analyzing...</h4>
-                                <div class="art-canvas-refined">
-                                    <div id="measure-w-val" class="measure-capsule capsule-bottom">18"</div>
-                                    <div id="measure-h-val" class="measure-capsule capsule-right">24"</div>
-                                    <div id="art-container" class="relative bg-white shadow-2xl transition-all duration-500 flex items-center justify-center border border-gray-200 mx-auto" style="max-height: 100%; max-width: 100%;">
-                                        <img id="preview-thumb" class="max-h-full max-w-full object-contain rounded-lg">
-                                        <div id="scale-badge" class="scale-badge-red hidden">50% SCALE</div>
-                                    </div>
+                            <div id="validator-container" class="space-y-4 text-black">
+                                <label class="text-[9px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
+                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-8 rounded-[2rem]">
+                                    <span class="text-[10px] font-black text-gray-400 uppercase italic text-center">Upload JPG, PNG or PDF</span>
+                                    <input type="file" id="file-input" class="hidden" accept="image/*,.pdf" onchange="processFile(this)">
                                 </div>
-                                <div class="flex justify-between items-center px-2">
-                                    <div class="text-left text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Uploaded:</p><p id="file-dims" class="text-[14px] font-black italic">0" x 0"</p></div>
-                                    <div class="text-right text-black"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-[14px] font-black italic text-green-600">Ready</p></div>
-                                </div>
-                                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden text-black"><div id="upload-progress" class="progress-bar"></div></div>
-                                <div class="flex gap-4">
-                                    <button id="approve-btn" onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-2xl shadow-lg italic hover:bg-black transition-all text-black">Approve artwork</button>
-                                    <button onclick="resetUpload()" class="px-8 bg-[#f3f4f6] text-gray-400 text-[12px] font-black uppercase rounded-2xl italic py-4">Discard</button>
-                                </div>
+
+                                <div id="validation-panel" class="hidden space-y-6">
+    <div id="validator-window" class="canvas-bg-grid shadow-inner" style="height: 350px; width: 100%; background: #f3f4f6; border-radius: 2.5rem; position: relative; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 20px;">
+        <div id="printing-area" class="relative bg-orange-600 shadow-2xl flex items-center justify-center" style="transition: all 0.3s ease; max-width: 90%; max-height: 90%; outline: 6px solid white;">
+            <div class="absolute inset-[4px] border border-dashed border-white/30 pointer-events-none z-20"></div>
+            <canvas id="pdf-canvas" class="max-w-none bg-white z-10 hidden"></canvas>
+            <img id="preview-thumb" class="max-w-none bg-white z-10" style="display: none;">
+            <div class="absolute -top-8 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase bg-black text-white px-2 py-0.5 rounded whitespace-nowrap">Ordered W: <span id="ordered-w-label">24</span>"</div>
+            <div class="absolute -right-20 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase rotate-90 bg-black text-white px-2 py-0.5 rounded whitespace-nowrap">Ordered H: <span id="ordered-h-label">24</span>"</div>
+        </div>
+    </div>
+    
+    <div class="bg-white border border-gray-100 p-10 rounded-[3rem] shadow-sm space-y-5">
+        <div class="flex justify-between items-center">
+            <h4 id="status-title" class="text-[13px] font-black uppercase italic tracking-tight">Analyzing...</h4>
+            <button onclick="resetUpload()" class="flex items-center gap-1 text-[11px] font-black text-red-500 hover:text-black uppercase italic">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> CHANGE FILE
+            </button>
+        </div>
+        
+        <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+            <div id="upload-progress-bar" class="bg-[#00ab66] h-full transition-all duration-500" style="width: 0%;"></div>
+        </div>
+
+        <div class="flex justify-between items-center">
+            <span id="file-dims-text" class="text-lg font-black italic">0" X 0"</span>
+            <span id="dpi-info" class="text-[13px] font-black uppercase italic flex items-center gap-1">Checking...</span>
+        </div>
+    </div>
+
+    <div class="flex gap-4">
+        <button onclick="autoFitImage()" class="flex-grow bg-[#2563eb] text-white text-[12px] font-black uppercase py-5 rounded-full shadow-xl italic hover:scale-[1.02] transition-all">AUTO-FIT & SCALE</button>
+        <button id="approve-btn" onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-full shadow-xl italic hover:scale-[1.02] transition-all">APPROVE DESIGN</button>
+    </div>
+</div>
                             </div>
 
-                            <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-12 rounded-[2.5rem]">
-                                <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Upload Design File</span>
-                                <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
-                            </div>
-
-                            <div class="flex justify-between items-center pt-8 border-t border-gray-100 relative">
+                            <div class="flex justify-between items-center pt-8 border-t border-gray-100 relative text-black">
                                 <div class="flex flex-col">
                                     <span class="text-[11px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span>
                                     <span class="text-[10px] font-bold text-gray-400 mt-1 uppercase text-black" id="area-display">3.000 sq ft</span>
@@ -217,7 +234,7 @@
                             </div>
 
                             <div class="flex gap-6">
-                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center text-xl outline-none">
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-28 p-6 border-2 border-gray-100 rounded-2xl font-black text-center text-xl outline-none text-black">
                                 <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-6 rounded-2xl text-[12px] uppercase italic cursor-not-allowed shadow-xl">Add to Bag</button>
                             </div>
                         </div>
@@ -225,8 +242,8 @@
                 </div>
             </div>
 
-            <footer class="bg-white border-t py-16 px-10 text-center w-full mt-10 text-black">
-                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl text-black">
+            <footer class="bg-white border-t py-16 px-10 text-center w-full mt-10">
+                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
                 </div>
                 <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
@@ -236,27 +253,34 @@
 
     <div id="cart-sidebar">
         <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 text-black" id="cart-count-text">0 items</p></div>
+            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
             <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100 text-black"><i data-lucide="x" class="w-6 h-6 text-black"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black text-black"></div>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
         <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
-            <div class="flex justify-between items-end text-black text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-center">Checkout</button>
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all text-white text-center">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script src="pricing.js"></script>
     <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         lucide.createIcons();
+        
         let uploadedFileUrl = ""; 
-        let uploadedImageData = null;
+        let isPdf = false;
+        let originalW = 0, originalH = 0;
         let globalTotalValue = 0;
         const PRODUCT_ID = "Coroplast";
 
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
-        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); document.getElementById('cart-overlay').classList.toggle('visible'); renderCart(); }
+        function toggleCart() { 
+            document.getElementById('cart-sidebar').classList.toggle('open');
+            document.getElementById('cart-overlay').classList.toggle('visible');
+            renderCart();
+        }
 
         function checkAuth() {
             const userName = localStorage.getItem('userName');
@@ -266,23 +290,38 @@
             const rangeDisplay = document.getElementById('prod-range');
             
             if (userName) {
-                authDiv.innerHTML = `<div class="flex items-center text-black text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2 cursor-pointer">LOGOUT</span></div>`;
+                authDiv.innerHTML = `<div class="flex items-center text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2 cursor-pointer">LOGOUT</span></div>`;
                 if (isWholesale && badgeBox) badgeBox.innerHTML = `<div class="wholesale-badge">✓ Wholesale Enabled</div>`;
             } else { authDiv.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`; }
             
             const multiplier = isWholesale ? 1 : 2;
             if (rangeDisplay) rangeDisplay.innerText = `$${(2.50 * multiplier).toFixed(2)} – $${(6.50 * multiplier).toFixed(2)} sq/ft`;
-            
             calculatePrice();
+        }
+
+        function updateOrderedLabels() {
+            const w = parseFloat(document.getElementById('w-input').value) || 0;
+            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            document.getElementById('ordered-w-label').innerText = w;
+            document.getElementById('ordered-h-label').innerText = h;
+            const areaBox = document.getElementById('printing-area');
+            if (areaBox && w > 0 && h > 0) {
+                const maxSize = 250;
+                if (w >= h) {
+                    areaBox.style.width = maxSize + "px";
+                    areaBox.style.height = (maxSize * (h / w)) + "px";
+                } else {
+                    areaBox.style.height = maxSize + "px";
+                    areaBox.style.width = (maxSize * (w / h)) + "px";
+                }
+            }
         }
 
         function validateSize() {
             const w = document.getElementById('w-input'); const h = document.getElementById('h-input');
-            const limitBadge = document.getElementById('limit-reached');
-            if (parseFloat(w.value) > 48) { w.value = 48; limitBadge.classList.remove('hidden'); setTimeout(() => limitBadge.classList.add('hidden'), 2500); }
-            if (parseFloat(h.value) > 96) { h.value = 96; limitBadge.classList.remove('hidden'); setTimeout(() => limitBadge.classList.add('hidden'), 2500); }
-            document.getElementById('measure-w-val').innerText = w.value + '"';
-            document.getElementById('measure-h-val').innerText = h.value + '"';
+            if (parseFloat(w.value) > 48) w.value = 48;
+            if (parseFloat(h.value) > 96) h.value = 96;
+            updateOrderedLabels();
             calculatePrice();
         }
 
@@ -300,54 +339,117 @@
             if (sides === 2) unitPrice *= 1.5;
             if (lam !== 'none') unitPrice += (2.00 * pricing.multiplier);
 
-            globalTotalValue = (unitPrice * area * qty) + (pricing.fixedFee * qty);
+            let total = (unitPrice * area * qty) + (pricing.fixedFee * qty);
+            if (turnVal !== "Standard") total + 50; // Turnaround fijo $50
+
+            globalTotalValue = total;
             document.getElementById('final-price').innerText = `$${globalTotalValue.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
         }
 
         async function processFile(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const orderedW = parseFloat(document.getElementById('w-input').value) || 1;
-                document.getElementById('drop-zone').classList.add('hidden');
-                document.getElementById('validation-panel').classList.remove('hidden');
-                document.getElementById('status-title').innerText = "ANALYZING & UPLOADING...";
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            isPdf = file.type === "application/pdf";
+            
+            document.getElementById('drop-zone').classList.add('hidden');
+            document.getElementById('validation-panel').classList.remove('hidden');
+            updateOrderedLabels();
 
+            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const previewImg = document.getElementById('preview-thumb');
+            const canvas = document.getElementById('pdf-canvas');
+
+            const renderArt = (w, h, contentUrl, isPdfType) => {
+                originalW = w; originalH = h;
+                const el = isPdfType ? canvas : previewImg;
+                if (!isPdfType) el.src = contentUrl;
+                el.style.width = ((w / 100) / targetW * 100) + "%";
+                el.style.height = ((h / 100) / targetH * 100) + "%";
+                el.style.display = "block";
+                updateUIInfo(w, h);
+            };
+
+            if (isPdf) {
+                previewImg.style.display = "none"; canvas.classList.remove('hidden');
                 const reader = new FileReader();
+                reader.onload = async function() {
+                    const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+                    const page = await pdf.getPage(1);
+                    const viewport = page.getViewport({ scale: 2.0 });
+                    canvas.height = viewport.height; canvas.width = viewport.width;
+                    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                    renderArt(viewport.width, viewport.height, null, true);
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                canvas.style.display = "none"; const reader = new FileReader();
                 reader.onload = (e) => {
-                    uploadedImageData = e.target.result;
-                    const img = new Image(); img.src = e.target.result;
-                    img.onload = function() {
-                        const fileW = (this.width / 72); 
-                        const fileH = (this.height / 72);
-                        const scalePercent = Math.round((fileW / orderedW) * 100);
-                        document.getElementById('preview-thumb').src = e.target.result;
-                        document.getElementById('file-dims').innerText = `${fileW.toFixed(1)}" x ${fileH.toFixed(1)}"`;
-                        const badge = document.getElementById('scale-badge');
-                        if (scalePercent < 95) { badge.classList.remove('hidden'); badge.innerText = `${scalePercent}% SCALE`; }
-                        else { badge.classList.add('hidden'); }
-                    };
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => renderArt(img.width, img.height, e.target.result, false);
                 };
                 reader.readAsDataURL(file);
-
-                const formData = new FormData();
-                formData.append('file', file);
-                try {
-                    const response = await fetch('https://ft-f34l.onrender.com/api/upload-preview', { method: 'POST', body: formData });
-                    const data = await response.json();
-                    if (data.success) {
-                        uploadedFileUrl = data.url; 
-                        document.getElementById('upload-progress').style.width = '100%';
-                        document.getElementById('status-title').innerText = "READY TO APPROVE";
-                    }
-                } catch (error) { alert("Upload failed."); resetUpload(); }
             }
+            uploadToRender(file);
+        }
+
+        function updateUIInfo(w, h) {
+            const inchW = (w / 100).toFixed(2); 
+            const inchH = (h / 100).toFixed(2);
+            document.getElementById('file-dims-text').innerText = `${inchW}" x ${inchH}"`;
+            const dpiInfo = document.getElementById('dpi-info');
+            const statusTitle = document.getElementById('status-title');
+            const targetW = parseFloat(document.getElementById('w-input').value) * 100;
+            const targetH = parseFloat(document.getElementById('h-input').value) * 100;
+
+            if (w < targetW || h < targetH) {
+                statusTitle.innerText = "WARNING: ORANGE VISIBLE";
+                statusTitle.className = "text-[10px] font-black uppercase text-orange-500 italic";
+                dpiInfo.innerHTML = 'LOW COVERAGE ⚠️';
+            } else {
+                statusTitle.innerText = "READY TO APPROVE ✓";
+                statusTitle.className = "text-[10px] font-black uppercase text-blue-600 italic";
+                dpiInfo.innerHTML = 'FULL COVERAGE APPLIED ✅';
+            }
+        }
+
+        function autoFitImage() {
+            const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
+            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            el.style.width = "100%"; el.style.height = "100%";
+            el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
+            if ((originalW > originalH) !== (targetW > targetH)) {
+                el.style.transform = "rotate(90deg)";
+                const areaBox = document.getElementById('printing-area');
+                el.style.width = areaBox.offsetHeight + "px";
+                el.style.height = areaBox.offsetWidth + "px";
+                el.style.position = "absolute";
+            }
+            document.getElementById('status-title').innerText = "AUTO-ROTATED & FITTED ✓";
+            document.getElementById('status-title').className = "text-[10px] font-black uppercase text-blue-600 italic";
+            document.getElementById('dpi-info').innerHTML = 'FULL COVERAGE APPLIED ✅';
+        }
+
+        async function uploadToRender(file) {
+            const formData = new FormData(); formData.append('file', file);
+            try {
+                const response = await fetch('https://ft-f34l.onrender.com/api/upload-preview', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.success) {
+                    uploadedFileUrl = data.url;
+                    document.getElementById('upload-progress-bar').style.width = '100%';
+                }
+            } catch (err) { console.error("Upload failed"); }
         }
 
         function approveArt() {
             if (!uploadedFileUrl) return alert("Wait for analysis");
             const btn = document.getElementById('add-to-cart-btn');
             btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
+            btn.classList.remove('cursor-not-allowed');
             document.getElementById('status-title').innerText = "ARTWORK APPROVED";
             document.getElementById('status-title').style.color = "#00ab66";
         }
@@ -356,15 +458,10 @@
             document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
             document.getElementById('file-input').value = "";
-            uploadedFileUrl = ""; uploadedImageData = null;
+            uploadedFileUrl = "";
+            document.getElementById('upload-progress-bar').style.width = '0%';
             document.getElementById('add-to-cart-btn').disabled = true;
             document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
-        }
-
-        function changeImage(el) {
-            document.getElementById('main-prod-img').src = el.src;
-            document.querySelectorAll('.thumb-img').forEach(i => i.classList.remove('thumb-active'));
-            el.classList.add('thumb-active');
         }
 
         function addToCart() {
@@ -372,6 +469,7 @@
             const thick = document.getElementById('thick-select');
             const turn = document.getElementById('turn-select');
             const sides = document.getElementById('side-select');
+            const lam = document.getElementById('lam-select');
             const grom = document.getElementById('grom-select');
             const w = document.getElementById('w-input').value;
             const h = document.getElementById('h-input').value;
@@ -379,17 +477,16 @@
 
             const newItem = {
                 name: "Coroplast Rigid Sign",
-                image: "../images/Rigid Signs/Coroplast-01.png", // SIEMPRE IMAGEN FIJA
+                image: "../images/Rigid Signs/Coroplast-01.png",
                 price: globalTotalValue,
                 fileUrl: uploadedFileUrl,
-                details: `SIZE: ${w}"x${h}" | MAT: ${thick.options[thick.selectedIndex].text} | SIDES: ${sides.options[sides.selectedIndex].text} | TURN: ${turn.options[turn.selectedIndex].text} | GROMMETS: ${grom.options[grom.selectedIndex].text} | QTY: ${qty}`
+                details: `SIZE: ${w}"x${h}" | MAT: ${thick.options[thick.selectedIndex].text} | SIDES: ${sides.options[sides.selectedIndex].text} | TURN: ${turn.options[turn.selectedIndex].text} | LAM: ${lam.options[lam.selectedIndex].text} | GROMMETS: ${grom.options[grom.selectedIndex].text} | QTY: ${qty}`
             };
             
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             cart.push(newItem);
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            resetUpload(); 
-            toggleCart();
+            resetUpload(); renderCart(); toggleCart();
         }
 
         function renderCart() {
@@ -397,43 +494,29 @@
             const container = document.getElementById('cart-items-container');
             if (!container) return;
             container.innerHTML = ''; let total = 0;
-
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
-                const dot = document.getElementById('cart-dot');
-                if(dot) dot.classList.add('hidden');
+                document.getElementById('cart-dot').classList.add('hidden');
             } else {
-                const dot = document.getElementById('cart-dot');
-                if(dot) dot.classList.remove('hidden');
+                document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : (item.price || 0);
+                    const priceNum = item.price || 0;
                     total += priceNum;
-                    
-                    // REPARACIÓN: Detectamos si la info viene como details, specs u options
-                    const showDetails = item.details || item.specs || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
-
                     container.innerHTML += `
                         <div class="flex gap-4 border-b pb-6 text-black">
-                            <div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0">
+                            <div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0 text-black">
                                 <img src="${item.image}" class="max-h-full max-w-full object-contain">
                             </div>
-                            <div class="flex-grow py-1 text-black">
-                                <div class="flex justify-between font-black uppercase italic text-xs">
-                                    <span>${item.name}</span>
-                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p>
-                                <span class="text-lg font-black italic">$${priceNum.toFixed(2)}</span>
+                            <div class="flex-grow py-1">
+                                <div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black">${item.details || 'NO INFO'}</p>
+                                <span class="text-lg font-black italic text-black">$${priceNum.toFixed(2)}</span>
                             </div>
                         </div>`;
                 });
             }
-            const totalDisp = document.getElementById('cart-total-price');
-            if(totalDisp) totalDisp.innerText = `$${total.toFixed(2)}`;
-            const countDisp = document.getElementById('cart-count-text');
-            if(countDisp) countDisp.innerText = `${cart.length} items`;
+            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
             lucide.createIcons();
         }
 
@@ -444,7 +527,7 @@
             renderCart();
         }
         function logout() { localStorage.clear(); window.location.reload(); }
-        window.onload = checkAuth;
+        window.onload = () => { checkAuth(); renderCart(); updateOrderedLabels(); };
     </script>
 </body>
 </html>

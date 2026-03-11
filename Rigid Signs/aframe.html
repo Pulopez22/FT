@@ -6,6 +6,7 @@
     <title>A-Frame Signs - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-y: auto; color: #000; }
@@ -28,8 +29,6 @@
         #cart-sidebar.open { transform: translateX(0); }
         #cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
-        .measure-label { position: absolute; background: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; color: black; }
-        .wholesale-badge { display: inline-flex; align-items: center; background-color: #f0fdf4; color: #16a34a; padding: 6px 16px; border-radius: 9999px; font-size: 10px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; border: 1px solid #dcfce7; margin-top: 10px; }
         .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
     </style>
 </head>
@@ -43,7 +42,7 @@
                     <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
                 </div>
             </a>
-           <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
+           <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic text-black">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
                 <a href="../Banners/banners.html" class="hover:text-black transition-colors">Banners</a>
                 <a href="#" class="hover:text-black transition-colors">Trade Show</a>
@@ -53,55 +52,56 @@
                 <a href="#" class="hover:text-black transition-colors">Marketing Materials</a>
             </div>
         </div>
-        <div class="flex items-center gap-2 md:gap-4">
-            <div id="auth-container"></div>
-            <button onclick="toggleCart()" class="relative text-black p-2">
+        <div class="flex items-center gap-4">
+            <div id="auth-container" class="flex items-center"></div>
+            <button onclick="toggleCart()" class="relative text-black p-2 mr-2">
                 <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 <span id="cart-dot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white hidden"></span>
             </button>
+            <a href="../track.html" class="hidden md:block text-[10px] font-black uppercase text-black hover:text-red-600 transition-colors border-b-2 border-black pb-0.5">
+                Track Order
+            </a>
         </div>
     </nav>
 
-    <div id="mobile-menu" class="p-8 flex flex-col gap-6 xl:hidden text-black">
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden text-black">
         <div class="flex justify-between items-center border-b pb-4">
             <span class="heavy-italic text-xl italic">Navigation</span>
-            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
         </div>
         <ul class="space-y-6 text-sm font-black uppercase italic">
-            <li><a href="../index.html" onclick="toggleMobileMenu()">Wall Art</a></li>
-            <li><a href="../Banners/banners.html" onclick="toggleMobileMenu()">Banners</a></li>
-            <li><a href="../Displays/displays.html" onclick="toggleMobileMenu()">Displays</a></li>
-            <li><a href="rigidsigns.html" class="text-red-600" onclick="toggleMobileMenu()">Rigid Signs</a></li>
+            <li><a href="../index.html">Wall Art</a></li>
+            <li><a href="../Banners/banners.html">Banners</a></li>
+            <li><a href="../Displays/displays.html">Displays</a></li>
+            <li><a href="largeprinting.html" class="text-red-600">Large Format</a></li>
         </ul>
     </div>
 
-   <div class="flex flex-row flex-grow w-full text-black">
+    <div class="flex flex-row flex-grow w-full text-black">
         <aside class="sidebar-fixed p-10 hidden lg:block text-black">
-            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black">Product Categories</h3>
+            <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
                 <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="largeprinting.html" class="block w-full">Large Format Printing</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
-                <li class="sidebar-item cursor-pointer active text-black"><a href="rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+                <li class="sidebar-item cursor-pointer active"><a href="../Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
 
         <main class="main-content-scroll text-black">
             <div class="p-6 md:p-12 flex-grow">
-                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-20 text-black">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 md:gap-20">
                     
                     <div class="space-y-8 md:space-y-12">
                         <div class="bg-gray-50 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-6 flex items-center justify-center border border-gray-100 min-h-[300px] md:min-h-[450px]">
                             <img id="main-prod-img" src="../images/Rigid Signs/A-frame5.png" alt="A-Frame" class="max-h-[250px] md:max-h-[380px] drop-shadow-2xl">
                         </div>
-                        <div class="pt-8 border-t border-gray-100 space-y-6 md:space-y-8 text-black">
-                            <div>
-                                <h2 id="desc-title" class="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-4 md:mb-6 italic">White Standard Signicade</h2>
-                                <p id="desc-body" class="text-sm text-gray-600 font-medium leading-relaxed">This heavy-duty plastic A-frame is the perfect solution for sidewalk advertising. The frame can be filled with sand or water for greater stability.</p>
-                            </div>
+                        <div class="pt-8 border-t border-gray-100 space-y-6">
+                            <h2 id="desc-title" class="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-4 md:mb-6 italic text-black">White Standard Signicade</h2>
+                            <p id="desc-body" class="text-sm text-gray-600 font-medium leading-relaxed">This heavy-duty plastic A-frame is the perfect solution for sidewalk advertising. The frame can be filled with sand or water for greater stability.</p>
                             <div class="space-y-4 bg-gray-50 p-6 md:p-8 rounded-[2rem] border border-gray-100">
                                 <h4 class="text-xs font-black uppercase tracking-widest text-black mb-4">Product Details:</h4>
                                 <ul id="desc-details" class="space-y-4 text-[12px] text-gray-700 font-medium"></ul>
@@ -111,15 +111,15 @@
 
                     <div class="space-y-8 md:space-y-10">
                         <header>
-                            <h1 class="text-4xl md:text-5xl heavy-italic text-black italic">A-Frame Signs</h1>
+                            <h1 class="text-4xl md:text-5xl heavy-italic text-black italic uppercase">A-Frame Signs</h1>
                             <div id="wholesale-badge-container"></div>
                             <p class="text-lg md:text-xl font-black text-gray-400 italic mt-4 md:mt-6" id="prod-range">Calculating...</p>
                         </header>
 
-                        <div class="space-y-6 text-black">
+                        <div class="space-y-6">
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Select A-Frame Type</label>
-                                <select id="type-select" onchange="handleTypeChange()" class="custom-dropdown">
+                                <select id="type-select" onchange="handleTypeChange()" class="custom-dropdown text-black">
                                     <option value="standard">White Standard Signicade</option>
                                     <option value="deluxe">White/Black Deluxe Signicade</option>
                                 </select>
@@ -127,7 +127,7 @@
 
                             <div id="hardware-color-container" class="hidden">
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Hardware Color</label>
-                                <select id="color-select" onchange="calculatePrice()" class="custom-dropdown">
+                                <select id="color-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                     <option value="white">White Hardware</option>
                                     <option value="black">Black Hardware</option>
                                 </select>
@@ -135,13 +135,13 @@
 
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Graphic Material</label>
-                                <select id="mat-select" onchange="calculatePrice()" class="custom-dropdown"></select>
+                                <select id="mat-select" onchange="calculatePrice()" class="custom-dropdown text-black"></select>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Lamination</label>
-                                    <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                         <option value="none">No Lamination</option>
                                         <option value="uv_gloss">UV Gloss</option>
                                         <option value="uv_matte">UV Matte</option>
@@ -150,82 +150,95 @@
                                 </div>
                                 <div>
                                     <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block">Turnaround</label>
-                                    <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                         <option value="Standard">Standard (3-5 Days)</option>
                                         <option value="Next Day">Next Day (+$50.00)</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div id="validation-panel" class="hidden bg-white border border-gray-100 rounded-[2rem] p-6 shadow-2xl space-y-6">
-                                <h4 id="status-title" class="text-xl font-black uppercase text-orange-500 italic">Analyzing Artwork...</h4>
-                                <div class="relative w-full bg-gray-200 rounded-xl canvas-bg-grid flex items-center justify-center border-2 border-gray-200" style="height: 250px;">
-                                    <div class="measure-label" style="bottom: 8px; left: 50%; transform: translateX(-50%);">24"</div>
-                                    <div class="measure-label" style="top: 50%; right: 8px; transform: translateY(-50) rotate(90deg);">36"</div>
-                                    <div id="art-container" class="relative bg-white shadow-2xl flex items-center justify-center border border-gray-300 mx-auto">
-                                        <img id="preview-thumb" class="max-h-full max-w-full object-contain">
-                                    </div>
+                            <div id="validator-container" class="space-y-4">
+                                <label class="text-[9px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
+                                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-8 rounded-[2rem]">
+                                    <span class="text-[10px] font-black text-gray-400 uppercase italic text-center">Upload JPG, PNG or PDF</span>
+                                    <input type="file" id="file-input" class="hidden" accept="image/*,.pdf" onchange="processFile(this)">
                                 </div>
-                                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-[1.5rem]">
-                                    <div class="text-left"><p class="text-[10px] text-gray-400 uppercase font-black">Uploaded:</p><p id="file-dims" class="text-sm font-black italic">0" x 0"</p></div>
-                                    <div class="text-right"><p class="text-[10px] text-gray-400 uppercase font-black">Status:</p><p id="dpi-info" class="text-sm font-black text-green-600 italic">Ready</p></div>
-                                </div>
-                                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden"><div id="upload-progress" class="progress-bar"></div></div>
-                                <div class="flex gap-4">
-                                    <button onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-2xl shadow-lg italic">Approve</button>
-                                    <button onclick="resetUpload()" class="px-8 bg-gray-100 text-gray-400 text-[12px] font-black uppercase rounded-2xl italic">Discard</button>
-                                </div>
+<div id="validation-panel" class="hidden space-y-6">
+    <div id="validator-window" class="canvas-bg-grid shadow-inner" style="height: 350px; width: 100%; background: #f3f4f6; border-radius: 2.5rem; position: relative; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 20px;">
+        <div id="printing-area" class="relative bg-orange-600 shadow-2xl flex items-center justify-center" style="transition: all 0.3s ease; max-width: 90%; max-height: 90%; outline: 6px solid white;">
+            <div class="absolute inset-[4px] border border-dashed border-white/30 pointer-events-none z-20"></div>
+            <canvas id="pdf-canvas" class="max-w-none bg-white z-10 hidden"></canvas>
+            <img id="preview-thumb" class="max-w-none bg-white z-10" style="display: none;">
+            <div class="absolute -top-8 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase bg-black text-white px-2 py-0.5 rounded whitespace-nowrap">Ordered W: <span id="ordered-w-label">24</span>"</div>
+            <div class="absolute -right-20 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase rotate-90 bg-black text-white px-2 py-0.5 rounded whitespace-nowrap">Ordered H: <span id="ordered-h-label">24</span>"</div>
+        </div>
+    </div>
+    
+    <div class="bg-white border border-gray-100 p-10 rounded-[3rem] shadow-sm space-y-5">
+        <div class="flex justify-between items-center">
+            <h4 id="status-title" class="text-[13px] font-black uppercase italic tracking-tight">Analyzing...</h4>
+            <button onclick="resetUpload()" class="flex items-center gap-1 text-[11px] font-black text-red-500 hover:text-black uppercase italic">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> CHANGE FILE
+            </button>
+        </div>
+        
+        <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+            <div id="upload-progress-bar" class="bg-[#00ab66] h-full transition-all duration-500" style="width: 0%;"></div>
+        </div>
+
+        <div class="flex justify-between items-center">
+            <span id="file-dims-text" class="text-lg font-black italic">0" X 0"</span>
+            <span id="dpi-info" class="text-[13px] font-black uppercase italic flex items-center gap-1">Checking...</span>
+        </div>
+    </div>
+
+    <div class="flex gap-4">
+        <button onclick="autoFitImage()" class="flex-grow bg-[#2563eb] text-white text-[12px] font-black uppercase py-5 rounded-full shadow-xl italic hover:scale-[1.02] transition-all">AUTO-FIT & SCALE</button>
+        <button id="approve-btn" onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-full shadow-xl italic hover:scale-[1.02] transition-all">APPROVE DESIGN</button>
+    </div>
+</div>
                             </div>
 
-                            <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-12 rounded-[2.5rem]">
-                                <span class="text-[11px] font-black text-gray-400 uppercase italic">Upload Artwork File</span>
-                                <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processFile(this)">
-                            </div>
-
-                            <div class="flex justify-between items-center pt-8 border-t border-gray-100 relative text-black">
+                            <div class="flex justify-between items-center pt-8 border-t border-gray-100 relative">
                                 <div class="flex flex-col">
                                     <span class="text-[11px] font-black uppercase tracking-widest italic leading-none">Estimated Total</span>
-                                    <span class="text-[10px] font-bold text-gray-400 mt-1 uppercase">Price for 24" x 36" Sign</span>
+                                    <span class="text-[10px] font-bold text-gray-400 mt-1 uppercase">Signicade A-Frame 24" x 36"</span>
                                 </div>
                                 <span id="final-price" class="text-4xl md:text-6xl heavy-italic italic leading-none">$0.00</span>
                             </div>
 
                             <div class="flex gap-4 md:gap-6">
-                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-20 md:w-28 p-4 md:p-6 border-2 border-gray-100 rounded-2xl font-black text-center text-xl outline-none">
+                                <input type="number" id="qty-input" value="1" min="1" oninput="calculatePrice()" class="w-20 md:w-28 p-4 md:p-6 border-2 border-gray-100 rounded-2xl font-black text-center text-xl outline-none text-black">
                                 <button id="add-to-cart-btn" onclick="addToCart()" disabled class="flex-grow bg-gray-200 text-white font-black py-4 md:py-6 rounded-2xl text-[12px] uppercase italic cursor-not-allowed shadow-md">Add to Bag</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <footer class="bg-white border-t py-12 md:py-16 px-6 text-center w-full">
-                <div class="bg-black p-3 rounded-xl inline-block mb-6 shadow-2xl">
-                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
-                </div>
-                <p class="text-[9px] md:text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
-            </footer>
         </main>
     </div>
 
     <div id="cart-sidebar">
-        <div class="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
-            <div><h3 class="text-2xl font-black uppercase italic tracking-tighter">Your Bag</h3><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1" id="cart-count-text">0 items</p></div>
-            <button onclick="toggleCart()" class="p-3 hover:bg-gray-50 rounded-2xl border border-gray-100"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 text-black">
+            <h3 class="text-2xl font-black uppercase italic">Your Bag</h3>
+            <button onclick="toggleCart()"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="cart-items-container" class="flex-grow overflow-y-auto p-6 md:p-8 space-y-8 bg-white text-black"></div>
-        <div class="p-6 md:p-8 bg-gray-50 border-t border-gray-100 space-y-6 text-black">
-            <div class="flex justify-between items-end"><span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-1">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic tracking-tighter leading-none">$0.00</span></div>
-            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-5 md:py-6 rounded-[2rem] text-[12px] uppercase tracking-[0.3em] italic shadow-2xl hover:bg-red-600 transition-all">Checkout</button>
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-8 space-y-8 bg-white text-black"></div>
+        <div class="p-8 bg-gray-50 border-t border-gray-100 space-y-6">
+            <div class="flex justify-between items-end text-black"><span class="text-[10px] font-black uppercase text-gray-400">Subtotal</span><span id="cart-total-price" class="text-4xl font-black italic">$0.00</span></div>
+            <button onclick="window.location.href='../checkout.html'" class="w-full bg-black text-white font-black py-6 rounded-[2rem] text-[12px] uppercase italic">Checkout</button>
         </div>
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script src="pricing.js"></script>
     <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         lucide.createIcons();
+        
         let uploadedFileUrl = ""; 
-        let uploadedImageData = null;
+        let isPdf = false;
+        let originalW = 0, originalH = 0;
         let globalTotalValue = 0;
         const PRODUCT_ID = "Aframe";
 
@@ -245,10 +258,10 @@
             const rangeDisplay = document.getElementById('prod-range');
 
             if (userName) {
-                authDiv.innerHTML = `<div class="flex items-center text-black text-black"><span class="text-[10px] font-black uppercase italic border-b-2 border-red-600 pb-0.5">HI, ${userName.split(' ')[0]}</span><span onclick="logout()" class="logout-btn italic ml-2 cursor-pointer">LOGOUT</span></div>`;
+                authDiv.innerHTML = `<span class="text-[10px] font-black uppercase italic text-black">HI, ${userName.split(' ')[0]}</span> <span onclick="logout()" class="logout-btn italic ml-2">LOGOUT</span>`;
                 if (isWholesale && badgeBox) badgeBox.innerHTML = `<div class="wholesale-badge">✓ Wholesale Enabled</div>`;
-            } else { authDiv.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase border-b-2 border-black pb-0.5 italic">Login</button>`; }
-
+            } else { authDiv.innerHTML = `<button onclick="window.location.href='../login.html'" class="text-[10px] font-black uppercase italic border-b-2 border-black text-black">Login</button>`; }
+            
             if (rangeDisplay) rangeDisplay.innerText = `$${(95.67 * multiplier).toFixed(2)} – $${(198.39 * multiplier).toFixed(2)}`;
             handleTypeChange();
         }
@@ -266,18 +279,17 @@
                 hardwareContainer.classList.add('hidden');
                 descTitle.innerText = "White Standard Signicade";
                 descBody.innerText = "This heavy-duty plastic A-frame is the perfect solution for sidewalk advertising. The frame can be filled with sand or water for greater stability.";
-                descDetails.innerHTML = `<li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Graphic Dimensions: 36"H x 24" W</li><li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Weight: 19 lbs</li>`;
+                descDetails.innerHTML = `<li>Graphic: 36"H x 24" W</li><li>Weight: 19 lbs</li>`;
                 matSelect.add(new Option('AB Permanent Adhesive Vinyl', 'vinyl'));
-                matSelect.add(new Option('Reflective AB Permanent Adhesive Vinyl', 'reflective'));
+                matSelect.add(new Option('Reflective Vinyl', 'reflective'));
             } else {
                 hardwareContainer.classList.remove('hidden');
                 descTitle.innerText = "White or Black Deluxe Signicade";
                 descBody.innerText = "Ultimate sidewalk advertising solution for quick change graphics. Hardware has two recessed 24x36 inch areas.";
-                descDetails.innerHTML = `<li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Graphic Dimensions: 36"H x 24" W</li><li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Weight: 19 lbs</li>`;
-                matSelect.add(new Option('4 mm White Coroplast Inserts', 'coro'));
-                matSelect.add(new Option('Reflective 4 mm White Coroplast Inserts', 'reflective_coro'));
+                descDetails.innerHTML = `<li>Graphic: 36"H x 24" W (Deluxe)</li><li>Easy Insert System</li>`;
+                matSelect.add(new Option('4 mm Coroplast Inserts', 'coro'));
+                matSelect.add(new Option('Reflective Coroplast Inserts', 'reflective_coro'));
             }
-            lucide.createIcons();
             calculatePrice();
         }
 
@@ -299,87 +311,136 @@
                 if (lam !== 'none') pricePerUnit += (5.91 * pricing.multiplier);
             }
 
-            globalTotalValue = (pricePerUnit + pricing.fixedFee) * qty;
+            let totalUnit = pricePerUnit + pricing.fixedFee;
+            if (turnVal !== "Standard") totalUnit + 50; 
+
+            globalTotalValue = totalUnit * qty;
             document.getElementById('final-price').innerText = `$${globalTotalValue.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
         async function processFile(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                document.getElementById('drop-zone').classList.add('hidden');
-                document.getElementById('validation-panel').classList.remove('hidden');
-                document.getElementById('status-title').innerText = "ANALYZING & UPLOADING...";
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            isPdf = file.type === "application/pdf";
+            document.getElementById('drop-zone').classList.add('hidden');
+            document.getElementById('validation-panel').classList.remove('hidden');
 
+            const previewImg = document.getElementById('preview-thumb');
+            const canvas = document.getElementById('pdf-canvas');
+
+            const renderArt = (w, h, contentUrl, isPdfType) => {
+                originalW = w; originalH = h;
+                const el = isPdfType ? canvas : previewImg;
+                if (!isPdfType) el.src = contentUrl;
+                el.style.width = ((w / 100) / 24 * 100) + "%";
+                el.style.height = ((h / 100) / 36 * 100) + "%";
+                el.style.display = "block";
+                updateUIInfo(w, h);
+            };
+
+            if (isPdf) {
+                previewImg.style.display = "none"; canvas.classList.remove('hidden');
                 const reader = new FileReader();
+                reader.onload = async function() {
+                    const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+                    const page = await pdf.getPage(1);
+                    const viewport = page.getViewport({ scale: 2.0 });
+                    canvas.height = viewport.height; canvas.width = viewport.width;
+                    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                    renderArt(viewport.width, viewport.height, null, true);
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                canvas.style.display = "none"; const reader = new FileReader();
                 reader.onload = (e) => {
-                    uploadedImageData = e.target.result;
                     const img = new Image(); img.src = e.target.result;
-                    img.onload = function() {
-                        const fileW = (this.width / 72); 
-                        const fileH = (this.height / 72);
-                        document.getElementById('preview-thumb').src = e.target.result;
-                        document.getElementById('file-dims').innerText = `${fileW.toFixed(1)}" x ${fileH.toFixed(1)}"`;
-                    };
+                    img.onload = () => renderArt(img.width, img.height, e.target.result, false);
                 };
                 reader.readAsDataURL(file);
+            }
+            uploadToRender(file);
+        }
 
-                const formData = new FormData();
-                formData.append('file', file);
-                try {
-                    const response = await fetch('https://ft-f34l.onrender.com/api/upload-preview', { method: 'POST', body: formData });
-                    const data = await response.json();
-                    if (data.success) {
-                        uploadedFileUrl = data.url; 
-                        document.getElementById('upload-progress').style.width = '100%';
-                        document.getElementById('status-title').innerText = "READY TO APPROVE";
-                    }
-                } catch (error) { alert("Upload failed."); resetUpload(); }
+        function updateUIInfo(w, h) {
+            const inchW = (w / 100).toFixed(2); 
+            const inchH = (h / 100).toFixed(2);
+            document.getElementById('file-dims-text').innerText = `${inchW}" x ${inchH}"`;
+            const dpiInfo = document.getElementById('dpi-info');
+            const statusTitle = document.getElementById('status-title');
+            const targetW = 2400; 
+            const targetH = 3600;
+
+            if (w < targetW || h < targetH) {
+                statusTitle.innerText = "WARNING: ORANGE VISIBLE";
+                statusTitle.className = "text-[10px] font-black uppercase text-orange-500 italic";
+                dpiInfo.innerHTML = 'LOW COVERAGE ⚠️';
+                dpiInfo.className = "text-[11px] font-black uppercase text-orange-500 italic";
+            } else {
+                statusTitle.innerText = "READY TO APPROVE ✓";
+                statusTitle.className = "text-[10px] font-black uppercase text-blue-600 italic";
+                dpiInfo.innerHTML = 'FULL COVERAGE APPLIED ✅';
+                dpiInfo.className = "text-[11px] font-black uppercase text-blue-600 italic";
             }
         }
 
+        function autoFitImage() {
+            const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
+            const targetW = 24; 
+            const targetH = 36;
+            el.style.width = "100%"; el.style.height = "100%";
+            el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
+            if ((originalW > originalH) !== (targetW > targetH)) {
+                el.style.transform = "rotate(90deg)";
+                const areaBox = document.getElementById('printing-area');
+                el.style.width = areaBox.offsetHeight + "px";
+                el.style.height = areaBox.offsetWidth + "px";
+                el.style.position = "absolute";
+            }
+            document.getElementById('status-title').innerText = "AUTO-ROTATED & FITTED ✓";
+            document.getElementById('status-title').className = "text-[10px] font-black uppercase text-blue-600 italic";
+            document.getElementById('dpi-info').innerHTML = 'FULL COVERAGE APPLIED ✅';
+        }
+
+        async function uploadToRender(file) {
+            const formData = new FormData(); formData.append('file', file);
+            try {
+                const response = await fetch('https://ft-f34l.onrender.com/api/upload-preview', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.success) {
+                    uploadedFileUrl = data.url;
+                    document.getElementById('upload-progress-bar').style.width = '100%';
+                }
+            } catch (err) { console.error("Upload failed"); }
+        }
+
         function approveArt() {
-            if (!uploadedFileUrl) return alert("Wait for upload to finish");
+            if (!uploadedFileUrl) return alert("Wait for analysis");
             const btn = document.getElementById('add-to-cart-btn');
             btn.disabled = false; btn.classList.replace('bg-gray-200', 'bg-black');
-            document.getElementById('status-title').innerText = "ARTWORK APPROVED";
-            document.getElementById('status-title').style.color = "#00ab66";
+            document.getElementById('status-title').innerText = "ARTWORK APPROVED ✓";
+            document.getElementById('status-title').className = "text-[10px] font-black uppercase text-green-600 italic";
         }
 
         function resetUpload() {
             document.getElementById('drop-zone').classList.remove('hidden');
             document.getElementById('validation-panel').classList.add('hidden');
-            document.getElementById('file-input').value = "";
-            uploadedFileUrl = ""; uploadedImageData = null;
             document.getElementById('add-to-cart-btn').disabled = true;
             document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
+            uploadedFileUrl = "";
         }
-
-        function changeImage(el) { document.getElementById('main-prod-img').src = el.src; }
 
         function addToCart() {
             if (!uploadedFileUrl) return;
             const type = document.getElementById('type-select');
-            const color = document.getElementById('color-select');
             const mat = document.getElementById('mat-select');
-            const lam = document.getElementById('lam-select');
+            const turn = document.getElementById('turn-select');
             const qty = document.getElementById('qty-input').value;
-            const hardwareText = type.value === 'deluxe' ? color.options[color.selectedIndex].text.split(' ')[0] : "WHITE";
-
-            const detailsText = `TYPE: ${type.options[type.selectedIndex].text.toUpperCase()} | HW: ${hardwareText.toUpperCase()} | GRAPHIC: ${mat.options[mat.selectedIndex].text.toUpperCase()} | LAM: ${lam.options[lam.selectedIndex].text.toUpperCase()} | QTY: ${qty}`;
-            
-            const newItem = {
-                name: "A-Frame Sign",
-                price: globalTotalValue,
-                image: "../images/Rigid Signs/A-frame5.png", // SIEMPRE IMAGEN FIJA
-                fileUrl: uploadedFileUrl,
-                details: detailsText
-            };
-            
+            const detailsText = `TYPE: ${type.options[type.selectedIndex].text} | GRAPHIC: ${mat.options[mat.selectedIndex].text} | TURN: ${turn.options[turn.selectedIndex].text} | QTY: ${qty}`;
+            const newItem = { name: "A-Frame Sign", price: globalTotalValue, image: "../images/Rigid Signs/A-frame5.png", fileUrl: uploadedFileUrl, details: detailsText };
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             cart.push(newItem);
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            resetUpload(); 
-            toggleCart();
+            resetUpload(); renderCart(); toggleCart();
         }
 
         function renderCart() {
@@ -387,43 +448,28 @@
             const container = document.getElementById('cart-items-container');
             if (!container) return;
             container.innerHTML = ''; let total = 0;
-
             if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
-                const dot = document.getElementById('cart-dot');
-                if(dot) dot.classList.add('hidden');
+                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic">Bag Empty</div>`;
+                document.getElementById('cart-dot').classList.add('hidden');
             } else {
-                const dot = document.getElementById('cart-dot');
-                if(dot) dot.classList.remove('hidden');
+                document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : (item.price || 0);
+                    const priceNum = item.price || 0;
                     total += priceNum;
-                    
-                    // REPARACIÓN: Detectamos si la info viene como details, specs u options
-                    const showDetails = item.details || item.specs || (item.options ? Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : "NO INFO");
-
                     container.innerHTML += `
                         <div class="flex gap-4 border-b pb-6 text-black">
                             <div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0">
                                 <img src="${item.image}" class="max-h-full max-w-full object-contain">
                             </div>
-                            <div class="flex-grow py-1 text-black">
-                                <div class="flex justify-between font-black uppercase italic text-xs">
-                                    <span>${item.name}</span>
-                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p>
+                            <div class="flex-grow">
+                                <div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.details || 'NO INFO'}</p>
                                 <span class="text-lg font-black italic">$${priceNum.toFixed(2)}</span>
                             </div>
                         </div>`;
                 });
             }
-            const totalDisp = document.getElementById('cart-total-price');
-            if(totalDisp) totalDisp.innerText = `$${total.toFixed(2)}`;
-            const countDisp = document.getElementById('cart-count-text');
-            if(countDisp) countDisp.innerText = `${cart.length} items`;
+            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
             lucide.createIcons();
         }
 
@@ -434,7 +480,7 @@
             renderCart();
         }
         function logout() { localStorage.clear(); window.location.reload(); }
-        window.onload = checkAuth;
+        window.onload = () => { checkAuth(); renderCart(); };
     </script>
 </body>
 </html>

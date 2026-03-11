@@ -66,7 +66,20 @@
         </div>
     </nav>
 
-   <div class="flex flex-row flex-grow w-full text-black">
+  <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden text-black">
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
+        </div>
+        <ul class="space-y-6 text-sm font-black uppercase italic">
+            <li><a href="../index.html">Wall Art</a></li>
+            <li><a href="../Banners/banners.html">Banners</a></li>
+            <li><a href="../Displays/displays.html">Displays</a></li>
+            <li><a href="largeprinting.html" class="text-red-600">Large Format</a></li>
+        </ul>
+    </div>
+
+    <div class="flex flex-row flex-grow w-full text-black">
         <aside class="sidebar-fixed p-10 hidden lg:block text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">

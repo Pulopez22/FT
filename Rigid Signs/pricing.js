@@ -7,6 +7,7 @@ window.rigidsigns = {
     "Aluminum Signs": { "material": 4.50, "type": "sqft" },
     "Aframe": { "material": 95.67, "type": "unit" },
     "Acrylicart": { 
+        "base": 25.00,
         "material": 25.00, 
         "type": "sqft",
         "variants": {
@@ -75,7 +76,7 @@ window.getLargeFormatPrice = function(productID, turnVal = "Standard", variant =
         let fixedFee = 0;
         const rushTerms = ["rush", "same day", "next day"];
         if (rushTerms.some(term => turnVal.toLowerCase().includes(term))) {
-            fixedFee = 50.00 * multiplier;
+            fixedFee = 50.00;
         }
 
         return {
