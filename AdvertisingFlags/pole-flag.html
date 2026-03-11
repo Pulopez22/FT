@@ -465,20 +465,38 @@ function autoFitImage() {
         }
 
         function addToCart() {
-            if (!uploadedFileUrl) return alert("Please upload your file first.");
-            const w = document.getElementById('w-input').value;
-            const h = document.getElementById('h-input').value;
-            const side = document.getElementById('side-select');
-            const finish = document.getElementById('finish-select');
-            const turn = document.getElementById('turn-select');
-            const qty = document.getElementById('qty-input').value;
-            const details = `SIZE: ${w}X${h} | PRINT: ${side.options[side.selectedIndex].text.toUpperCase()} | FINISHING: ${finish.value.toUpperCase()} | TURNAROUND: ${turn.options[turn.selectedIndex].text.toUpperCase()} | QTY: ${qty}`;
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push({ name: "CUSTOM POLE FLAG", price: globalTotal, image: "../images/Advertising Flags/Custom-Pole-Flag-02-1.png", fileUrl: uploadedFileUrl, details: details });
-            localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            resetUpload();
-            toggleCart();
-        }
+    if (!uploadedFileUrl) return alert("Please upload and approve your file first.");
+
+    const w = document.getElementById('w-input').value;
+    const h = document.getElementById('h-input').value;
+    
+    const sideSelect = document.getElementById('side-select');
+    const sideText = sideSelect.options[sideSelect.selectedIndex].text;
+    
+    const finishSelect = document.getElementById('finish-select');
+    const finishText = finishSelect.options[finishSelect.selectedIndex].text;
+    
+    const turnSelect = document.getElementById('turn-select');
+    const turnText = turnSelect.options[turnSelect.selectedIndex].text;
+    
+    const qty = document.getElementById('qty-input').value;
+    const finalPrice = document.getElementById('final-price').innerText;
+
+    const item = {
+        name: "Custom Pole Flag",
+        price: parseFloat(finalPrice.replace(/[$,]/g, '')),
+        image: "../images/Advertising Flags/Custom-Pole-Flag-02-1.png",
+        fileUrl: uploadedFileUrl,
+        details: `SIZE: ${w}"x${h}" | PRINT: ${sideText} | FINISH: ${finishText} | TURN: ${turnText} | QTY: ${qty}`,
+        qty: qty
+    };
+
+    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+    cart.push(item);
+    localStorage.setItem('sqft_cart', JSON.stringify(cart));
+    resetUpload();
+    toggleCart();
+}
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];

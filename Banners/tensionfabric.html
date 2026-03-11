@@ -283,20 +283,31 @@
         }
 
         function calculatePrice() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const turnVal = document.getElementById('turn-select').value;
-            const velcroVal = document.getElementById('velcro-select').value;
-            const pocketVal = document.getElementById('pocket-select').value;
-            const area = (w * h) / 144;
-            if (typeof getBannerTotalUnit === 'function') {
-                const pricing = getBannerTotalUnit(PRODUCT_ID, velcroVal, turnVal, null, pocketVal, w, h);
-                const finalTotal = (area * pricing.pricePerSqFt * qty) + pricing.fixedFee;
-                document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
-                document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            }
+    const w = parseFloat(document.getElementById('w-input').value) || 0;
+    const h = parseFloat(document.getElementById('h-input').value) || 0;
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+    const turnVal = document.getElementById('turn-select').value; // ID correcto en este HTML
+    const velcroVal = document.getElementById('velcro-select').value;
+    const pocketVal = document.getElementById('pocket-select').value;
+    
+    const area = (w * h) / 144;
+
+    if (typeof getBannerTotalUnit === 'function') {
+        const pricing = getBannerTotalUnit(PRODUCT_ID, velcroVal, turnVal, null, pocketVal, w, h);
+        
+        // Cálculo del total base
+        let finalTotal = (area * pricing.pricePerSqFt * qty) + pricing.fixedFee;
+
+        // SUMA MANUAL DEL RUSH:
+        // Si el usuario elige "Rush", sumamos los $50.00
+        if (turnVal === "Rush") {
+            finalTotal += 50;
         }
+
+        document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
+        document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    }
+}
 
         function updateOrderedLabels() {
             const w = parseFloat(document.getElementById('w-input').value) || 0;

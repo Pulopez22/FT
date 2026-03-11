@@ -266,25 +266,34 @@
         }
 
         function calculatePrice() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const turnVal = document.getElementById('turn-select').value;
-            const pocketVal = document.getElementById('pocket-select').value;
+    const w = parseFloat(document.getElementById('w-input').value) || 0;
+    const h = parseFloat(document.getElementById('h-input').value) || 0;
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+    const turnVal = document.getElementById('turn-select').value; // "Standard" o "Rush"
+    const pocketVal = document.getElementById('pocket-select').value;
 
-            // Lógica especial: menos de 30" se cobra como 36"
-            let calcW = w < 30 ? 36 : w;
-            let calcH = h < 30 ? 36 : h;
-            const areaCobrada = (calcW * calcH) / 144;
-            const areaReal = (w * h) / 144;
+    // Lógica de cobro mínimo: menos de 30" se cobra como 36"
+    let calcW = w < 30 ? 36 : w;
+    let calcH = h < 30 ? 36 : h;
+    const areaCobrada = (calcW * calcH) / 144;
+    const areaReal = (w * h) / 144;
 
-            if (typeof getBannerTotalUnit === 'function') {
-                const pricing = getBannerTotalUnit(PRODUCT_ID, "none", turnVal, null, pocketVal, w, h);
-                const finalTotal = (areaCobrada * pricing.pricePerSqFt * qty) + pricing.fixedFee;
-                document.getElementById('area-display').innerText = `${areaReal.toFixed(2)} sq ft`;
-                document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            }
+    if (typeof getBannerTotalUnit === 'function') {
+        // Llamamos a la función de pricing.js
+        const pricing = getBannerTotalUnit(PRODUCT_ID, "none", turnVal, null, pocketVal, w, h);
+        
+        // Calculamos el total base
+        let finalTotal = (areaCobrada * pricing.pricePerSqFt * qty) + pricing.fixedFee;
+
+        // SUMA MANUAL DEL RUSH: Si el usuario selecciona "Rush", sumamos los $50
+        if (turnVal === "Rush") {
+            finalTotal += 50;
         }
+
+        document.getElementById('area-display').innerText = `${areaReal.toFixed(2)} sq ft`;
+        document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    }
+}
 
         function updateOrderedLabels() {
             const w = parseFloat(document.getElementById('w-input').value) || 0;

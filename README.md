@@ -13,14 +13,15 @@ Square Foot Printin
             </a>
         </div>
 
-<div class="pt-8 border-t border-gray-100 text-black text-black text-black">
-                            <h2 class="text-4xl heavy-italic mb-6 italic">Vinyl Banner - Super Smooth 13oz.</h2>
-                            <div class="text-[14px] leading-[1.8] space-y-6 font-medium text-black text-black text-black">
-                                <p>Premium heavy weight 13 oz. super smooth vinyl banner. Very smooth surface for high-fidelity printing results.</p>
-                                <ul class="list-disc pl-5 space-y-3 text-[13px] text-black text-black text-black">
-                                    <li>High resolution digitally printed at 720 x 720</li>
-                                    <li>Indoor and outdoor use, waterproof and UV safe</li>
-                                    <li><strong>Pricing Note:</strong> Banners under 30" charged as 36"</li>
+<div class="pt-8 border-t border-gray-100">
+                            <h2 class="text-3xl md:text-4xl heavy-italic mb-6 italic text-black">EZ Tube Tension Stand</h2>
+                            <div class="text-[14px] leading-[1.8] space-y-6 font-medium text-black">
+                                <p>Professional tension fabric display with interlocking aluminum frame. Tool-free assembly for a modern, wrinkle-free trade show presence.</p>
+                                <ul class="list-disc pl-5 space-y-3 text-[13px] text-black">
+                                    <li>Lightweight interlocking aluminum frame</li>
+                                    <li>Premium 9oz Stretch Polyester Fabric</li>
+                                    <li>Available in Straight or Curved shapes</li>
+                                    <li>Padded travel bag included with kits</li>
                                 </ul>
                             </div>
                         </div>

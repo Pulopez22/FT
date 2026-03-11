@@ -196,7 +196,7 @@
                 badge.innerText = "Public Retail Prices";
                 badge.className = "mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic";
             }
-            applySort('random', document.querySelector('.filter-btn'));
+            applySort('featured', document.querySelector('.filter-btn'));
             renderCart();
         }
 
@@ -229,16 +229,23 @@
         }
 
         function applySort(type, btn) {
-            if(btn) {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-            let sorted = [...banners];
-            if (type === 'low') sorted.sort((a, b) => getBannerPrice(a.id) - getBannerPrice(b.id));
-            else if (type === 'high') sorted.sort((a, b) => getBannerPrice(b.id) - getBannerPrice(a.id));
-            else sorted.sort(() => 0.5 - Math.random());
-            renderBanners(sorted);
-        }
+    if(btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    let sorted = [...banners];
+    if (type === 'low') {
+        sorted.sort((a, b) => getBannerPrice(a.id) - getBannerPrice(b.id));
+    } else if (type === 'high') {
+        sorted.sort((a, b) => getBannerPrice(b.id) - getBannerPrice(a.id));
+    } 
+    // Quitamos el Math.random() para que no se muevan al azar
+    else {
+        // Se queda con el orden original del array 'banners'
+        sorted = [...banners]; 
+    }
+    renderBanners(sorted);
+}
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];

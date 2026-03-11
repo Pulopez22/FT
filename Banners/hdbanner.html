@@ -65,6 +65,19 @@
         </div>
     </nav>
 
+    <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden text-black">
+        <div class="flex justify-between items-center border-b pb-4">
+            <span class="heavy-italic text-xl italic">Navigation</span>
+            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
+        </div>
+        <ul class="space-y-6 text-sm font-black uppercase italic">
+            <li><a href="../index.html">Wall Art</a></li>
+            <li><a href="../Banners/banners.html">Banners</a></li>
+            <li><a href="displays.html" class="text-red-600">Displays</a></li>
+            <li><a href="../Stickers/stickers.html">Stickers</a></li>
+        </ul>
+    </div>
+
     <div class="flex flex-row flex-grow w-full text-black">
         <aside class="sidebar-fixed p-10 hidden lg:block text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
@@ -268,19 +281,27 @@
         }
 
         function calculatePrice() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const turnVal = document.getElementById('turn-select').value;
-            const pocketVal = document.getElementById('pocket-select').value;
-            const area = (w * h) / 144;
-            if (typeof getBannerTotalUnit === 'function') {
-                const pricing = getBannerTotalUnit(PRODUCT_ID, null, turnVal, null, pocketVal, w, h);
-                const finalTotal = (area * pricing.pricePerSqFt * qty) + pricing.fixedFee;
-                document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
-                document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            }
+    const w = parseFloat(document.getElementById('w-input').value) || 0;
+    const h = parseFloat(document.getElementById('h-input').value) || 0;
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+    const turnVal = document.getElementById('turn-select').value;
+    const pocketVal = document.getElementById('pocket-select').value;
+    
+    const area = (w * h) / 144;
+
+    if (typeof getBannerTotalUnit === 'function') {
+        const pricing = getBannerTotalUnit(PRODUCT_ID, null, turnVal, null, pocketVal, w, h);
+        
+        let finalTotal = (area * pricing.pricePerSqFt * qty) + pricing.fixedFee;
+
+        if (turnVal === "Rush") {
+            finalTotal += 50;
         }
+
+        document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
+        document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    }
+}
 
         function updateOrderedLabels() {
             const w = parseFloat(document.getElementById('w-input').value) || 0;

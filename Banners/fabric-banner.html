@@ -142,9 +142,9 @@
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Hem</label>
                                 <select id="hem-select" onchange="calculatePrice()" class="custom-dropdown">
-                                    <option value="none">Trim to Size (No Hem)</option>
-                                    <option value="hem">Hem All Sides</option>
-                                </select>
+    <option value="3.00">Trim to Size (No Hem)</option>
+    <option value="3.50">Hem All Sides</option>
+</select>
                             </div>
 
                             <div>
@@ -168,18 +168,18 @@
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Velcro</label>
                                 <select id="velcro-select" onchange="calculatePrice()" class="custom-dropdown">
-                                    <option value="none">No Velcro</option>
-                                    <option value="1in">1" Velcro All Sides</option>
-                                    <option value="2in">2" Velcro All Sides</option>
-                                </select>
+    <option value="0">No Velcro</option>
+    <option value="1.50">1" Velcro All Sides</option>
+    <option value="3.00">2" Velcro All Sides</option>
+</select>
                             </div>
 
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Turnaround</label>
                                 <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
-                                    <option value="Standard">3 Days</option>
-                                    <option value="Rush">Same Day Rush + $50</option>
-                                </select>
+    <option value="0">3 Days</option>
+    <option value="50">Same Day Rush + $50</option>
+</select>
                             </div>
 
                             <div id="validator-container" class="space-y-4">
@@ -303,21 +303,30 @@
         }
 
         function calculatePrice() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const turnVal = document.getElementById('turn-select').value;
-            const velcroVal = document.getElementById('velcro-select').value;
-            const hemVal = document.getElementById('hem-select').value;
-            const pocketVal = document.getElementById('pocket-select').value;
-            const area = (w * h) / 144;
-            if (typeof getBannerTotalUnit === 'function') {
-                const pricing = getBannerTotalUnit(PRODUCT_ID, velcroVal, turnVal, hemVal, pocketVal);
-                const finalTotal = (area * pricing.pricePerSqFt * qty) + pricing.fixedFee;
-                document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
-                document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            }
-        }
+    const w = parseFloat(document.getElementById('w-input').value) || 0;
+    const h = parseFloat(document.getElementById('h-input').value) || 0;
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+    
+    // Capturar todos los valores de los selects
+    const turnVal = document.getElementById('turn-select').value;
+    const velcroVal = document.getElementById('velcro-select').value;
+    const hemVal = document.getElementById('hem-select'); // Asegúrate de obtener el .value
+    const pocketVal = document.getElementById('pocket-select').value;
+    const grommetVal = document.getElementById('grommet-select').value;
+
+    const area = (w * h) / 144;
+
+    if (typeof getBannerTotalUnit === 'function') {
+        // PASO CLAVE: Enviamos todos los parámetros a pricing.js
+        const pricing = getBannerTotalUnit(PRODUCT_ID, velcroVal, turnVal, hemVal.value, pocketVal, grommetVal);
+        
+        // El cálculo debe incluir el precio por pie cuadrado Y el cargo fijo (Rush)
+        const finalTotal = (area * pricing.pricePerSqFt * qty) + (pricing.fixedFee || 0);
+        
+        document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
+        document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    }
+}
 
         function updateOrderedLabels() {
             const w = parseFloat(document.getElementById('w-input').value) || 0;
@@ -456,24 +465,44 @@
         }
 
         function addToCart() {
-            if (!uploadedFileUrl) return alert("Please upload art first");
-            const w = document.getElementById('w-input').value;
-            const h = document.getElementById('h-input').value;
-            const hem = document.getElementById('hem-select');
-            const qty = document.getElementById('qty-input').value;
-            const details = `SIZE: ${w}"X${h}" | HEM: ${hem.options[hem.selectedIndex].text} | QTY: ${qty}`;
-            const item = {
-                name: "Wrinkle Free Fabric Banner",
-                price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
-                image: "../images/Banners/AMS-Fabric-6.png",
-                fileUrl: uploadedFileUrl,
-                details: details
-            };
-            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push(item);
-            localStorage.setItem('sqft_cart', JSON.stringify(cart));
-            toggleCart();
-        }
+    if (!uploadedFileUrl) return alert("Please upload art first");
+
+    // 1. Capturamos todos los valores de los selects e inputs
+    const w = document.getElementById('w-input').value;
+    const h = document.getElementById('h-input').value;
+    const qty = document.getElementById('qty-input').value;
+    
+    const hem = document.getElementById('hem-select');
+    const grommet = document.getElementById('grommet-select');
+    const pocket = document.getElementById('pocket-select');
+    const velcro = document.getElementById('velcro-select');
+    const turnaround = document.getElementById('turn-select');
+
+    // 2. Creamos un string de detalles que incluya TODO
+    const details = `SIZE: ${w}"X${h}" | ` +
+                    `HEM: ${hem.options[hem.selectedIndex].text} | ` +
+                    `GROMMETS: ${grommet.options[grommet.selectedIndex].text} | ` +
+                    `POCKETS: ${pocket.options[pocket.selectedIndex].text} | ` +
+                    `VELCRO: ${velcro.options[velcro.selectedIndex].text} | ` +
+                    `TURNAROUND: ${turnaround.options[turnaround.selectedIndex].text} | ` +
+                    `QTY: ${qty}`;
+
+    // 3. Creamos el objeto del item
+    const item = {
+        name: "Wrinkle Free Fabric Banner",
+        price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
+        image: "../images/Banners/AMS-Fabric-6.png",
+        fileUrl: uploadedFileUrl,
+        details: details // Aquí ya va la información completa
+    };
+
+    // 4. Guardar en LocalStorage
+    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+    cart.push(item);
+    localStorage.setItem('sqft_cart', JSON.stringify(cart));
+    
+    toggleCart();
+}
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
