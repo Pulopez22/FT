@@ -12,8 +12,8 @@ const paypal = require('@paypal/checkout-server-sdk');
 
 // Configuración de PayPal
 let environment = new paypal.core.SandboxEnvironment(
-    process.env.PAYPAL_CLIENT_ID || 'AUbkVL7-ki_DER-xXi7WUJLdmkIS2ISX7f_FLQTar5uhYycbzdEE6BcASfjqDTGJbdYrsywgkdkZ2O88',
-    process.env.PAYPAL_SECRET || 'TU_SECRET_AQUI'
+    process.env.PAYPAL_CLIENT_ID,
+    process.env.PAYPAL_SECRET
 );
 let paypalClient = new paypal.core.PayPalHttpClient(environment);
 
@@ -282,6 +282,37 @@ app.post('/api/checkout/create-paypal-order', async (req, res) => {
     }
 });
 
+// Ruta para capturar el pago (Confirmar que el dinero se movió)
+app.post('/api/checkout/capture-paypal-order', async (req, res) => {
+    const { orderID, orderDatabaseId } = req.body; // Recibimos el ID de PayPal y el ID de nuestra DB
+
+    const request = new paypal.orders.OrdersCaptureRequest(orderID);
+    request.requestBody({});
+
+    try {
+        const capture = await paypalClient.execute(request);
+        
+        // 1. Verificar si el pago fue exitoso según PayPal
+        if (capture.result.status === 'COMPLETED') {
+            const transactionId = capture.result.purchase_units[0].payments.captures[0].id;
+
+            // 2. Actualizar la orden en MongoDB
+            await Order.findByIdAndUpdate(orderDatabaseId, {
+                payment_status: 'Paid',
+                transaction_id: transactionId,
+                status: 'Processing' // Ya puedes empezar a imprimir
+            });
+
+            res.json({ success: true, details: capture.result });
+        } else {
+            res.status(400).json({ success: false, message: 'Pago no completado' });
+        }
+    } catch (err) {
+        console.error("Error capturando pago:", err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // --- BUSCA ESTA RUTA AL FINAL DE TU ARCHIVO Y REEMPLÁZALA ---
 app.get('/api/orders/track/:orderId', async (req, res) => {
     try {
@@ -326,7 +357,11 @@ async function calculateTotalFromDB(items, isWholesaleUser) {
         if (priceRecord) {
             let itemPrice = priceRecord.price;
             if (priceRecord.type === 'sqft') {
-                const sqft = (parseFloat(item.width) || 1) * (parseFloat(item.height) || 1);
+                const width = Math.max(1, Math.abs(parseFloat(item.width) || 1));
+                const height = Math.max(1, Math.abs(parseFloat(item.height) || 1));
+
+                const sqft = width * height;
+
                 let unitPrice = itemPrice * sqft;
                 // Sumar opciones si existen (ej. velcro)
                 if (item.options && Array.isArray(item.options)) {

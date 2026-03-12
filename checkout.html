@@ -265,11 +265,25 @@
                     .then(order => order.id);
                 },
                 onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        alert('Payment Successful!');
-                        validateAndPlaceOrder(true); // Guardar orden como pagada
-                    });
-                },
+    // data.orderID es el ID que genera PayPal
+    return fetch('/api/checkout/capture-paypal-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderID: data.orderID,
+            orderDatabaseId: idDeTuOrdenEnMongoDB // Asegúrate de guardar este ID cuando creas la orden
+        })
+    })
+    .then(res => res.json())
+    .then(details => {
+        if (details.success) {
+            alert('¡Pago exitoso! Su pedido está en proceso.');
+            window.location.href = "/track.html?order=" + data.orderID;
+        } else {
+            alert('Error al procesar el pago.');
+        }
+    });
+},
                 onError: function(err) {
                     console.error('PayPal Error:', err);
                     alert('PayPal process failed. Please check your data.');
