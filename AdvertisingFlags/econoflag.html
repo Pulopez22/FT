@@ -452,50 +452,72 @@
             document.getElementById('status-title').innerText = "ARTWORK APPROVED ✓";
         }
 
-        function addToCart() {
-    // 1. CAPTURAR VALORES DE LOS SELECTS
-    const sideSelect = document.getElementById('side-select');
-    const sideText = sideSelect.options[sideSelect.selectedIndex].text;
+       function addToCart() {
+    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
+    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
+    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
+    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
+    const mainImg = document.getElementById('main-prod-img')?.src || "";
 
-    const hwSelect = document.getElementById('hardware-select');
-    const hwText = hwSelect.options[hwSelect.selectedIndex].text;
+    // 2. RECOPILAR OPCIONES DE LOS SELECTS
+    // Buscamos todos los select de la página
+    const optionElements = document.querySelectorAll('select.custom-dropdown');
+    let itemDetails = [];
+    let variantKey = "base"; // Por defecto
 
-    const turnSelect = document.getElementById('turn-select');
-    const turnText = turnSelect.options[turnSelect.selectedIndex].text;
+    optionElements.forEach(select => {
+        const label = select.previousElementSibling?.innerText || "Option";
+        const text = select.options[select.selectedIndex].text;
+        const value = select.value;
 
-    const qty = document.getElementById('qty-input').value;
-    const finalPrice = document.getElementById('final-price').innerText;
+        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
+        if (select.id.includes('hardware') || select.id.includes('material')) {
+            variantKey = value;
+        }
+        
+        itemDetails.push(`${label}: ${text}`);
+    });
 
-    // 2. CAPTURAR ESTADO DEL VALIDADOR (Para el área de diseño)
-    const previewThumb = document.getElementById('preview-thumb');
-    const pdfCanvas = document.getElementById('pdf-canvas');
-    const el = isPdf ? pdfCanvas : previewThumb;
+    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
+    // Si existen los inputs de width/height los guardamos
+    const widthInput = document.getElementById('width-input');
+    const heightInput = document.getElementById('height-input');
     
-    // Verificamos si el usuario activó el Auto-Fit (viendo el transform o el objectFit)
-    const hasAutoFit = (el.style.objectFit === "cover") ? "YES" : "NO";
-    const isRotated = (el.style.transform.includes("rotate")) ? "YES (90deg)" : "NO";
+    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
+    let artNote = "";
+    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
+        const previewThumb = document.getElementById('preview-thumb');
+        const pdfCanvas = document.getElementById('pdf-canvas');
+        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
+        
+        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
+        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
+        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
+    }
 
-    // 3. CREAR TEXTO DETALLADO PARA EL CARRITO
-    // Esto es lo que verás tú y el cliente en el resumen
-    const itemDetails = `SIDE: ${sideText} | HW: ${hwText} | TURN: ${turnText} | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-
+    // 5. CREAR EL OBJETO PARA EL SERVIDOR
     const item = {
-        name: "Econo Feather Flag",
-        price: parseFloat(finalPrice.replace('$', '')),
-        image: "../images/Advertising Flags/Econo-Feather-Flag-Main-1.png",
-        fileUrl: uploadedFileUrl, // Link de la imagen original subida
-        details: itemDetails,
-        qty: qty
+        name: prodTitle,
+        productId: PRODUCT_ID, // Definido al inicio del script de cada página
+        variantKey: variantKey,
+        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
+        image: mainImg,
+        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
+        details: itemDetails.join(' | ') + artNote,
+        quantity: qty,
+        // Dimensiones para que el servidor calcule el precio real por sqft
+        width: widthInput ? parseFloat(widthInput.value) : 0,
+        height: heightInput ? parseFloat(heightInput.value) : 0
     };
 
-    // 4. GUARDAR EN LOCALSTORAGE
+    // 6. GUARDAR EN LOCALSTORAGE
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
     cart.push(item);
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
     
-    // 5. UI: Reset y Abrir Carrito
-    resetUpload();
-    toggleCart();
+    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
+    if (typeof resetUpload === 'function') resetUpload();
+    if (typeof toggleCart === 'function') toggleCart();
 }
 
         function renderCart() {
