@@ -276,8 +276,7 @@ const pricingSchema = new mongoose.Schema({
 
 const Pricing = mongoose.model('Prices', pricingSchema);
 
-
-app.post('/api/admin/seed-pricing-complete', async (req, res) => {
+app.get('/api/admin/seed-pricing-complete', async (req, res) => {
     try {
         await Pricing.deleteMany({});
         const data = [];
@@ -366,8 +365,6 @@ app.post('/api/admin/seed-pricing-complete', async (req, res) => {
         res.status(500).send("Error: " + err.message);
     }
 });
-
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server Square Foot Printing ready on port ${PORT}`));
