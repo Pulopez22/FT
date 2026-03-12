@@ -237,59 +237,89 @@
             }
         }
 
-        function renderPayPalButtons() {
-            paypalRendered = true;
-            paypal.Buttons({
-                createOrder: function(data, actions) {
-                    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-                    const email = document.getElementById('emailAddress').value;
-                    
-                    if (!email) {
-                        alert("Please enter your email address first.");
-                        return actions.reject();
-                    }
+        let mongoDatabaseId = null; // Variable global para el ID de MongoDB
 
-                    // LLAMADA AL SERVIDOR PARA CALCULO SEGURO
-                    return fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            items: cart, 
-                            userEmail: email 
-                        })
+function renderPayPalButtons() {
+    paypalRendered = true;
+    paypal.Buttons({
+        createOrder: async function(data, actions) {
+            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            const email = document.getElementById('emailAddress').value;
+            const name = document.getElementById('customerName').value; // Asumiendo que tienes este ID
+            const phone = document.getElementById('phoneNumber').value;  // Asumiendo que tienes este ID
+
+            if (!email) {
+                alert("Please enter your email address first.");
+                return actions.reject();
+            }
+
+            try {
+                // 1. PRIMERO: Guardamos la orden en nuestra DB como "Pending"
+                const orderResponse = await fetch('https://ft-f34l.onrender.com/api/place-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: 'SFP-' + Date.now(),
+                        customer_name: name,
+                        customer_email: email,
+                        customer_phone: phone,
+                        order_items: cart,
+                        total_price: "0", // El backend lo recalculará o actualizará
+                        payment_status: 'Pending'
                     })
-                    .then(res => {
-                        if (!res.ok) throw new Error('Server error calculating total');
-                        return res.json();
+                });
+                
+                const orderData = await orderResponse.json();
+                if (!orderData.success) throw new Error("Error saving order to DB");
+                
+                // GUARDAMOS EL ID PARA EL SIGUIENTE PASO
+                mongoDatabaseId = orderData.id; 
+
+                // 2. SEGUNDO: Creamos la orden en PayPal con el cálculo seguro
+                const paypalResponse = await fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        items: cart, 
+                        userEmail: email 
                     })
-                    .then(order => order.id);
-                },
-                onApprove: function(data, actions) {
-    // data.orderID es el ID que genera PayPal
-    return fetch('/api/checkout/capture-paypal-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            orderID: data.orderID,
-            orderDatabaseId: idDeTuOrdenEnMongoDB // Asegúrate de guardar este ID cuando creas la orden
-        })
-    })
-    .then(res => res.json())
-    .then(details => {
-        if (details.success) {
-            alert('¡Pago exitoso! Su pedido está en proceso.');
-            window.location.href = "/track.html?order=" + data.orderID;
-        } else {
-            alert('Error al procesar el pago.');
-        }
-    });
-},
-                onError: function(err) {
-                    console.error('PayPal Error:', err);
-                    alert('PayPal process failed. Please check your data.');
+                });
+
+                const paypalOrder = await paypalResponse.json();
+                return paypalOrder.id;
+
+            } catch (err) {
+                console.error("Setup Error:", err);
+                alert("Could not initialize payment. Please try again.");
+                return actions.reject();
+            }
+        },
+        onApprove: function(data, actions) {
+            // USAMOS mongoDatabaseId que guardamos arriba
+            return fetch('https://ft-f34l.onrender.com/api/checkout/capture-paypal-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderID: data.orderID,
+                    orderDatabaseId: mongoDatabaseId // Ya no saldrá error porque se definió en createOrder
+                })
+            })
+            .then(res => res.json())
+            .then(details => {
+                if (details.success) {
+                    alert('¡Pago exitoso! Su pedido está en proceso.');
+                    localStorage.removeItem('sqft_cart'); // Limpiamos el carrito
+                    window.location.href = "/track.html?order=" + details.details.id;
+                } else {
+                    alert('Error al capturar el pago.');
                 }
-            }).render('#paypal-button-container');
+            });
+        },
+        onError: function(err) {
+            console.error('PayPal Error:', err);
         }
+    }).render('#paypal-button-container');
+}
 
         function formatExpiry(el) {
             let val = el.value.replace(/\D/g, '');
