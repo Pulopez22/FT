@@ -9,7 +9,7 @@
     <script src="https://www.paypal.com/sdk/js?client-id=AUbkVL7-ki_DER-xXi7WUJLdmkIS2ISX7f_FLQTar5uhYycbzdEE6BcASfjqDTGJbdYrsywgkdkZ2O88"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-   <style>
+    <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; color: #000; overflow-x: hidden; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         .input-field { width: 100%; padding: 1rem; border-radius: 1.25rem; border: 1px solid #e5e7eb; outline: none; transition: all 0.3s; font-size: 14px; font-weight: 600; background-color: #f9fafb; color: #000; }
@@ -127,10 +127,10 @@
                                 <div onclick="selectPayment('zelle')" id="pay-zelle" class="select-button p-6 rounded-[1.5rem] flex flex-col items-center gap-2">
                                     <i data-lucide="wallet"></i><span class="heavy-italic text-[10px]">Zelle</span>
                                 </div>
-                               <div onclick="selectPayment('paypal')" id="pay-paypal" class="select-button p-6 rounded-[1.5rem] flex flex-col items-center justify-center gap-3">
-    <i class="fa-brands fa-paypal text-2xl"></i>
-    <span class="heavy-italic text-[10px] tracking-widest">PAYPAL</span>
-</div>
+                                <div onclick="selectPayment('paypal')" id="pay-paypal" class="select-button p-6 rounded-[1.5rem] flex flex-col items-center justify-center gap-3">
+                                    <i class="fa-brands fa-paypal text-2xl"></i>
+                                    <span class="heavy-italic text-[10px] tracking-widest">PAYPAL</span>
+                                </div>
                             </div>
                             <div id="card-details" class="hidden bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 space-y-6">
                                 <div><label>Card Number</label><input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" class="input-field"></div>
@@ -218,40 +218,63 @@
 
         function selectPayment(method) {
             currentPayment = method;
-            document.getElementById('pay-card').classList.toggle('active', method === 'card');
-            document.getElementById('pay-zelle').classList.toggle('active', method === 'zelle');
-            document.getElementById('pay-paypal').classList.toggle('active', method === 'paypal');
+            document.querySelectorAll('.select-button').forEach(btn => btn.classList.remove('active'));
+            const target = document.getElementById('pay-' + method);
+            if(target) target.classList.add('active');
+            
             document.getElementById('card-details').classList.toggle('hidden', method !== 'card');
 
-            const paypalBtn = document.getElementById('paypal-button-container');
+            const paypalBtnContainer = document.getElementById('paypal-button-container');
             const placeBtn = document.getElementById('place-order-btn');
 
             if (method === 'paypal') {
-                paypalBtn.classList.remove('hidden');
+                paypalBtnContainer.classList.remove('hidden');
                 placeBtn.classList.add('hidden');
-                renderPayPalButtons();
+                if (!paypalRendered) renderPayPalButtons();
             } else {
-                paypalBtn.classList.add('hidden');
+                paypalBtnContainer.classList.add('hidden');
                 placeBtn.classList.remove('hidden');
             }
         }
 
         function renderPayPalButtons() {
-            if (paypalRendered) return;
+            paypalRendered = true;
             paypal.Buttons({
-                createOrder: (data, actions) => {
-                    const total = document.getElementById('final-price-display').innerText.replace('$', '');
-                    return actions.order.create({
-                        purchase_units: [{ amount: { value: total } }]
+                createOrder: function(data, actions) {
+                    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+                    const email = document.getElementById('emailAddress').value;
+                    
+                    if (!email) {
+                        alert("Please enter your email address first.");
+                        return actions.reject();
+                    }
+
+                    // LLAMADA AL SERVIDOR PARA CALCULO SEGURO
+                    return fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            items: cart, 
+                            userEmail: email 
+                        })
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Server error calculating total');
+                        return res.json();
+                    })
+                    .then(order => order.id);
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        alert('Payment Successful!');
+                        validateAndPlaceOrder(true); // Guardar orden como pagada
                     });
                 },
-                onApprove: (data, actions) => {
-                    return actions.order.capture().then(details => {
-                        validateAndPlaceOrder(true); 
-                    });
+                onError: function(err) {
+                    console.error('PayPal Error:', err);
+                    alert('PayPal process failed. Please check your data.');
                 }
             }).render('#paypal-button-container');
-            paypalRendered = true;
         }
 
         function formatExpiry(el) {
@@ -292,8 +315,6 @@
                 const displayPrice = isTooLow ? 50.00 : pNum;
                 subtotal += displayPrice;
 
-                const showDetails = item.details || item.specs || "Standard Specs";
-
                 return `
                     <div class="border-b border-gray-50 pb-6 mb-6 last:border-0 text-black">
                         <div class="flex gap-4 items-center">
@@ -305,7 +326,7 @@
                                     <span class="font-black text-[11px] uppercase italic leading-none">${item.name}</span>
                                     <button onclick="removeItem(${index})" class="text-gray-300 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                                 </div>
-                                <p class="text-[8px] text-gray-400 font-bold uppercase mt-1 leading-tight">${showDetails}</p>
+                                <p class="text-[8px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.details || item.specs || "Standard Specs"}</p>
                                 <div class="font-black text-sm mt-2 ${isTooLow ? 'text-red-600' : 'text-black'}">$${displayPrice.toFixed(2)}</div>
                             </div>
                         </div>
@@ -339,25 +360,19 @@
             btn.disabled = true;
 
             const oNum = 'ORD-' + Math.floor(Math.random() * 900000);
-
-            const orderItemsStructured = cart.map((item) => {
-                const cleanDetails = item.details ? item.details.split('|').map(d => d.trim()).join('\n') : "No details";
-                return {
-                    name: item.name.toUpperCase(),
-                    details: cleanDetails,
-                    price: item.price,
-                    fileUrl: item.fileUrl || "",
-                    image: item.image
-                };
-            });
-
             const oInfo = {
                 order_id: oNum,
                 customer_name: name,
                 customer_email: email,
                 customer_phone: document.getElementById('phoneNumber').value,
                 total_price: document.getElementById('final-price-display').innerText,
-                order_items: orderItemsStructured,
+                order_items: cart.map(item => ({
+                    name: item.name.toUpperCase(),
+                    details: item.details || "Standard",
+                    price: item.price,
+                    fileUrl: item.fileUrl || "",
+                    image: item.image
+                })),
                 status: isPaid ? "Paid" : "Pending"
             };
 
