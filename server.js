@@ -266,5 +266,108 @@ app.get('/api/orders/track/:orderId', async (req, res) => {
     }
 });
 
+const pricingSchema = new mongoose.Schema({
+    category: String,
+    productId: String,
+    variantKey: String, // Para llaves complejas como "small-single-Printed..."
+    price: Number,      // Precio Wholesale
+    type: { type: String, default: 'unit' } // 'unit', 'sqft', o 'size'
+});
+
+const Pricing = mongoose.model('Prices', pricingSchema);
+
+
+app.post('/api/admin/seed-pricing-complete', async (req, res) => {
+    try {
+        await Pricing.deleteMany({});
+        const data = [];
+
+        // --- 1. CATEGORÍA: FLAGS ---
+        data.push(
+            { category: 'Flags', productId: 'custom-pole-flag', variantKey: 'base', price: 10.00, type: 'base' },
+            { category: 'Flags', productId: 'custom-pole-flag', variantKey: 'double', price: 18.50, type: 'base' },
+            { category: 'Flags', productId: 'teardrop-flag', variantKey: 'base', price: 19.17, type: 'base' },
+            { category: 'Flags', productId: 'feather-angled-flag', variantKey: 'base', price: 19.17, type: 'base' },
+            { category: 'Flags', productId: 'econo-feather-flag', variantKey: 'flag-only', price: 73.65, type: 'base' },
+            { category: 'Flags', productId: 'econo-feather-flag', variantKey: 'full-kit', price: 156.60, type: 'base' },
+            { category: 'Flags', productId: 'econo-feather-flag', variantKey: 'base', price: 33.32, type: 'base' }
+        );
+
+        // --- BANDERAS PRO (FEATHER Y TEARDROP) ---
+        // Aquí incluimos TODAS las combinaciones que pasaste en tu objeto masterPricing
+        const proIds = ['feather-angled-flag-pro', 'teardrop-flag-pro'];
+        const proVariants = {
+            "small-single-Printed Flag Only (No Hardware)-No": 63.42,
+            "small-single-Printed Flag Only (No Hardware)-Yes": 98.36,
+            "small-single-Printed Flag + Pole + Ground Stake-No": 112.19,
+            "small-single-Printed Flag + Pole + Ground Stake-Yes": 133.97,
+            "small-single-Printed Flag + Pole + Cross Base-No": 125.55,
+            "small-single-Printed Flag + Pole + Cross Base-Yes": 146.82,
+            "small-single-Printed Flag + Pole + Square Base-No": 138.29,
+            "small-single-Printed Flag + Pole + Square Base-Yes": 159.29,
+            "small-double-Printed Flag Only (No Hardware)-No": 112.92,
+            "medium-single-Printed Flag Only (No Hardware)-No": 66.59,
+            "large-single-Printed Flag Only (No Hardware)-No": 75.25,
+            "xlarge-single-Printed Flag Only (No Hardware)-No": 154.26,
+            "xlarge-double-Printed Flag Only (No Hardware)-Yes": 354.18
+            // (Agrega aquí el resto de variantes PRO siguiendo este formato)
+        };
+        proIds.forEach(id => {
+            for (let key in proVariants) {
+                data.push({ category: 'Flags', productId: id, variantKey: key, price: proVariants[key], type: 'fixed' });
+            }
+        });
+
+        // --- 2. CATEGORÍA: BANNERS (Precios x SQFT y Acabados) ---
+        data.push(
+            { category: 'Banners', productId: 'blockout-fabric', variantKey: 'material', price: 6.75, type: 'material' },
+            { category: 'Banners', productId: 'blockout-fabric', variantKey: 'velcro-1', price: 1.50, type: 'option' },
+            { category: 'Banners', productId: 'blockout-fabric', variantKey: 'velcro-2', price: 2.50, type: 'option' },
+            { category: 'Banners', productId: 'wrinkle-free', variantKey: 'material', price: 3.00, type: 'material' },
+            { category: 'Banners', productId: 'mesh-banner', variantKey: 'material', price: 2.00, type: 'material' },
+            { category: 'Banners', productId: 'super-smooth', variantKey: 'material', price: 1.25, type: 'material' },
+            { category: 'Banners', productId: 'standard-banner', variantKey: 'material', price: 0.00, type: 'material' }
+        );
+
+        // --- 3. CATEGORÍA: LARGE PRINTING ---
+        data.push(
+            { category: 'LargePrinting', productId: 'adhesive-vinyl', variantKey: 'material', price: 3.00, type: 'material' },
+            { category: 'LargePrinting', productId: 'reflective-vinyl', variantKey: 'material', price: 6.00, type: 'material' },
+            { category: 'LargePrinting', productId: 'window-perf', variantKey: 'material', price: 2.50, type: 'material' },
+            { category: 'LargePrinting', productId: 'gallery-canvas', variantKey: '8x10', price: 29.34, type: 'size' },
+            { category: 'LargePrinting', productId: 'gallery-canvas', variantKey: '24x36', price: 52.32, type: 'size' },
+            { category: 'LargePrinting', productId: 'table-cover', variantKey: '6-3', price: 125.75, type: 'size' }
+        );
+
+        // --- 4. CATEGORÍA: RIGID SIGNS (Con Upcharges de Grosor) ---
+        const rigidMats = { "pvc": 3.00, "foamboard": 3.50, "coroplast": 3.50, "styrene": 3.50 };
+        for (let mat in rigidMats) {
+            data.push({ category: 'RigidSigns', productId: mat, variantKey: 'material', price: rigidMats[mat], type: 'material' });
+        }
+        data.push(
+            { category: 'RigidSigns', productId: 'acrylic', variantKey: 'material', price: 10.00, type: 'material' },
+            { category: 'RigidSigns', productId: 'acrylic', variantKey: 'variant-clear', price: 4.00, type: 'option' },
+            { category: 'RigidSigns', productId: 'acrylic', variantKey: 'thickness-1/8', price: 2.00, type: 'option' }
+        );
+
+        // --- 5. CATEGORÍA: DISPLAYS ---
+        data.push(
+            { category: 'Displays', productId: 'x-stand', variantKey: '24x63-13oz-Standard', price: 55.50, type: 'fixed' },
+            { category: 'Displays', productId: 'retractable', variantKey: '33-Silver-Standard', price: 106.75, type: 'fixed' },
+            { category: 'Displays', productId: 'eventtent', variantKey: 'full_kit-Standard', price: 492.90, type: 'fixed' }
+        );
+
+        // --- 6. CATEGORÍA: STICKERS (Temporal) ---
+        data.push({ category: 'Stickers', productId: 'custom-sticker', variantKey: 'sq_inch', price: 0.05, type: 'material' });
+
+        await Pricing.insertMany(data);
+        res.json({ message: "¡Base de datos Maestra actualizada con ÉXITO!", totalRecords: data.length });
+    } catch (err) {
+        res.status(500).send("Error: " + err.message);
+    }
+});
+
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server Square Foot Printing ready on port ${PORT}`));
