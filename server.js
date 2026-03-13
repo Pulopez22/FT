@@ -253,49 +253,62 @@ app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
 
 app.post('/api/checkout/create-paypal-order', async (req, res) => {
     try {
-        const { items } = req.body;
+        const { items, userEmail } = req.body;
         
-        // 1. Protección: Verificar que items exista y sea un arreglo válido
-        if (!items || !Array.isArray(items)) {
-            throw new Error("El carrito está vacío o corrupto.");
+        if (!items || items.length === 0) {
+            return res.status(400).json({ error: "Carrito vacío" });
         }
 
-        // 2. Cálculo seguro usando los datos que sí vienen del frontend
+        // 1. Identificar al usuario
+        const user = await User.findOne({ email: userEmail });
+        const isWholesale = user ? user.isWholesale : false;
+
+        // 2. Calcular total REAL desde la base de datos
         let finalAmount = 0;
-        items.forEach(item => {
-            // Aseguramos que el item existe y tiene la propiedad price
-            if (item && item.price) {
-                let p = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
-                if (!isNaN(p)) {
-                    // Si tienes reglas como el mínimo de $50, se aplican aquí también
-                    finalAmount += (p < 50 && !item.isMinimumApplied) ? 50 : p;
-                }
-            }
-        });
 
-        // 3. Protección vital: PayPal explota si le mandas $0.00
-        if (finalAmount <= 0) {
-            throw new Error("El monto total a cobrar no puede ser 0.");
+        for (const item of items) {
+            // Buscamos el precio oficial en MongoDB
+            const priceRecord = await Pricing.findOne({ productId: item.productId });
+
+            if (!priceRecord) {
+                // Si el producto no existe en tu tabla de precios, bloqueamos por seguridad
+                console.error(`🚨 Intento de compra con producto no registrado: ${item.productId}`);
+                return res.status(403).json({ error: `Producto no válido: ${item.name}` });
+            }
+
+            let unitPrice = priceRecord.price;
+
+            // Lógica de pies cuadrados (si aplica)
+            if (priceRecord.type === 'sqft') {
+                const width = Math.max(1, parseFloat(item.width) || 1);
+                const height = Math.max(1, parseFloat(item.height) || 1);
+                unitPrice = unitPrice * (width * height);
+            }
+
+            // Aplicar multiplicador Retail (x2) si no es Wholesale
+            const finalUnitPrice = isWholesale ? unitPrice : (unitPrice * 2);
+            
+            finalAmount += finalUnitPrice * (item.quantity || 1);
         }
 
-        // 4. Crear la orden de PayPal
+        // 3. Verificación de seguridad de PayPal
         const request = new paypal.orders.OrdersCreateRequest();
-        request.prefer("return=representation");
         request.requestBody({
             intent: 'CAPTURE',
             purchase_units: [{
                 amount: {
                     currency_code: 'USD',
-                    value: finalAmount.toFixed(2) // Formato estricto para PayPal (ej. "150.00")
+                    value: finalAmount.toFixed(2)
                 }
             }]
         });
 
         const order = await paypalClient.execute(request);
         res.json({ id: order.result.id });
+
     } catch (err) {
-        console.error("Error PayPal:", err.message);
-        res.status(500).json({ error: err.message });
+        console.error("❌ Error en validación de precios:", err.message);
+        res.status(500).json({ error: "Error interno al calcular precios oficial" });
     }
 });
 
