@@ -303,14 +303,20 @@ function renderPayPalButtons() {
                 console.log("✅ Order saved in DB:", resData.id);
 
                 // 4. PASO B: Crear la orden en PayPal (Llamada a tu backend)
-                const paypalRes = await fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        items: cart, 
-                        userEmail: email 
-                    })
-                });
+                const totalVisible = document.getElementById('final-price-display').innerText;
+const totalParaCobrar = parseFloat(totalVisible.replace(/[$,]/g, ''));
+
+console.log("Enviando total al servidor:", totalParaCobrar);
+
+// 2. Llamada al servidor (Asegúrate de que el body sea exactamente así)
+const paypalRes = await fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+        items: cart,        // Enviamos el carrito completo
+        totalForzado: totalParaCobrar // <--- ESTO LE DIRÁ AL SERVER CUÁNTO COBRAR
+    })
+});
 
                 if (!paypalRes.ok) {
                     const textError = await paypalRes.text();
