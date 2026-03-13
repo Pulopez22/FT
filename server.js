@@ -253,15 +253,32 @@ app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
 
 app.post('/api/checkout/create-paypal-order', async (req, res) => {
     try {
-        const { items, userEmail } = req.body;
+        const { items } = req.body;
         
-        // Buscamos si el usuario es wholesale
-        const user = await User.findOne({ email: userEmail });
-        const isWholesale = user ? user.isWholesale : false;
+        // 1. Protección: Verificar que items exista y sea un arreglo válido
+        if (!items || !Array.isArray(items)) {
+            throw new Error("El carrito está vacío o corrupto.");
+        }
 
-        // Calculamos el total real consultando la DB de precios
-        const finalAmount = await calculateTotalFromDB(items, isWholesale);
+        // 2. Cálculo seguro usando los datos que sí vienen del frontend
+        let finalAmount = 0;
+        items.forEach(item => {
+            // Aseguramos que el item existe y tiene la propiedad price
+            if (item && item.price) {
+                let p = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
+                if (!isNaN(p)) {
+                    // Si tienes reglas como el mínimo de $50, se aplican aquí también
+                    finalAmount += (p < 50 && !item.isMinimumApplied) ? 50 : p;
+                }
+            }
+        });
 
+        // 3. Protección vital: PayPal explota si le mandas $0.00
+        if (finalAmount <= 0) {
+            throw new Error("El monto total a cobrar no puede ser 0.");
+        }
+
+        // 4. Crear la orden de PayPal
         const request = new paypal.orders.OrdersCreateRequest();
         request.prefer("return=representation");
         request.requestBody({
@@ -269,7 +286,7 @@ app.post('/api/checkout/create-paypal-order', async (req, res) => {
             purchase_units: [{
                 amount: {
                     currency_code: 'USD',
-                    value: finalAmount
+                    value: finalAmount.toFixed(2) // Formato estricto para PayPal (ej. "150.00")
                 }
             }]
         });
@@ -277,7 +294,7 @@ app.post('/api/checkout/create-paypal-order', async (req, res) => {
         const order = await paypalClient.execute(request);
         res.json({ id: order.result.id });
     } catch (err) {
-        console.error("Error PayPal:", err);
+        console.error("Error PayPal:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
