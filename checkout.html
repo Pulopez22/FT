@@ -248,8 +248,18 @@ function renderPayPalButtons() {
 
     paypal.Buttons({
         createOrder: async function(data, actions) {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            const email = document.getElementById('emailAddress').value;
+    // PROTECCIÓN CONTRA CARRITOS CORRUPTOS
+    let cart = [];
+    try {
+        const storedCart = localStorage.getItem('sqft_cart');
+        if (storedCart === "[object Object]") throw new Error("Carrito corrupto");
+        cart = JSON.parse(storedCart) || [];
+    } catch (e) {
+        console.error("Limpiando carrito con errores...");
+        localStorage.removeItem('sqft_cart');
+        alert("Hubo un problema leyendo tu carrito. Por favor, agrega el producto de nuevo.");
+        return actions.reject();
+    }
             const name = document.getElementById('fullName').value;
 
             if (!name || !email) {
