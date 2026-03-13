@@ -58,12 +58,11 @@ const Order = mongoose.model('Order', new mongoose.Schema({
 
 // --- CONFIGURACIÓN DE CORREO (MAILTRAP) ---
 const transporter = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
-  auth: {
-    user: process.env.MAILTRAP_USER || "09ee2ace2fcb4c", 
-    pass: process.env.MAILTRAP_PASS || "8a7eee9541e016"  
-  }
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER, // Toma el correo de la variable de entorno
+        pass: process.env.GMAIL_PASS  // Toma la "Contraseña de Aplicación" de la variable de entorno
+    }
 });
 
 // --- MIDDLEWARE DE AUTENTICACIÓN ---
@@ -254,40 +253,54 @@ app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
 app.post('/api/checkout/create-paypal-order', async (req, res) => {
     try {
         const { items, userEmail } = req.body;
+        
+        // 1. Validar usuario
         const user = await User.findOne({ email: userEmail });
         const isWholesale = user ? user.isWholesale : false;
 
-        let finalAmount = 0;
+        let totalCalculadoDB = 0;
 
+        // 2. Cálculo FORZOSO desde Base de Datos
         for (const item of items) {
             const priceRecord = await Pricing.findOne({ 
                 productId: item.productId,
                 variantKey: item.variantKey || 'base'
             });
 
-            if (priceRecord) {
-                // USA PRECIO DE BASE DE DATOS
-                let unitPrice = priceRecord.price;
-                if (priceRecord.type === 'sqft') {
-                    const width = Math.max(1, parseFloat(item.width) || 1);
-                    const height = Math.max(1, parseFloat(item.height) || 1);
-                    unitPrice = unitPrice * (width * height);
-                }
-                const finalUnitPrice = isWholesale ? unitPrice : (unitPrice * 2);
-                finalAmount += finalUnitPrice * (item.quantity || 1);
-            } else {
-                // RESPALDO: USA PRECIO DEL CARRITO (Evita el error 403)
-                console.warn(`⚠️ Seguridad: Producto ${item.productId} no hallado en DB. Usando precio de carrito.`);
-                let fallback = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
-                finalAmount += fallback;
+            // SI NO ESTÁ EN LA BD, MATAMOS EL PROCESO AQUÍ
+            if (!priceRecord) {
+                console.error(`🚨 BLOQUEO DE SEGURIDAD: ${item.productId} no existe en la BD.`);
+                return res.status(403).json({ 
+                    error: `Product ${item.name} is not authorized for sale. Please contact admin.` 
+                });
             }
+
+            let unitPrice = priceRecord.price;
+
+            // Lógica SqFt
+            if (priceRecord.type === 'sqft') {
+                const width = Math.max(1, parseFloat(item.width) || 1);
+                const height = Math.max(1, parseFloat(item.height) || 1);
+                unitPrice = unitPrice * (width * height);
+            }
+
+            // Aplicar Multiplicador (Retail x2 / Wholesale x1)
+            const finalUnitPrice = isWholesale ? unitPrice : (unitPrice * 2);
+            totalCalculadoDB += finalUnitPrice * (item.quantity || 1);
         }
 
+        // 3. Verificación final de monto
+        if (totalCalculadoDB <= 0) throw new Error("Invalid total amount from DB");
+
+        // 4. Crear Orden en PayPal con el valor de la BD
         const request = new paypal.orders.OrdersCreateRequest();
         request.requestBody({
             intent: 'CAPTURE',
             purchase_units: [{
-                amount: { currency_code: 'USD', value: finalAmount.toFixed(2) }
+                amount: {
+                    currency_code: 'USD',
+                    value: totalCalculadoDB.toFixed(2)
+                }
             }]
         });
 
