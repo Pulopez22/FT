@@ -191,6 +191,7 @@
 
     <script>
         lucide.createIcons();
+        let mongoDatabaseId = null; 
         let currentMethod = 'pickup', currentPayment = '';
         const UPS_SHIPPING_FEE = 15.00;
         let paypalRendered = false;
@@ -241,20 +242,18 @@
             }
         }
 
-let mongoDatabaseId = null; 
-
 function renderPayPalButtons() {
+    if (paypalRendered) return; // Evita duplicar botones
     paypalRendered = true;
+
     paypal.Buttons({
         createOrder: async function(data, actions) {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const email = document.getElementById('emailAddress').value;
-            // Asegúrate de que estos IDs existan en tu HTML o usa variables que ya tengas
-            const name = document.getElementById('name')?.value || "Customer"; 
-            const phone = document.getElementById('phone')?.value || "N/A";
+            const name = document.getElementById('fullName').value;
 
-            if (!email) {
-                alert("Please enter your email address first.");
+            if (!name || !email) {
+                alert("Please fill in your Name and Email first.");
                 return actions.reject();
             }
 
@@ -267,9 +266,9 @@ function renderPayPalButtons() {
                         order_id: 'SFP-' + Date.now(),
                         customer_name: name,
                         customer_email: email,
-                        customer_phone: phone,
+                        customer_phone: document.getElementById('phoneNumber').value,
                         order_items: cart,
-                        total_price: "0", // Se actualizará en la captura
+                        total_price: document.getElementById('final-price-display').innerText.replace('$', ''),
                         payment_status: 'Pending'
                     })
                 });
@@ -277,14 +276,14 @@ function renderPayPalButtons() {
                 const resData = await response.json();
                 
                 if (resData.success) {
-                    // AQUÍ se asigna el valor. Esto quita el error de "not defined"
+                    // ASIGNACIÓN GLOBAL: Aquí es donde se guarda el ID real
                     mongoDatabaseId = resData.id; 
-                    console.log("Orden guardada en DB:", mongoDatabaseId);
+                    console.log("✅ ID de MongoDB guardado correctamente:", mongoDatabaseId);
                 } else {
-                    throw new Error("Error al guardar orden");
+                    throw new Error("No se pudo guardar la orden en la DB");
                 }
 
-                // PASO B: Llamar a tu API para crear la orden de PayPal
+                // PASO B: Crear orden en PayPal
                 const paypalRes = await fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -295,30 +294,31 @@ function renderPayPalButtons() {
                 return order.id;
 
             } catch (err) {
-                console.error("Error en el proceso inicial:", err);
-                alert("Hubo un problema al iniciar el pago.");
+                console.error("❌ Error en createOrder:", err);
+                alert("Payment setup failed. Please try again.");
                 return actions.reject();
             }
         },
 
         onApprove: function(data, actions) {
-            // PASO C: Capturar el pago usando el ID guardado
+            // PASO C: Capturar pago usando la variable global
+            console.log("Capturando pago para la orden DB:", mongoDatabaseId);
+            
             return fetch('https://ft-f34l.onrender.com/api/checkout/capture-paypal-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     orderID: data.orderID,
-                    orderDatabaseId: mongoDatabaseId // Ahora sí tiene valor
+                    orderDatabaseId: mongoDatabaseId // Ahora sí será visible
                 })
             })
             .then(res => res.json())
             .then(details => {
                 if (details.success) {
-                    alert('¡Pago exitoso!');
                     localStorage.removeItem('sqft_cart');
-                    window.location.href = "/order.html?order=" + data.orderID;
+                    window.location.href = "order.html?id=" + data.orderID;
                 } else {
-                    alert('Error en la captura del pago: ' + details.message);
+                    alert("Capture failed: " + details.message);
                 }
             });
         }
