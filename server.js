@@ -255,43 +255,45 @@ app.post('/api/checkout/create-paypal-order', async (req, res) => {
     try {
         const { items, userEmail } = req.body;
         
-        if (!items || items.length === 0) {
-            return res.status(400).json({ error: "Carrito vacío" });
-        }
+        if (!items || items.length === 0) return res.status(400).json({ error: "Empty cart" });
 
-        // 1. Identificar al usuario
+        // 1. Identificar si el usuario es Wholesale para aplicar precio x1 o x2
         const user = await User.findOne({ email: userEmail });
         const isWholesale = user ? user.isWholesale : false;
 
-        // 2. Calcular total REAL desde la base de datos
         let finalAmount = 0;
 
+        // 2. Recorrer items y validar PRECIOS REALES en MongoDB
         for (const item of items) {
-            // Buscamos el precio oficial en MongoDB
-            const priceRecord = await Pricing.findOne({ productId: item.productId });
+            // Buscamos por productId y variantKey (vital para banderas PRO)
+            const priceRecord = await Pricing.findOne({ 
+                productId: item.productId,
+                variantKey: item.variantKey || 'base'
+            });
 
-            if (!priceRecord) {
-                // Si el producto no existe en tu tabla de precios, bloqueamos por seguridad
-                console.error(`🚨 Intento de compra con producto no registrado: ${item.productId}`);
-                return res.status(403).json({ error: `Producto no válido: ${item.name}` });
+            if (priceRecord) {
+                // Si existe en BD, usamos ese precio. Nadie puede hackear el HTML.
+                let unitPrice = priceRecord.price;
+                
+                // Si el producto es por pie cuadrado (Banners, Vinyl, etc)
+                if (priceRecord.type === 'sqft') {
+                    const width = Math.max(1, parseFloat(item.width) || 1);
+                    const height = Math.max(1, parseFloat(item.height) || 1);
+                    unitPrice = unitPrice * (width * height);
+                }
+
+                // Aplicar x2 si es cliente normal (Retail)
+                const finalUnitPrice = isWholesale ? unitPrice : (unitPrice * 2);
+                finalAmount += finalUnitPrice * (item.quantity || 1);
+            } else {
+                // Si el producto NO está en la base de datos de precios, 
+                // por seguridad bloqueamos la transacción.
+                console.error(`🚨 Producto no encontrado en DB: ${item.productId}`);
+                return res.status(403).json({ error: `Security: Product ${item.name} not authorized.` });
             }
-
-            let unitPrice = priceRecord.price;
-
-            // Lógica de pies cuadrados (si aplica)
-            if (priceRecord.type === 'sqft') {
-                const width = Math.max(1, parseFloat(item.width) || 1);
-                const height = Math.max(1, parseFloat(item.height) || 1);
-                unitPrice = unitPrice * (width * height);
-            }
-
-            // Aplicar multiplicador Retail (x2) si no es Wholesale
-            const finalUnitPrice = isWholesale ? unitPrice : (unitPrice * 2);
-            
-            finalAmount += finalUnitPrice * (item.quantity || 1);
         }
 
-        // 3. Verificación de seguridad de PayPal
+        // 3. Crear orden en PayPal con el monto verificado
         const request = new paypal.orders.OrdersCreateRequest();
         request.requestBody({
             intent: 'CAPTURE',
@@ -307,8 +309,8 @@ app.post('/api/checkout/create-paypal-order', async (req, res) => {
         res.json({ id: order.result.id });
 
     } catch (err) {
-        console.error("❌ Error en validación de precios:", err.message);
-        res.status(500).json({ error: "Error interno al calcular precios oficial" });
+        console.error("❌ PayPal Server Error:", err.message);
+        res.status(500).json({ error: err.message });
     }
 });
 

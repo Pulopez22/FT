@@ -307,25 +307,31 @@ function renderPayPalButtons() {
         },
 
         onApprove: function(data, actions) {
-            const dbId = localStorage.getItem('mongoOrderId');
-            return fetch('https://ft-f34l.onrender.com/api/checkout/capture-paypal-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    orderID: data.orderID,
-                    orderDatabaseId: dbId
-                })
-            })
-            .then(res => res.json())
-            .then(details => {
-                if (details.success) {
-                    localStorage.removeItem('sqft_cart');
-                    window.location.href = "order.html?id=" + data.orderID;
-                } else {
-                    alert("Capture failed: " + details.message);
-                }
-            });
+    // Recuperamos el ID de la base de datos que guardamos en el Paso A
+    const dbId = localStorage.getItem('mongoOrderId');
+
+    return fetch('https://ft-f34l.onrender.com/api/checkout/capture-paypal-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderID: data.orderID,        // ID de PayPal
+            orderDatabaseId: dbId         // _id de tu MongoDB
+        })
+    })
+    .then(res => res.json())
+    .then(details => {
+        if (details.success) {
+            // ¡ÉXITO TOTAL!
+            localStorage.removeItem('sqft_cart');
+            localStorage.removeItem('mongoOrderId');
+            
+            // Redirigimos a la página de éxito
+            window.location.href = "order.html?id=" + data.orderID;
+        } else {
+            alert("Error en la captura del pago. Por favor contacta a soporte.");
         }
+    });
+}
     }).render('#paypal-button-container');
 }
 
