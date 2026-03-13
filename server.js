@@ -280,24 +280,6 @@ app.post('/api/checkout/create-paypal-order', async (req, res) => {
         console.error("Error PayPal:", err);
         res.status(500).json({ error: err.message });
     }
-
-    // PASO B: Crear orden en PayPal
-                const paypalRes = await fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ items: cart, userEmail: email })
-                });
-                
-                // --- NUEVA PROTECCIÓN PROFESIONAL ---
-                if (!paypalRes.ok) {
-                    const textError = await paypalRes.text(); // Leemos el texto en lugar de forzar JSON
-                    console.error("❌ Fallo en el servidor al contactar a PayPal:", textError);
-                    alert("No se pudo iniciar PayPal. Revisa los logs de tu servidor en Render.");
-                    return actions.reject();
-                }
-                
-                const order = await paypalRes.json();
-                return order.id;
 });
 
 // Ruta para capturar el pago (Confirmar que el dinero se movió)

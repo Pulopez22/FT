@@ -300,11 +300,20 @@ function renderPayPalButtons() {
                 }
 
                 // 4. Crear orden en PayPal
+                // PASO 4: Crear orden en PayPal
                 const paypalRes = await fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ items: cart, userEmail: email })
                 });
+                
+                // --- NUEVA PROTECCIÓN PROFESIONAL (ESTO VA EN EL HTML) ---
+                if (!paypalRes.ok) {
+                    const textError = await paypalRes.text(); 
+                    console.error("❌ Fallo en el servidor al contactar a PayPal:", textError);
+                    alert("No se pudo iniciar PayPal. Revisa los logs en Render.");
+                    return actions.reject();
+                }
                 
                 const order = await paypalRes.json();
                 return order.id;
