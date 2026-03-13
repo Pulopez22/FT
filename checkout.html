@@ -51,6 +51,10 @@
         <div class="flex justify-between items-center border-b pb-4">
             <span class="heavy-italic text-xl italic">Navigation</span>
             <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <button onclick="window.location.href='track.html?order=' + document.getElementById('orderNumberDisplay').innerText" 
+        class="hidden md:block text-[10px] font-black uppercase text-black border-b-2 border-black pb-0.5">
+    Track Order
+</button>
         </div>
         <ul class="space-y-6 text-sm font-black uppercase italic">
             <li><a href="index.html" onclick="toggleMobileMenu()">Wall Art</a></li>
@@ -237,7 +241,7 @@
             }
         }
 
-        let mongoDatabaseId = null; // Variable global para el ID de MongoDB
+let mongoDatabaseId = null; 
 
 function renderPayPalButtons() {
     paypalRendered = true;
@@ -245,8 +249,9 @@ function renderPayPalButtons() {
         createOrder: async function(data, actions) {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const email = document.getElementById('emailAddress').value;
-            const name = document.getElementById('customerName').value; // Asumiendo que tienes este ID
-            const phone = document.getElementById('phoneNumber').value;  // Asumiendo que tienes este ID
+            // Asegúrate de que estos IDs existan en tu HTML o usa variables que ya tengas
+            const name = document.getElementById('name')?.value || "Customer"; 
+            const phone = document.getElementById('phone')?.value || "N/A";
 
             if (!email) {
                 alert("Please enter your email address first.");
@@ -254,8 +259,8 @@ function renderPayPalButtons() {
             }
 
             try {
-                // 1. PRIMERO: Guardamos la orden en nuestra DB como "Pending"
-                const orderResponse = await fetch('https://ft-f34l.onrender.com/api/place-order', {
+                // PASO A: Crear la orden en MongoDB
+                const response = await fetch('https://ft-f34l.onrender.com/api/place-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -264,59 +269,58 @@ function renderPayPalButtons() {
                         customer_email: email,
                         customer_phone: phone,
                         order_items: cart,
-                        total_price: "0", // El backend lo recalculará o actualizará
+                        total_price: "0", // Se actualizará en la captura
                         payment_status: 'Pending'
                     })
                 });
-                
-                const orderData = await orderResponse.json();
-                if (!orderData.success) throw new Error("Error saving order to DB");
-                
-                // GUARDAMOS EL ID PARA EL SIGUIENTE PASO
-                mongoDatabaseId = orderData.id; 
 
-                // 2. SEGUNDO: Creamos la orden en PayPal con el cálculo seguro
-                const paypalResponse = await fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
+                const resData = await response.json();
+                
+                if (resData.success) {
+                    // AQUÍ se asigna el valor. Esto quita el error de "not defined"
+                    mongoDatabaseId = resData.id; 
+                    console.log("Orden guardada en DB:", mongoDatabaseId);
+                } else {
+                    throw new Error("Error al guardar orden");
+                }
+
+                // PASO B: Llamar a tu API para crear la orden de PayPal
+                const paypalRes = await fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        items: cart, 
-                        userEmail: email 
-                    })
+                    body: JSON.stringify({ items: cart, userEmail: email })
                 });
-
-                const paypalOrder = await paypalResponse.json();
-                return paypalOrder.id;
+                
+                const order = await paypalRes.json();
+                return order.id;
 
             } catch (err) {
-                console.error("Setup Error:", err);
-                alert("Could not initialize payment. Please try again.");
+                console.error("Error en el proceso inicial:", err);
+                alert("Hubo un problema al iniciar el pago.");
                 return actions.reject();
             }
         },
+
         onApprove: function(data, actions) {
-            // USAMOS mongoDatabaseId que guardamos arriba
+            // PASO C: Capturar el pago usando el ID guardado
             return fetch('https://ft-f34l.onrender.com/api/checkout/capture-paypal-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     orderID: data.orderID,
-                    orderDatabaseId: mongoDatabaseId // Ya no saldrá error porque se definió en createOrder
+                    orderDatabaseId: mongoDatabaseId // Ahora sí tiene valor
                 })
             })
             .then(res => res.json())
             .then(details => {
                 if (details.success) {
-                    alert('¡Pago exitoso! Su pedido está en proceso.');
-                    localStorage.removeItem('sqft_cart'); // Limpiamos el carrito
-                    window.location.href = "/track.html?order=" + details.details.id;
+                    alert('¡Pago exitoso!');
+                    localStorage.removeItem('sqft_cart');
+                    window.location.href = "/order.html?order=" + data.orderID;
                 } else {
-                    alert('Error al capturar el pago.');
+                    alert('Error en la captura del pago: ' + details.message);
                 }
             });
-        },
-        onError: function(err) {
-            console.error('PayPal Error:', err);
         }
     }).render('#paypal-button-container');
 }
