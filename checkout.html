@@ -248,12 +248,17 @@ function renderPayPalButtons() {
 
     paypal.Buttons({
         createOrder: async function(data, actions) {
-            // 1. Leer el carrito de forma segura
+            // 1. Leer el carrito y validar que no esté vacío
             let cart = [];
             try {
                 cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             } catch (e) {
-                alert("Error leyendo el carrito. Por favor, límpialo y vuelve a agregar el producto.");
+                alert("Error reading cart. Please try again.");
+                return actions.reject();
+            }
+
+            if (cart.length === 0) {
+                alert("Your cart is empty. Please add a product first.");
                 return actions.reject();
             }
 
@@ -261,12 +266,12 @@ function renderPayPalButtons() {
             const name = document.getElementById('fullName').value;
 
             if (!name || !email) {
-                alert("Please fill in your Name and Email first.");
+                alert("Please fill in your Name and Email address first.");
                 return actions.reject();
             }
 
             try {
-                // 2. Darle a los items el formato exacto que tu servidor espera (evita que el emailTemplate explote)
+                // 2. Formatear items para evitar errores en el servidor
                 const formattedItems = cart.map(item => ({
                     name: item.name ? item.name.toUpperCase() : "ITEM",
                     details: item.details || item.specs || "Standard",
@@ -275,7 +280,7 @@ function renderPayPalButtons() {
                     image: item.image || ""
                 }));
 
-                // 3. Crear la orden en tu base de datos
+                // 3. PASO A: Crear la orden en TU base de datos (MongoDB)
                 const response = await fetch('https://ft-f34l.onrender.com/api/place-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -284,51 +289,48 @@ function renderPayPalButtons() {
                         customer_name: name,
                         customer_email: email,
                         customer_phone: document.getElementById('phoneNumber').value,
-                        order_items: formattedItems, // Usamos los items protegidos
+                        order_items: formattedItems,
                         total_price: document.getElementById('final-price-display').innerText.replace('$', ''),
                         payment_status: 'Pending'
                     })
                 });
 
                 const resData = await response.json();
+                if (!resData.success) throw new Error(resData.error || "Failed to save order in DB");
                 
-                if (resData.success) {
-                    localStorage.setItem('mongoOrderId', resData.id); 
-                } else {
-                    // AQUÍ ATRAPAMOS EL ERROR REAL DE TU SERVIDOR
-                    throw new Error(resData.error || "Fallo desconocido al guardar en MongoDB");
-                }
+                // Guardamos el ID de MongoDB para la captura final
+                localStorage.setItem('mongoOrderId', resData.id);
+                console.log("✅ Order saved in DB:", resData.id);
 
-                // 4. Crear orden en PayPal
-                // PASO 4: Crear orden en PayPal
+                // 4. PASO B: Crear la orden en PayPal (Llamada a tu backend)
                 const paypalRes = await fetch('https://ft-f34l.onrender.com/api/checkout/create-paypal-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ items: cart, userEmail: email })
+                    body: JSON.stringify({ 
+                        items: cart, 
+                        userEmail: email 
+                    })
                 });
-                
-                // --- NUEVA PROTECCIÓN PROFESIONAL (ESTO VA EN EL HTML) ---
+
                 if (!paypalRes.ok) {
-                    const textError = await paypalRes.text(); 
-                    console.error("❌ Fallo en el servidor al contactar a PayPal:", textError);
-                    alert("No se pudo iniciar PayPal. Revisa los logs en Render.");
-                    return actions.reject();
+                    const textError = await paypalRes.text();
+                    throw new Error("PayPal logic error: " + textError);
                 }
-                
-                const order = await paypalRes.json();
-                return order.id;
+
+                const paypalOrder = await paypalRes.json();
+                return paypalOrder.id;
 
             } catch (err) {
-                console.error("❌ Error:", err);
-                // ESTA ALERTA TE DIRÁ EXACTAMENTE QUÉ ESTÁ FALLANDO
-                alert("ERROR DEL SERVIDOR:\n" + err.message + "\n\n(Si dice 'timeout', revisa el Network Access de MongoDB Atlas)");
+                console.error("❌ Process Error:", err);
+                alert("Payment Error: " + err.message);
                 return actions.reject();
             }
         },
 
         onApprove: function(data, actions) {
             const dbIdSeguro = localStorage.getItem('mongoOrderId');
-            
+
+            // 5. PASO C: Capturar el pago final
             return fetch('https://ft-f34l.onrender.com/api/checkout/capture-paypal-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
