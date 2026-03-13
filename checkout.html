@@ -277,7 +277,7 @@ function renderPayPalButtons() {
                 
                 if (resData.success) {
                     // ASIGNACIÓN GLOBAL: Aquí es donde se guarda el ID real
-                    mongoDatabaseId = resData.id; 
+                    window.mongoDatabaseId = resData.id;
                     console.log("✅ ID de MongoDB guardado correctamente:", mongoDatabaseId);
                 } else {
                     throw new Error("No se pudo guardar la orden en la DB");
@@ -309,7 +309,7 @@ function renderPayPalButtons() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     orderID: data.orderID,
-                    orderDatabaseId: mongoDatabaseId // Ahora sí será visible
+                    orderDatabaseId: window.mongoDatabaseId // Ahora sí será visible
                 })
             })
             .then(res => res.json())
