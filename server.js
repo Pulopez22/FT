@@ -12,7 +12,7 @@ const paypal = require('@paypal/checkout-server-sdk');
 
 // Configuración de PayPal
 let environment = new paypal.core.SandboxEnvironment(
-    process.env.PAYPAL_CLIENT_ID,
+    process.env.PAYPAL_CLIENT_ID, 
     process.env.PAYPAL_SECRET
 );
 let paypalClient = new paypal.core.PayPalHttpClient(environment);
