@@ -171,6 +171,13 @@
                                 </div>
                             </div>
 
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Insert Material</label>
+                                <select id="material-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="fabric" selected>9oz. Premium Polyester Fabric</option>
+                                    <option value="vinyl">13oz Matte Vinyl Banner</option>
+                                </select>
+                            </div>
                             <div id="validator-container" class="space-y-4">
                                 <label class="text-[10px] font-black uppercase text-red-500 block italic tracking-widest">Art Validation Required</label>
                                 <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone flex flex-col items-center justify-center p-10 rounded-[2rem]">

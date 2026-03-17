@@ -129,9 +129,9 @@
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Select Size</label>
                                 <select id="size-select" onchange="updateOrderedLabels(); calculatePrice();" class="custom-dropdown text-black">
-                                    <option value="39.34">18" x 36"</option><option value="65.56">18" x 60"</option><option value="78.67">18" x 72"</option><option value="91.78">18" x 84"</option><option value="104.89">18" x 96"</option>
-                                    <option value="52.45">24" x 36"</option><option value="69.93">24" x 48"</option><option value="87.41">24" x 60"</option><option value="104.89">24" x 72"</option><option value="122.37">24" x 84"</option><option value="139.85">24" x 96"</option>
-                                    <option value="65.56">30" x 36"</option><option value="87.41">30" x 48"</option><option value="109.26">30" x 60"</option><option value="131.11">30" x 72"</option><option value="152.96">30" x 84"</option><option value="171.66">30" x 96"</option>
+                                    <option value="18x36">18" x 36"</option><option value="18x60">18" x 60"</option><option value="18x72">18" x 72"</option><option value="18x84">18" x 84"</option><option value="18x96">18" x 96"</option>
+                                    <option value="24x36">24" x 36"</option><option value="24x48">24" x 48"</option><option value="24x60">24" x 60"</option><option value="24x72">24" x 72"</option><option value="24x84">24" x 84"</option><option value="24x94">24" x 96"</option>
+                                    <option value="30x26">30" x 36"</option><option value="30x48">30" x 48"</option><option value="30x60">30" x 60"</option><option value="30x72">30" x 72"</option><option value="30x84">30" x 84"</option><option value="171.66">30" x 96"</option>
                                 </select>
                             </div>
 
@@ -144,12 +144,12 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Hardware</label>
-                                    <select id="hw-select" class="custom-dropdown text-black">
-                                        <option>Full Set Included</option>
-                                        <option>Graphic Only</option>
-                                    </select>
-                                </div>
+    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Hardware</label>
+    <select id="hw-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+        <option value="full-set">Full Set Included (+$60.00)</option>
+        <option value="graphic-only">Graphic Only</option>
+    </select>
+</div>
                             </div>
 
                             <div class="space-y-3 text-black">
@@ -272,6 +272,23 @@
             calculatePrice();
         }
 
+            function calculatePrice() {
+    const sizeKey = document.getElementById('size-select').value;
+    const turnVal = document.getElementById('turn-select').value;
+    const hwKey = document.getElementById('hw-select').value; // Nueva captura
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+
+    if (typeof getListProductPrice === 'function') {
+        // Enviamos el hwKey como nuevo parámetro
+        const finalTotal = getListProductPrice(PRODUCT_ID, sizeKey, turnVal, qty, hwKey);
+        
+        document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
+    }
+}
+
         function updateOrderedLabels() {
             const sizeText = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex].text;
             const dims = sizeText.match(/\d+/g);
@@ -378,86 +395,44 @@
         }
 
         function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+    if (!uploadedFileUrl) return alert("Please upload art first");
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
+    const sizeSelect = document.getElementById('size-select');
+    const sizeText = sizeSelect.options[sizeSelect.selectedIndex].text; // Ej: "18\" x 36\""
+    const finalPriceText = document.getElementById('final-price').innerText;
+    const qty = document.getElementById('qty-input').value;
+
     const optionElements = document.querySelectorAll('select.custom-dropdown');
     let itemDetails = [];
-    let variantKey = "base"; // Por defecto
+    
+    // Añadimos el tamaño extraído del select
+    itemDetails.push(`SIZE: ${sizeText}`);
 
     optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
-
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
+        if (select.id !== 'size-select') { // No repetir el tamaño
+            const label = select.previousElementSibling?.innerText || "Option";
+            const text = select.options[select.selectedIndex].text;
+            itemDetails.push(`${label.replace(':', '')}: ${text}`);
         }
-        
-        itemDetails.push(`${label}: ${text}`);
     });
 
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
-    
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
-
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
     const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
+        name: "Pole Banner (Double Sided)",
+        productId: PRODUCT_ID,
         price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
+        image: document.getElementById('main-prod-img').src,
+        fileUrl: uploadedFileUrl,
+        details: itemDetails.join(' | '),
+        quantity: parseInt(qty)
     };
 
-    // 6. GUARDAR EN LOCALSTORAGE
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
     cart.push(item);
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
     
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
+    resetUpload();
+    toggleCart();
 }
-
-        // Asegúrate de que calculatePrice use el valor numérico para el cálculo
-        function calculatePrice() {
-            const baseVal = document.getElementById('size-select').value;
-            const turnVal = document.getElementById('turn-select').value;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-
-            // getListProductPrice usa turnVal (0 o 50) para el cálculo monetario
-            const finalTotal = (typeof getListProductPrice === 'function') 
-                ? getListProductPrice(PRODUCT_ID, baseVal, turnVal, qty) 
-                : 0;
-
-            document.getElementById('final-price').innerText = `$${finalTotal.toFixed(2)}`;
-        }
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; const container = document.getElementById('cart-items-container');

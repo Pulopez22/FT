@@ -30,7 +30,7 @@
         #cart-overlay.visible { opacity: 1; pointer-events: auto; }
         .logout-btn { color: #ef4444; font-size: 8px; font-weight: 900; cursor: pointer; text-decoration: underline; margin-left: 5px; }
         .measure-label { position: absolute; background: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; color: black; }
-        .measure-h { top: 50%; right: 8px; transform: translateY(-50%) rotate(90deg); }
+        .measure-h { top: 50%; right: -45px; transform: translateY(-50%) rotate(90deg); }
         .measure-w { bottom: 8px; left: 50%; transform: translateX(-50%); }
     </style>
 </head>
@@ -141,9 +141,9 @@
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Full Walls (Single Sided)</label>
                                 <select id="fullwall-select" onchange="calculatePrice()" class="custom-dropdown">
                                     <option value="0">No Full Walls</option>
-                                    <option value="1">1 Full Wall (+$185)</option>
-                                    <option value="2">2 Full Walls (+$370)</option>
-                                    <option value="3">3 Full Walls (+$555)</option>
+                                    <option value="1">1 Full Wall</option>
+                                    <option value="2">2 Full Walls</option>
+                                    <option value="3">3 Full Walls</option>
                                 </select>
                             </div>
 
@@ -151,8 +151,8 @@
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Half Walls</label>
                                 <select id="halfwall-select" onchange="calculatePrice()" class="custom-dropdown">
                                     <option value="0">No Half Walls</option>
-                                    <option value="1">1 Half Wall (+$145)</option>
-                                    <option value="2">2 Half Walls (+$290)</option>
+                                    <option value="1">1 Half Wall</option>
+                                    <option value="2">2 Half Walls</option>
                                 </select>
                             </div>
 
@@ -160,9 +160,9 @@
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Optional Accessories</label>
                                 <select id="acc-select" onchange="calculatePrice()" class="custom-dropdown">
                                     <option value="none">No Accessories</option>
-                                    <option value="bag">Upgrade Carry Bag w/ Wheels (+$45)</option>
-                                    <option value="sand">4 Sandbags (+$60)</option>
-                                    <option value="both">Bag + Sandbags (+$105)</option>
+                                    <option value="bag">Upgrade Carry Bag w/ Wheels</option>
+                                    <option value="sand">4 Sandbags</option>
+                                    <option value="both">Bag + Sandbags</option>
                                 </select>
                             </div>
 
@@ -170,7 +170,7 @@
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Turnaround</label>
                                 <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
                                     <option value="Standard">Standard (3-5 Business Days)</option>
-                                    <option value="Quick">Quick Turn (1-2 Business Days) +$50</option>
+                                    <option value="Quick">Quick Turn (1-2 Business Days)</option>
                                 </select>
                             </div>
 
@@ -276,30 +276,44 @@
         }
 
         function calculatePrice() {
-            const kitType = document.getElementById('size-select').value;
-            const turn = document.getElementById('turn-select').value;
-            const acc = document.getElementById('acc-select').value;
-            const fWalls = parseInt(document.getElementById('fullwall-select').value) || 0;
-            const hWalls = parseInt(document.getElementById('halfwall-select').value) || 0;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+    const kitType = document.getElementById('size-select').value; 
+    const turn = document.getElementById('turn-select').value;    
+    const acc = document.getElementById('acc-select').value;      
+    const fWalls = parseInt(document.getElementById('fullwall-select').value) || 0;
+    const hWalls = parseInt(document.getElementById('halfwall-select').value) || 0;
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-            if (typeof getBannerTotalUnit === 'function') {
-                const res = getBannerTotalUnit(PRODUCT_ID, kitType, turn, acc, { fw: fWalls, hw: hWalls });
-                const finalTotal = res.pricePerSqFt * qty;
-                document.getElementById('final-price').innerText = `$${finalTotal.toFixed(2)}`;
-            }
-        }
+    if (typeof getBannerTotalUnit === 'function') {
+        // Obtenemos el precio desde pricing.js pasando el objeto de paredes {fw, hw}
+        const res = getBannerTotalUnit(PRODUCT_ID, kitType, turn, acc, { fw: fWalls, hw: hWalls });
+        
+        // Multiplicamos por cantidad (multiplier ya viene aplicado en res)
+        const finalTotal = res.pricePerSqFt * qty;
 
-        function updateOrderedLabels() {
-            const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
-            const w = parseFloat(sel.getAttribute('data-w')) || 0;
-            const h = parseFloat(sel.getAttribute('data-h')) || 0;
-            document.getElementById('measure-w').innerText = w + '"';
-            document.getElementById('measure-h').innerText = h + '"';
-            const areaBox = document.getElementById('printing-area');
-            if (w >= h) { areaBox.style.width = "300px"; areaBox.style.height = (300 * (h / w)) + "px"; }
-            else { areaBox.style.height = "300px"; areaBox.style.width = (300 * (w / h)) + "px"; }
-        }
+        document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
+        
+        document.getElementById('area-display').innerText = `Pro-Tent 10x10 | ${kitType.replace('_', ' ').toUpperCase()}`;
+    }
+}
+
+function updateOrderedLabels() {
+    const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
+    const w = parseFloat(sel.getAttribute('data-w')) || 120;
+    const h = parseFloat(sel.getAttribute('data-h')) || 120;
+    
+    // Limpieza de decimales para las etiquetas visuales
+    document.getElementById('measure-w').innerText = Math.round(w/12) + "ft";
+    document.getElementById('measure-h').innerText = Math.round(h/12) + "ft";
+    
+    const areaBox = document.getElementById('printing-area');
+    if (areaBox) {
+        areaBox.style.width = "300px"; 
+        areaBox.style.height = "300px";
+    }
+}
 
         async function processFile(input) {
             if (!input.files || !input.files[0]) return;
@@ -390,92 +404,114 @@
             document.getElementById('status-title').innerText = "ARTWORK APPROVED ✓";
         }
 
-       function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+      function addToCart() {
+    if (!uploadedFileUrl) return alert("Please upload and approve art first");
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
-    let itemDetails = [];
-    let variantKey = "base"; // Por defecto
-
-    optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
-
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
-        }
-        
-        itemDetails.push(`${label}: ${text}`);
-    });
-
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
+    const prodTitle = document.getElementById('prod-title').innerText;
+    const finalPriceText = document.getElementById('final-price').innerText;
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
     
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
+    // Recolector de detalles
+    let d = [];
 
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
-    const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
-        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
+    // Helper para obtener el texto del select
+    const getTxt = (id) => {
+        const el = document.getElementById(id);
+        return el ? el.options[el.selectedIndex].text : "";
     };
 
-    // 6. GUARDAR EN LOCALSTORAGE
+    // 1. Opciones base (Siempre visibles)
+    d.push("TYPE: " + getTxt('size-select'));
+    d.push("STRIP: " + getTxt('strip-select'));
+
+    // 2. Paredes (Solo si la cantidad es mayor a 0)
+    const fwVal = document.getElementById('fullwall-select').value;
+    if (fwVal !== "0") d.push("FULL WALLS: " + getTxt('fullwall-select'));
+
+    const hwVal = document.getElementById('halfwall-select').value;
+    if (hwVal !== "0") d.push("HALF WALLS: " + getTxt('halfwall-select'));
+
+    // 3. Accesorios (Solo si no es "none")
+    const accVal = document.getElementById('acc-select').value;
+    if (accVal !== "none") d.push("ACC: " + getTxt('acc-select'));
+
+    // 4. Turnaround (Siempre visible)
+    d.push("TURNAROUND: " + getTxt('turn-select'));
+
+    const item = {
+        name: prodTitle,
+        productId: PRODUCT_ID,
+        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
+        image: document.getElementById('main-prod-img').src,
+        fileUrl: uploadedFileUrl,
+        details: d.join(' | ').toUpperCase(), // Esto genera el formato de tu imagen
+        quantity: qty
+    };
+
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
     cart.push(item);
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
     
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
+    renderCart();
+    toggleCart();
 }
 
         function renderCart() {
-            const cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; const container = document.getElementById('cart-items-container');
-            container.innerHTML = ''; let total = 0;
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
-                document.getElementById('cart-dot')?.classList.add('hidden');
-            } else {
-                document.getElementById('cart-dot')?.classList.remove('hidden');
-                cart.forEach((item, i) => {
-                    const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
-                    total += priceNum;
-                    container.innerHTML += `<div class="flex gap-4 border-b pb-6 text-black"><div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0"><img src="${item.image}" class="max-h-full max-w-full object-contain"></div><div class="flex-grow py-1 text-black"><div class="flex justify-between font-black uppercase italic text-xs"><span>${item.name}</span><button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight text-black">${item.details || item.specs || ""}</p><span class="text-lg font-black italic text-black">$${priceNum.toFixed(2)}</span></div></div>`;
-                });
-            }
-            document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('cart-count-text').innerText = `${cart.length} items`;
-            lucide.createIcons();
-        }
+    const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+    const container = document.getElementById('cart-items-container');
+    container.innerHTML = '';
+    let total = 0;
+
+    if (cart.length === 0) {
+        container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
+        document.getElementById('cart-dot')?.classList.add('hidden');
+    } else {
+        document.getElementById('cart-dot')?.classList.remove('hidden');
+        
+        cart.forEach((item, i) => {
+            // Aseguramos que el precio sea un número
+            const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
+            
+            // Calculamos subtotal por item (Precio x Cantidad)
+            const itemQty = item.quantity || 1;
+            const itemSubtotal = priceNum * itemQty;
+            total += itemSubtotal;
+
+            container.innerHTML += `
+                <div class="flex gap-4 border-b pb-6 text-black">
+                    <div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0 overflow-hidden">
+                        <img src="${item.image}" class="max-h-full max-w-full object-contain">
+                    </div>
+
+                    <div class="flex-grow py-1 text-black">
+                        <div class="flex justify-between font-black uppercase italic text-xs">
+                            <span>${item.name} ${itemQty > 1 ? `(x${itemQty})` : ''}</span>
+                            <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500 transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        
+                        <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight tracking-tight">
+                            ${item.details || "No options selected"}
+                        </p>
+
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-lg font-black italic text-black">
+                                $${itemSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            </span>
+                        </div>
+                    </div>
+                </div>`;
+        });
+    }
+
+    // Actualizar Totales del Sidebar
+    document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    document.getElementById('cart-count-text').innerText = `${cart.length} items`;
+    
+    // Reiniciar iconos de Lucide para que aparezca el basurero
+    lucide.createIcons();
+}
 
         function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }
         function logout() { localStorage.clear(); window.location.reload(); }

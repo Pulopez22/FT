@@ -299,7 +299,7 @@
             let turnFee = 0;
             if (turnVal.toLowerCase().includes("rush")) {
                 const multiplier = localStorage.getItem('userTier') === 'wholesale' ? 1 : 2;
-                turnFee = 50.00 * multiplier;
+                turnFee = 50.00;
             }
             
             const total = (basePrice * qty) + turnFee;

@@ -294,58 +294,70 @@
         }
 
         function updateUI() {
-            const size = document.getElementById('size-select').value;
-            const hard = document.getElementById('hardware-select').value;
-            document.getElementById('shape-container').classList.toggle('hidden', size === "Small" || size === "Medium");
-            document.getElementById('led-container').classList.toggle('hidden', hard === "insert");
-            updateOrderedLabels();
-            calculatePrice();
-        }
+    const size = document.getElementById('size-select').value;
+    const hard = document.getElementById('hardware-select').value;
+    
+    // Solo mostrar opción de forma (Straight/Curved) para tamaños grandes
+    const shapeCont = document.getElementById('shape-container');
+    if (shapeCont) {
+        shapeCont.classList.toggle('hidden', size === "Small" || size === "Medium");
+    }
+    
+    // Solo mostrar opción de luces LED si eligen el "Full Kit"
+    const ledCont = document.getElementById('led-container');
+    if (ledCont) {
+        ledCont.classList.toggle('hidden', hard === "insert");
+    }
+    
+    updateOrderedLabels();
+    calculatePrice();
+}
 
         function updateOrderedLabels() {
-            const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
-            const w = parseFloat(sel.getAttribute('data-w'));
-            const h = parseFloat(sel.getAttribute('data-h'));
+    const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
+    const w = parseFloat(sel.getAttribute('data-w')) || 0;
+    const h = parseFloat(sel.getAttribute('data-h')) || 0;
 
-            document.getElementById('label-w').innerText = `Width: ${w}"`;
-            document.getElementById('label-h').innerText = `Height: ${h}"`;
-            
-            const area = document.getElementById('printing-area');
-            area.style.width = (w * 4) + "px"; 
-            area.style.height = (h * 4) + "px";
-
-            // Si hay imagen, re-ajustar visualmente
-            const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
-            if (originalW > 0) {
-                el.style.width = (originalW * 0.04) + "px";
-                el.style.height = (originalH * 0.04) + "px";
-            }
-        }
+    if(document.getElementById('label-w')) document.getElementById('label-w').innerText = `Width: ${w}"`;
+    if(document.getElementById('label-h')) document.getElementById('label-h').innerText = `Height: ${h}"`;
+    
+    const area = document.getElementById('printing-area');
+    // Escala 4 para que quepa en el visor
+    if (area) {
+        area.style.width = (w * 4) + "px"; 
+        area.style.height = (h * 4) + "px";
+    }
+}
 
         function calculatePrice() {
-            const size = document.getElementById('size-select').value;
-            const hard = document.getElementById('hardware-select').value;
-            const side = document.getElementById('side-select').value;
-            const led = document.getElementById('led-select').value;
-            const turn = document.getElementById('turn-select').value;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+    const size = document.getElementById('size-select').value;      // Small, Medium, Large, X-Large
+    const hard = document.getElementById('hardware-select').value;  // kit, insert
+    const side = document.getElementById('side-select').value;      // single, double
+    const led = document.getElementById('led-select').value;        // yes, no
+    const turn = document.getElementById('turn-select').value;      // Standard, Rush
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+    const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
 
-            if (typeof getBannerTotalUnit === 'function') {
-                const res = getBannerTotalUnit(PRODUCT_ID, size, "Standard", hard, { side: side, led: led });
-                
-                // MULTIPLICADOR (Wholesale 1x, Retail 2x)
-                const multiplier = isWholesale ? 1 : 2;
-                let finalTotal = (res.pricePerSqFt * multiplier) + (res.fixedFee * multiplier);
+    if (typeof getBannerTotalUnit === 'function') {
+        // Estructura de parámetros para Tension Stand:
+        // (id, size, "Standard", hardwareType, { side, led })
+        const res = getBannerTotalUnit(PRODUCT_ID, size, "Standard", hard, { side: side, led: led });
+        
+        const multiplier = isWholesale ? 1 : 2;
+        // El precio unitario ya viene calculado desde la matrix del JS
+        let finalTotal = (res.pricePerSqFt * multiplier);
 
-                // TURNAROUND (Rush Fee +$50.00)
-                if (turn === "Rush") {
-                    finalTotal += 50.00;
-                }
-
-                document.getElementById('final-price').innerText = `$${(finalTotal * qty).toFixed(2)}`;
-            }
+        // Sumamos el cargo por urgencia fijo si es Rush
+        if (turn === "Rush") {
+            finalTotal += 50.00;
         }
+
+        document.getElementById('final-price').innerText = `$${(finalTotal * qty).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
+    }
+}
 
         async function processFile(input) {
             if (!input.files || !input.files[0]) return;

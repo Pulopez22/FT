@@ -148,9 +148,9 @@
 
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Turnaround</label>
-                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black text-black text-black text-black">
-                                    <option value="0">Standard (3-5 Days)</option>
-                                    <option value="50">Quickly (1-2 Days) +$50.00</option>
+                                <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown">
+                                    <option value="Standard">Standard (3-5 Days)</option>
+                                    <option value="Next Day">Quickly (1-2 Days) +$50.00</option> 
                                 </select>
                             </div>
 
@@ -233,7 +233,7 @@
         lucide.createIcons();
         
         let uploadedFileUrl = ""; let isPdf = false; let originalW = 0, originalH = 0;
-        const PRODUCT_ID = "tension-fabric"; // O el ID que corresponda a Step & Repeat
+        const PRODUCT_ID = "backdrop"; // O el ID que corresponda a Step & Repeat
 
         const pricingMatrix = {
             "fabric": { "8x8": { kit: 255, insert: 218 }, "9x8": { kit: 255, insert: 220 }, "10x8": { kit: 255, insert: 222 } },
@@ -261,36 +261,48 @@
         }
 
         function calculatePrice() {
-            const material = document.getElementById('material-select').value;
-            const size = document.getElementById('size-select').value;
-            const hardware = document.getElementById('hardware-select').value;
-            const rushFee = parseFloat(document.getElementById('turn-select').value) || 0;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const isWholesale = localStorage.getItem('userTier') === 'wholesale';
+    const mat = document.getElementById('material-select').value; 
+    const size = document.getElementById('size-select').value;    
+    const hw = document.getElementById('hardware-select').value;  
+    const turn = document.getElementById('turn-select').value;    
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-            let base = pricingMatrix[material][size][hardware];
-            const multiplier = isWholesale ? 1 : 2;
-            const finalTotal = (base * multiplier * qty) + rushFee;
-            
-            document.getElementById('final-price').innerText = `$${finalTotal.toFixed(2)}`;
-            const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
-            document.getElementById('area-display').innerText = `${sel.text} | ${material.toUpperCase()}`;
+    if (typeof getBannerTotalUnit === 'function') {
+        // Le pasamos los datos al JS. 
+        // Nota: getBannerTotalUnit ya aplica el multiplicador x2 de Retail
+        const pricing = getBannerTotalUnit(PRODUCT_ID, mat, turn, size, hw);
+        
+        let unitPrice = pricing.pricePerSqFt; 
+        let total = unitPrice * qty;
+
+        // Sumamos el extra de urgencia si corresponde
+        if (turn === "Next Day") {
+            total += 50.00;
         }
+
+        document.getElementById('final-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        
+        const selText = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex].text;
+        document.getElementById('area-display').innerText = `${selText} | ${mat.toUpperCase()}`;
+    }
+}
 
         function updateOrderedLabels() {
-            const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
-            const w = parseFloat(sel.getAttribute('data-w')) || 0;
-            const h = parseFloat(sel.getAttribute('data-h')) || 0;
-            
-            if(document.getElementById('ordered-w-label')) document.getElementById('ordered-w-label').innerText = w;
-            if(document.getElementById('ordered-h-label')) document.getElementById('ordered-h-label').innerText = h;
-            
-            const areaBox = document.getElementById('printing-area');
-            if (w > 0 && h > 0) {
-                if (w >= h) { areaBox.style.width = "300px"; areaBox.style.height = (300 * (h / w)) + "px"; }
-                else { areaBox.style.height = "300px"; areaBox.style.width = (300 * (w / h)) + "px"; }
-            }
-        }
+    const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
+    // Extraemos los atributos data-w y data-h del HTML
+    const w = parseFloat(sel.getAttribute('data-w')) || 0;
+    const h = parseFloat(sel.getAttribute('data-h')) || 0;
+    
+    if(document.getElementById('ordered-w-label')) document.getElementById('ordered-w-label').innerText = (w/12) + "ft";
+    if(document.getElementById('ordered-h-label')) document.getElementById('ordered-h-label').innerText = (h/12) + "ft";
+    
+    const areaBox = document.getElementById('printing-area');
+    if (w > 0 && h > 0) {
+        // Escala visual para el validador (ej: 8ft = 96" -> ~250px)
+        areaBox.style.width = (w * 2.5) + "px";
+        areaBox.style.height = (h * 2.5) + "px";
+    }
+}
 
         async function processFile(input) {
             if (!input.files || !input.files[0]) return;

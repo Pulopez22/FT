@@ -14,17 +14,17 @@ window.displaysPricing = {
         "rush": 50.00
     },
     "retractable": {
-        "matrix": {
-            "24": { "Silver": { "Standard (3-5 Days)": 102.25, "Standard (2 Days)": 160.75 } },
-            "33": { 
-                "Silver": { "Standard (2 Days)": 106.75, "Next Day": 166.75, "Same Day": 166.75 },
-                "Black": { "Standard (2 Days)": 113.75, "Next Day": 234.75 } 
-            },
-            "36": { "Silver": { "Standard (2 Days)": 139.50, "Next Day": 267.00 } },
-            "47": { "Silver": { "Standard (2 Days)": 133.97, "Next Day": 256.26 } },
-            "48": { "Silver": { "Standard (3-5 Days)": 225.50, "Standard (2 Days)": 404.00 } },
-            "60": { "Silver": { "Standard (2 Days)": 238.50, "Next Day": 454.50 } }
-        }
+    "matrix": {
+        "24": { "Silver": { "Standard (3-5 Days)": 102.25, "Standard (2 Days)": 160.75 } },
+        "33": { 
+            "Silver": { "Standard (2 Days)": 106.75, "Next Day": 166.75, "Same Day": 166.75 },
+            "Black": { "Standard (2 Days)": 113.75, "Next Day": 234.75 } 
+        },
+        "36": { "Silver": { "Standard (2 Days)": 139.50, "Next Day": 267.00 } },
+        "47": { "Silver": { "Standard (2 Days)": 133.97, "Next Day": 256.26 } },
+        "48": { "Silver": { "Standard (3-5 Days)": 225.50, "Standard (2 Days)": 404.00 } },
+        "60": { "Silver": { "Standard (2 Days)": 238.50, "Next Day": 454.50 } }
+    }
     },
     "tensionstand": {
         "matrix": {
@@ -72,20 +72,24 @@ window.getBannerTotalUnit = function(productID, opt1, turnVal, opt2 = null, opt3
 
         // 1. LÓGICA BACKDROP (NUEVO)
         if (productID === "backdrop") {
-            const material = (opt1 === "none") ? "fabric" : opt1;
-            const size = (opt2 === null || opt2 === "none") ? "8x8" : opt2;
-            const type = (opt3 === null || opt3 === "none") ? "insert" : opt3;
-            baseWholesale = product.matrix[material][size][type];
-            return { pricePerSqFt: baseWholesale * multiplier, fixedFee: 0 };
-        }
+    // opt1: material, opt2: size, opt3: type (kit/insert)
+    const material = opt1 || "fabric";
+    const size = opt2 || "8x8";
+    const type = opt3 || "kit";
+    
+    // Busca en window.displaysPricing.backdrop.matrix
+    baseWholesale = product.matrix[material][size][type];
+    
+    return { pricePerSqFt: baseWholesale * multiplier, fixedFee: 0 };
+}
 
         // 2. LÓGICA STRETCH TABLE (NUEVO)
-        if (productID === "stretchtable") {
-            const size = (opt1 === "none") ? "6" : opt1;
-            baseWholesale = product.base[size];
-            if (turnVal === "Next Day") fixedFee = product.rush;
-            return { pricePerSqFt: baseWholesale * multiplier, fixedFee: fixedFee };
-        }
+      if (productID === "stretchtable") {
+    const size = (opt1 === "none") ? "6" : opt1; // Busca "6" u "8"
+    baseWholesale = product.base[size];
+    // Retorna el precio base * multiplicador. El Rush se suma en el HTML.
+    return { pricePerSqFt: baseWholesale * multiplier, fixedFee: 0 };
+}
 
         // LÓGICA X-STAND
         if (productID === "x-stand") {
@@ -122,11 +126,23 @@ window.getBannerTotalUnit = function(productID, opt1, turnVal, opt2 = null, opt3
 
         // LÓGICA EVENT TENT
         if (productID === "eventtent") {
-            const type = (opt1 === "none") ? "full_kit" : opt1;
-            const turn = (turnVal === "0") ? "Standard" : turnVal;
-            baseWholesale = product.base[type][turn];
-            return { pricePerSqFt: baseWholesale * multiplier, fixedFee: 0 };
-        }
+    const type = opt1 || "full_kit"; // full_kit o canopy_only
+    const turn = turnVal || "Standard"; // Standard o Quick
+    const acc = opt2 || "none"; // bag, sand, both
+    const walls = opt3 || { fw: 0, hw: 0 }; // Paredes extra
+
+    // 1. Precio Base del Kit desde la matriz
+    baseWholesale = product.base[type][turn];
+
+    // 2. Sumar Accesorios (JS busca en product.extras.acc)
+    const accPrice = product.extras.acc[acc] || 0;
+
+    // 3. Sumar Paredes (JS busca en product.extras.fullwall y halfwall)
+    const wallPrice = (walls.fw * product.extras.fullwall) + (walls.hw * product.extras.halfwall);
+
+    // Retornamos el precio acumulado con el multiplicador retail aplicado al total
+    return { pricePerSqFt: (baseWholesale + accPrice + wallPrice) * multiplier, fixedFee: 0 };
+}
 
         // PRODUCTOS SIMPLES (A-Frame, Canvas, Table Cover)
         if (product.material) {

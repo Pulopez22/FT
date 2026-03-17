@@ -125,19 +125,7 @@
                         </header>
 
                         <div class="space-y-6">
-                            <div class="relative">
-                                <div id="limit-msg" class="hidden absolute -top-8 left-0 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit reached (120"x1800")</div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Width (Inches)</label>
-                                        <input type="number" id="width-input" value="24" oninput="validateSize()" class="custom-input">
-                                    </div>
-                                    <div>
-                                        <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Height (Inches)</label>
-                                        <input type="number" id="height-input" value="24" oninput="validateSize()" class="custom-input">
-                                    </div>
-                                </div>
-                            </div>
+                            
 
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Finishing Options</label>
@@ -164,6 +152,20 @@
                                     <option value="Standard">Standard (2-3 Days)</option>
                                     <option value="Rush">Same Day Rush (+$50.00)</option>
                                 </select>
+                            </div>
+
+                            <div class="relative">
+                                <div id="limit-msg" class="hidden absolute -top-8 left-0 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit reached (120"x1800")</div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Width (Inches)</label>
+                                        <input type="number" id="width-input" value="24" oninput="validateSize()" class="custom-input">
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Height (Inches)</label>
+                                        <input type="number" id="height-input" value="24" oninput="validateSize()" class="custom-input">
+                                    </div>
+                                </div>
                             </div>
 
                             <div id="validator-container" class="space-y-4">
@@ -271,8 +273,8 @@
         }
 
         function validateSize() {
-            const w = document.getElementById('w-input');
-            const h = document.getElementById('h-input');
+            const w = document.getElementById('width-input');
+            const h = document.getElementById('height-input');
             const msg = document.getElementById('limit-msg');
             if (parseFloat(w.value) > 120) { w.value = 120; msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 2000); }
             if (parseFloat(h.value) > 1800) { h.value = 1800; msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 2000); }
@@ -281,31 +283,37 @@
         }
 
         function calculatePrice() {
-    const w = parseFloat(document.getElementById('w-input').value) || 0;
-    const h = parseFloat(document.getElementById('h-input').value) || 0;
+    const w = parseFloat(document.getElementById('width-input').value) || 0;
+    const h = parseFloat(document.getElementById('height-input').value) || 0;
     const qty = parseInt(document.getElementById('qty-input').value) || 1;
-    const turnVal = document.getElementById('turn-select').value;
-    const pocketVal = document.getElementById('pocket-select').value;
     
+    const finishVal = document.getElementById('finish-select').value;
+    const pocketVal = document.getElementById('pocket-select').value;
+    const turnVal = document.getElementById('turn-select').value;
+
     const area = (w * h) / 144;
 
     if (typeof getBannerTotalUnit === 'function') {
-        const pricing = getBannerTotalUnit(PRODUCT_ID, null, turnVal, null, pocketVal, w, h);
-        
-        let finalTotal = (area * pricing.pricePerSqFt * qty) + pricing.fixedFee;
+        const pricing = getBannerTotalUnit(PRODUCT_ID, {
+            finishingType: finishVal,
+            turnType: turnVal === "Rush" ? "50" : "0",
+            pocketType: pocketVal
+        });
 
-        if (turnVal === "Rush") {
-            finalTotal += 50;
-        }
+        // (Área * Precio per sq/ft acumulado * Cantidad) + Fixed Fee (Rush)
+        const finalTotal = (area * pricing.pricePerSqFt * qty) + pricing.fixedFee;
 
         document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
-        document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
     }
 }
 
         function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             if(document.getElementById('ordered-w-label')) document.getElementById('ordered-w-label').innerText = w;
             if(document.getElementById('ordered-h-label')) document.getElementById('ordered-h-label').innerText = h;
             const areaBox = document.getElementById('printing-area');
@@ -321,8 +329,8 @@
             document.getElementById('drop-zone').classList.add('hidden');
             document.getElementById('validation-panel').classList.remove('hidden');
             updateOrderedLabels();
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             const previewImg = document.getElementById('preview-thumb');
             const canvas = document.getElementById('pdf-canvas');
             const renderArt = (w, h, contentUrl, isPdfType) => {
@@ -359,8 +367,8 @@
             const inchW = (w / 100).toFixed(2); const inchH = (h / 100).toFixed(2);
             document.getElementById('file-dims').innerText = `${inchW}" x ${inchH}"`;
             const dpiInfo = document.getElementById('dpi-info'); const statusTitle = document.getElementById('status-title');
-            const targetW = parseFloat(document.getElementById('w-input').value) * 100;
-            const targetH = parseFloat(document.getElementById('h-input').value) * 100;
+            const targetW = parseFloat(document.getElementById('width-input').value) * 100;
+            const targetH = parseFloat(document.getElementById('height-input').value) * 100;
             if (w < targetW || h < targetH) {
                 statusTitle.innerText = "WARNING: ORANGE VISIBLE"; statusTitle.className = "text-[10px] font-black uppercase text-orange-500 italic";
                 dpiInfo.innerHTML = 'LOW COVERAGE ⚠️'; dpiInfo.className = "text-red-500 font-black italic text-[10px] flex items-center gap-1";
@@ -373,8 +381,8 @@
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
             const statusTitle = document.getElementById('status-title');
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             el.style.width = "100%"; el.style.height = "100%"; el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
             if ((originalW > originalH) !== (targetW > targetH)) {
                 el.style.transform = "rotate(90deg)"; const areaBox = document.getElementById('printing-area');
@@ -410,70 +418,74 @@
         }
 
         function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
+    // 1. VALIDACIÓN DE ARTE (Si es necesaria en tu flujo)
+    if (typeof uploadedFileUrl === 'undefined' || uploadedFileUrl === "") {
+        return alert("Please upload and approve your artwork first.");
+    }
+
+    // 2. CAPTURA UNIVERSAL DE MEDIDAS
+    // Detecta tanto 'width-input' como 'w-input'
+    const wEl = document.getElementById('width-input') || document.getElementById('w-input');
+    const hEl = document.getElementById('height-input') || document.getElementById('h-input') || document.getElementById('heigth-input');
+    
+    const width = wEl ? wEl.value : "0";
+    const height = hEl ? hEl.value : "0";
+
+    // 3. CAPTURA DE PRECIO Y DATOS BÁSICOS
+    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Banner";
     const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
     const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
     const mainImg = document.getElementById('main-prod-img')?.src || "";
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
+    // 4. RECOPILACIÓN DINÁMICA DE OPCIONES (SELECTS)
+    // Buscamos todos los select que tengan la clase 'custom-dropdown'
+    const selects = document.querySelectorAll('select.custom-dropdown');
     let itemDetails = [];
-    let variantKey = "base"; // Por defecto
+    
+    // Insertamos las medidas al inicio de la lista de detalles
+    itemDetails.push(`SIZE: ${width}" x ${height}"`);
 
-    optionElements.forEach(select => {
+    selects.forEach(select => {
+        // Buscamos el label que está arriba del select para saber qué opción es
         const label = select.previousElementSibling?.innerText || "Option";
         const text = select.options[select.selectedIndex].text;
-        const value = select.value;
-
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
-        }
         
-        itemDetails.push(`${label}: ${text}`);
+        // Evitamos duplicar si el label dice algo genérico o vacío
+        if (text && text !== "" && !text.includes("Select")) {
+            itemDetails.push(`${label.replace(':', '')}: ${text}`);
+        }
     });
 
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
-    
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
+    // 5. NOTAS DE VALIDACIÓN DE ARTE (Opcional)
     let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
+    const previewThumb = document.getElementById('preview-thumb');
+    if (previewThumb && previewThumb.style.objectFit === "cover") {
+        artNote = " | AUTO-FITTED";
     }
 
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
+    // 6. CREACIÓN DEL OBJETO PARA EL CARRITO
     const item = {
         name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
+        productId: typeof PRODUCT_ID !== 'undefined' ? PRODUCT_ID : "custom-product",
         price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
         image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
+        fileUrl: uploadedFileUrl,
+        // El string 'details' es lo que el usuario verá en el carrito lateral
         details: itemDetails.join(' | ') + artNote,
         quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
+        width: parseFloat(width),
+        height: parseFloat(height)
     };
 
-    // 6. GUARDAR EN LOCALSTORAGE
+    // 7. GUARDADO EN LOCALSTORAGE
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
     cart.push(item);
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
-    
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
+
+    // 8. FEEDBACK VISUAL Y RESET
     if (typeof resetUpload === 'function') resetUpload();
+    
+    // Abrir el carrito automáticamente para que el usuario vea su item
     if (typeof toggleCart === 'function') toggleCart();
 }
 

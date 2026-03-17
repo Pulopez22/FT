@@ -152,7 +152,7 @@
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Turnaround</label>
                                 <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black text-black">
                                     <option value="Standard" selected>Standard (2-3 Days)</option>
-                                    <option value="Rush">Next Day (+$50.00)</option>
+                                    <option value="Next Day">Next Day</option>
                                 </select>
                             </div>
 
@@ -291,22 +291,23 @@
         }
 
         function calculatePrice() {
-            const size = document.getElementById('size-select').value;
-            const mat = document.getElementById('material-select').value;
-            const turn = document.getElementById('turn-select').value;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+    const size = document.getElementById('size-select').value;      // opt1: "24x63"
+    const mat = document.getElementById('material-select').value;   // opt2: "popup"
+    const turn = document.getElementById('turn-select').value;      // turnVal: "Standard" o "Next Day"
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-            if (typeof getBannerTotalUnit === 'function') {
-                const res = getBannerTotalUnit(PRODUCT_ID, size, "Standard", mat);
-                const multiplier = isWholesale ? 1 : 2;
-                let finalTotal = (res.pricePerSqFt * multiplier);
+    if (typeof getBannerTotalUnit === 'function') {
+        // Tu JS espera: productID, opt1 (size), turnVal, opt2 (material)
+        const pricing = getBannerTotalUnit(PRODUCT_ID, size, turn, mat);
+        
+        const finalTotal = (pricing.pricePerSqFt + pricing.fixedFee) * qty;
 
-                if (turn === "Rush") finalTotal += 50.00;
-
-                document.getElementById('final-price').innerText = `$${(finalTotal * qty).toFixed(2)}`;
-            }
-        }
+        document.getElementById('final-price').innerText = `$${finalTotal.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
+    }
+}
 
         async function processFile(input) {
             if (!input.files || !input.files[0]) return;

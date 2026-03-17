@@ -164,11 +164,14 @@
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic">Hardware Options</label>
-                                <select id="hardware-select" onchange="calculatePrice()" class="custom-dropdown">
+                             <div>
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black">Hardware</label>
+                                <select id="hardware-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                     <option value="Printed Flag + Pole + Ground Stake">Printed Flag + Pole + Ground Stake</option>
                                     <option value="Printed Flag + Pole + Cross Base">Printed Flag + Pole + Cross Base</option>
+                                    <option value="Printed Flag + Pole + Ground Stake + Cross Base">Printed Flag + Pole + Ground Stake + Cross Base</option>
+                                    <option value="Printed Flag + Pole + Cross Base + Water Bag">Printed Flag + Pole + Cross Base + Water Bag</option>
+                                    <option value="Printed Flag + Pole + Square Base">Printed Flag + Pole + Square Base</option>
                                     <option value="Printed Flag Only (No Hardware)">Printed Flag Only (No Hardware)</option>
                                 </select>
                             </div>
@@ -337,7 +340,7 @@
             let turnFee = 0;
             if (turnVal.toLowerCase().includes("rush")) {
                 const multiplier = localStorage.getItem('userTier') === 'wholesale' ? 1 : 2;
-                turnFee = 50.00 * multiplier;
+                turnFee = 50.00;
             }
             const total = (basePrice * qty) + turnFee;
             document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
