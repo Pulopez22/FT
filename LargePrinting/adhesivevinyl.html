@@ -131,8 +131,8 @@
                                 <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Lamination</label>
                                 <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                     <option value="none">No Lamination</option>
-                                    <option value="uv_gloss" selected>UV Gloss Lamination</option>
-                                    <option value="uv_matte">UV Matte Lamination</option>
+                                    <option value="uv_gloss">UV Gloss</option>
+                                    <option value="ultra_uv">Ultra Premium UV</option>
                                 </select>
                             </div>
 
@@ -142,6 +142,8 @@
                                     <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown text-black">
                                         <option value="trim">Trim to Size</option>
                                         <option value="contour">Contour Cut</option>
+                                        <option value="mount">Mount to Supplied Substrate</option>
+                                        <option value="contour_mount">Contour Cut & Mount</option>
                                     </select>
                                 </div>
                                 <div>
@@ -275,16 +277,21 @@
             calculatePrice();
         }
 
-        // RE-ESCRIBE EL CUADRO NARANJA SEGUN MEDIDAS
         function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            document.getElementById('ordered-w-label').innerText = w;
-            document.getElementById('ordered-h-label').innerText = h;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             
+            // Actualiza los textos negros (W: 24", H: 24")
+            const labelW = document.getElementById('ordered-w-label');
+            const labelH = document.getElementById('ordered-h-label');
+            
+            if (labelW) labelW.innerText = w;
+            if (labelH) labelH.innerText = h;
+            
+            // Ajusta visualmente el cuadro naranja para que mantenga la proporción
             const areaBox = document.getElementById('printing-area');
             if (areaBox && w > 0 && h > 0) {
-                const maxSize = 300;
+                const maxSize = 280;
                 if (w >= h) {
                     areaBox.style.width = maxSize + "px";
                     areaBox.style.height = (maxSize * (h / w)) + "px";
@@ -295,33 +302,74 @@
             }
         }
 
-        function validateSize() {
-            const w = document.getElementById('w-input');
-            if (parseFloat(w.value) > 52) { 
-                w.value = 52; 
-                document.getElementById('limit-msg').classList.remove('hidden'); 
-                setTimeout(() => document.getElementById('limit-msg').classList.add('hidden'), 2500); 
+        function updateUIInfo(w, h) {
+            const inchW = (w / 100).toFixed(2); 
+            const inchH = (h / 100).toFixed(2);
+            document.getElementById('file-dims-text').innerText = `${inchW}" x ${inchH}"`;
+            
+            const dpiInfo = document.getElementById('dpi-info');
+            const statusTitle = document.getElementById('status-title');
+            
+            // Sincronizado con width-input y height-input
+            const targetW = parseFloat(document.getElementById('width-input').value) * 100;
+            const targetH = parseFloat(document.getElementById('height-input').value) * 100;
+
+            if (w < targetW || h < targetH) {
+                statusTitle.innerText = "WARNING: ORANGE VISIBLE";
+                statusTitle.className = "text-[10px] font-black uppercase text-orange-500 italic";
+                dpiInfo.innerHTML = 'LOW COVERAGE ⚠️';
+            } else {
+                statusTitle.innerText = "READY TO APPROVE ✓";
+                statusTitle.className = "text-[10px] font-black uppercase text-blue-600 italic";
+                dpiInfo.innerHTML = 'FULL COVERAGE APPLIED ✅';
             }
-            updateOrderedLabels();
+        }
+
+        function validateSize() {
+            const wInput = document.getElementById('width-input');
+            const hInput = document.getElementById('height-input');
+            const limitMsg = document.getElementById('limit-msg');
+
+            // Límite real de Backlit Adhesive (52 pulgadas de ancho)
+            if (parseFloat(wInput.value) > 52) {
+                wInput.value = 52;
+                limitMsg.classList.remove('hidden');
+                setTimeout(() => limitMsg.classList.add('hidden'), 2500);
+            }
+            
+            // Actualiza etiquetas negras del visualizador
+            document.getElementById('ordered-w-label').innerText = wInput.value || 0;
+            document.getElementById('ordered-h-label').innerText = hInput.value || 0;
+
+            updateOrderedLabels(); // Para redimensionar el cuadro naranja
             calculatePrice();
         }
 
         function calculatePrice() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const turn = document.getElementById('turn-select').value;
-            const lam = document.getElementById('lam-select').value;
-            const finish = document.getElementById('finish-select').value;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const turnVal = document.getElementById('turn-select').value;
+            
+            // Captura de llaves
+            const lamKey = document.getElementById('lam-select').value;
+            const finishKey = document.getElementById('finish-select').value;
 
             if (typeof window.getLargeFormatPrice === 'function') {
-                const pricing = window.getLargeFormatPrice(PRODUCT_ID, turn);
-                let unitRate = pricing.unitPrice;
-                if (lam !== "none") unitRate += (0.75 * pricing.multiplier);
-                if (finish === "contour") unitRate += (0.75 * pricing.multiplier);
+                const pricing = window.getLargeFormatPrice("backlit-film", { turn: turnVal });
+                
+                // Obtenemos valores del JSON
+                const baseMaterial = window.largeFormatPricing["backlit-film"].material;
+                const lamAdd = parseFloat(window.largeFormatPricing["backlit-film"].lamination[lamKey] || 0);
+                const finishAdd = parseFloat(window.largeFormatPricing["backlit-film"].finishing[finishKey] || 0);
+                
+                // Sumamos base + extras y aplicamos Tier (Wholesale x1 / Retail x2)
+                const unitRate = (baseMaterial + lamAdd + finishAdd) * pricing.multiplier;
+                
                 const area = (w * h) / 144;
                 const total = (unitRate * area * qty) + (pricing.fixedFee * qty);
-                document.getElementById('final-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+                document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
                 document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
             }
         }
@@ -335,18 +383,37 @@
             document.getElementById('validation-panel').classList.remove('hidden');
             updateOrderedLabels();
 
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             const previewImg = document.getElementById('preview-thumb');
             const canvas = document.getElementById('pdf-canvas');
 
             const renderArt = (w, h, contentUrl, isPdfType) => {
                 originalW = w; originalH = h;
+                const previewImg = document.getElementById('preview-thumb');
+                const canvas = document.getElementById('pdf-canvas');
                 const el = isPdfType ? canvas : previewImg;
+
                 if (!isPdfType) el.src = contentUrl;
-                el.style.width = ((w / 100) / targetW * 100) + "%";
-                el.style.height = ((h / 100) / targetH * 100) + "%";
-                el.style.display = "block";
+
+                // Control de visibilidad
+                previewImg.style.display = isPdfType ? "none" : "block";
+                if (isPdfType) canvas.classList.remove('hidden');
+
+                // --- LÓGICA DE ESCALA REAL ---
+                // Sincronizado con tus IDs: width-input
+                const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+                const inchW = w / 100; 
+                const scalePercent = (inchW / targetW) * 100;
+
+                // Estilos de visibilidad forzada
+                el.style.position = "relative";
+                el.style.zIndex = "50"; 
+                el.style.width = scalePercent + "%"; 
+                el.style.height = "auto";
+                el.style.maxWidth = "none"; 
+                el.style.objectFit = "fill"; 
+
                 updateUIInfo(w, h);
             };
 
@@ -374,32 +441,10 @@
             uploadToRender(file);
         }
 
-       function updateUIInfo(w, h) {
-    const inchW = (w / 100).toFixed(2); 
-    const inchH = (h / 100).toFixed(2);
-    document.getElementById('file-dims-text').innerText = `${inchW}" x ${inchH}"`;
-    const dpiInfo = document.getElementById('dpi-info');
-    const statusTitle = document.getElementById('status-title');
-    const targetW = parseFloat(document.getElementById('w-input').value) * 100;
-    const targetH = parseFloat(document.getElementById('h-input').value) * 100;
-
-    if (w < targetW || h < targetH) {
-        statusTitle.innerText = "WARNING: ORANGE VISIBLE";
-        statusTitle.className = "text-[10px] font-black uppercase text-orange-500 italic";
-        dpiInfo.innerHTML = 'LOW COVERAGE ⚠️';
-        dpiInfo.className = "text-[11px] font-black uppercase text-orange-500 italic";
-    } else {
-        statusTitle.innerText = "READY TO APPROVE ✓";
-        statusTitle.className = "text-[10px] font-black uppercase text-blue-600 italic";
-        dpiInfo.innerHTML = 'FULL COVERAGE APPLIED ✅';
-        dpiInfo.className = "text-[11px] font-black uppercase text-blue-600 italic";
-    }
-}
-
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
 
             el.style.width = "100%"; el.style.height = "100%";
             el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
@@ -447,78 +492,52 @@
         }
 
         function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+            if (!uploadedFileUrl) return alert("Please upload and approve artwork first");
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
-    let itemDetails = [];
-    let variantKey = "base"; // Por defecto
+            // 1. Capturar Medidas y Cantidad
+            const w = document.getElementById('width-input').value;
+            const h = document.getElementById('height-input').value;
+            const qty = document.getElementById('qty-input').value;
 
-    optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
+            // 2. Capturar textos descriptivos de los Selects
+            const matText = document.getElementById('mat-select').options[document.getElementById('mat-select').selectedIndex].text;
+            const lamText = document.getElementById('lam-select').options[document.getElementById('lam-select').selectedIndex].text;
+            const finishText = document.getElementById('finish-select').options[document.getElementById('finish-select').selectedIndex].text;
+            const turnText = document.getElementById('turn-select').options[document.getElementById('turn-select').selectedIndex].text;
 
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
+            // 3. Crear el string de detalles (esto es lo que verás en el carrito)
+            const details = `QTY: ${qty} PZS | SIZE: ${w}" x ${h}" | MAT: ${matText} | LAM: ${lamText} | FINISH: ${finishText} | TURN: ${turnText}`;
+
+            const item = {
+                name: "Adhesive Back-lit Vinyl",
+                productId: PRODUCT_ID,
+                price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
+                image: document.getElementById('main-prod-img').src,
+                fileUrl: uploadedFileUrl,
+                details: details,
+                quantity: parseInt(qty),
+                width: parseFloat(w),
+                height: parseFloat(h)
+            };
+
+            // 4. Guardar en LocalStorage
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(item);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            
+            // 5. UI Feedback
+            renderCart();
+            toggleCart();
+            resetUpload();
         }
-        
-        itemDetails.push(`${label}: ${text}`);
-    });
-
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
-    
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
-
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
-    const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
-        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
-    };
-
-    // 6. GUARDAR EN LOCALSTORAGE
-    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
-    localStorage.setItem('sqft_cart', JSON.stringify(cart));
-    
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
-}
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('cart-items-container');
             if (!container) return;
-            container.innerHTML = ''; let total = 0;
+            
+            container.innerHTML = ''; 
+            let total = 0;
 
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 text-gray-300 font-black italic text-[11px]">Bag Empty</div>`;
@@ -526,19 +545,23 @@
             } else {
                 document.getElementById('cart-dot').classList.remove('hidden');
                 cart.forEach((item, i) => {
-                    const priceNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : (item.price || 0);
+                    const priceNum = item.price || 0;
                     total += priceNum;
                     container.innerHTML += `
                         <div class="flex gap-4 border-b pb-6 text-black">
                             <div class="w-16 h-16 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0">
                                 <img src="${item.image}" class="max-h-full max-w-full object-contain">
                             </div>
-                            <div class="flex-grow py-1 text-black">
+                            <div class="flex-grow py-1">
                                 <div class="flex justify-between font-black uppercase italic text-xs">
                                     <span>${item.name}</span>
-                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                    <button onclick="removeItem(${i})" class="text-gray-300 hover:text-red-500">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
                                 </div>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.details || 'No info'}</p>
+                                <p class="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-tight">
+                                    ${item.details}
+                                </p>
                                 <span class="text-lg font-black italic">$${priceNum.toFixed(2)}</span>
                             </div>
                         </div>`;

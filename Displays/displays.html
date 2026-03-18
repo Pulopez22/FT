@@ -153,13 +153,22 @@
             { id: 'aframe', name: 'A-Frame', cat: 'specialty', basePrice: 95.67, img: '../images/Rigid Signs/A-frame5.png', desc: 'Portable sidewalk signage with inserts.', url: '../Rigid Signs/aframe.html' }
         ];
 
-        function getProductPrice(p) {
+                function getProductPrice(p) {
+            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+            const multiplier = isWholesale ? 1 : 2;
+
+            // Si el producto tiene un basePrice definido en el array 'products' arriba, úsalo.
+            if (p.basePrice) {
+                return p.basePrice * multiplier;
+            }
+
+            // Si no tiene basePrice, intenta usar el calculador de banners (respaldo)
             if (typeof window.getBannerTotalUnit === 'function') {
                 const res = window.getBannerTotalUnit(p.id, "none", "0");
-                return res.pricePerSqFt;
+                return res.pricePerSqFt || 0;
             }
-            const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
-            return isWholesale ? p.basePrice : p.basePrice * 2;
+
+            return 0;
         }
 
         function checkAuth() {

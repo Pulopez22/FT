@@ -2,12 +2,13 @@
 window.largeFormatPricing = {
     "calendar-vinyl": { 
         "material": 1.25,
-        "bubbleFreeBase": 2.00 
+        "lamination": { "0": 0, "1.00": 1.00 }, // UV Gloss/Matte
+        "finishing": { "0": 0, "1.00": 1.00, "1.50": 1.50 } // Flex/Contour
     },
     "bubble-free": { 
-        "material": 2.50, 
-        "specialPrice": 5.75, 
-        "maxLimit": 53.5 
+        "material": 2.50,
+        "lamination": { "0": 0, ".75": 0.75 },
+        "finishing": { "0": 0, ".75": 0.75, "SPECIAL": 5.75 }
     },
     "window-cling": {
         "materials": {
@@ -55,60 +56,95 @@ window.largeFormatPricing = {
         }
     },
     "glass-adhere": { "material": 2.50 },
-    "magnet": { "material": 5.50 },
+    "magnet": { 
+    "material": 5.50,
+    "lamination": { 
+        "0": 0, 
+        "0.75": 0.75 
+    },
+    "special_finishing": {
+        "cut-to-shape": 10
+    }
+},
     "adhesive-vinyl": { "material": 3.00 },
-    "floor-graphics": { "material": 4.00 },
-    "reflective-vinyl": { "material": 6.00 },
-    "tshirt-vinyl": { "material": 25.00 },
+    "floor-graphics": { 
+    "material": 4.00, // Precio base Wholesale por sqft
+    "lamination": { 
+        "included": 0 
+    },
+    "finishing": { 
+        "0": 0,         // Trim to Size
+        "0.75": 0.75    // Contour Cut
+    }
+},
+    "reflective-vinyl": { 
+    "material": 6.00, 
+    "lamination": { 
+        "gloss": 0.75, 
+        "matte": 0.75 
+    },
+    "finishing": { 
+        "0": 0, 
+        "0.75": 0.75 
+    }
+},
+    "heat-press-vinyl": { 
+    "material": 25.00, 
+    "application": { 
+        "0": 0, 
+        "5": 5.00 
+    }
+},
     "heat-press-vinyl": { "material": 25.00 },
-    "backlit-film": { "material": 3.50 },
+  "backlit-film": { 
+    "material": 3.50, 
+    "finishing": { "0": 0, "2.25": 0 } // Ponemos 0 en el valor del extra por si acaso
+},
     "aframe": { "material": 95.67 },
-    "window-perf": { "material": 2.50 }
+    "window-perf": { 
+    "material": 2.50,
+    "lamination": { "0": 0, "3.25": 3.25 }
+}
 };
 
-/**
- * Función Maestra para Large Format
- * Devuelve un objeto con el precio base por sqft (o unidad) y el cargo fijo
- */
-window.getLargeFormatPrice = function(productID, turnVal = "Standard") {
+window.getLargeFormatPrice = function(productID, options = {}) {
     const isWholesale = localStorage.getItem('userTier') === 'wholesale';
     const multiplier = isWholesale ? 1 : 2;
     const product = window.largeFormatPricing[productID];
+    const turnVal = options.turn || "Standard";
     
     if (!product) return { unitPrice: 0, fixedFee: 0, multiplier: multiplier };
 
-    try {
-        let basePrice = 0;
+    let baseRate = 0;
 
-        // Caso 1: Productos con precio directo de material (sq/ft)
-        if (product.material) {
-            basePrice = product.material * multiplier;
-        } 
-        // Caso 2: Productos con tallas fijas (Gallery Canvas, Table Covers)
-        else if (product.sizes) {
-            const firstKey = Object.keys(product.sizes)[0];
-            basePrice = product.sizes[firstKey] * multiplier;
-        }
-        // Caso 3: Productos con variantes de material (Wrap cast/calendar)
-        else if (product.calendar || product.cast) {
-            basePrice = (product.calendar ? product.calendar.material : 3.00) * multiplier;
-        }
-
-        let fixedFee = 0;
-        // Lógica de cargo por urgencia (Rush)
-        if (turnVal.toLowerCase().includes("rush") || turnVal.toLowerCase().includes("same day")) {
-            fixedFee = 50.00;
-        }
-
-        return {
-            unitPrice: basePrice,
-            fixedFee: fixedFee,
-            multiplier: multiplier 
-        };
-    } catch (e) {
-        console.error("Error calculando precio en Large Printing:", e);
-        return { unitPrice: 0, fixedFee: 0, multiplier: multiplier };
+    // 1. CASO POSTERS (Busca dentro de .types)
+    if (options.type && product.types && product.types[options.type]) {
+        baseRate = product.types[options.type];
     }
+    // 2. CASO WINDOW CLING (Busca dentro de .materials)
+    else if (options.materialKey && product.materials && product.materials[options.materialKey]) {
+        baseRate = product.materials[options.materialKey];
+    }
+    // 3. CASO ESTÁNDAR (Busca .material directo como Rough Wall o Window Perf)
+    else if (product.material) {
+        baseRate = product.material;
+    }
+
+    // --- SUMAR LAMINACIÓN ---
+    if (options.lam && product.lamination && product.lamination[options.lam] !== undefined) {
+        baseRate += parseFloat(product.lamination[options.lam]);
+    }
+
+    let fixedFee = 0;
+    if (turnVal === "Rush" || turnVal === "50" || turnVal.toLowerCase().includes("rush")) {
+        fixedFee = 50.00;
+    }
+
+    return {
+        unitPrice: baseRate * multiplier, 
+        fixedFee: fixedFee,
+        multiplier: multiplier 
+    };
 };
 
 window.getTierMultiplier = function() {

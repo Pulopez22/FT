@@ -289,8 +289,8 @@
         }
 
         function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             document.getElementById('ordered-w-label').innerText = w;
             document.getElementById('ordered-h-label').innerText = h;
             const areaBox = document.getElementById('printing-area');
@@ -307,74 +307,123 @@
         }
 
         function validateSize() {
-            const w = document.getElementById('w-input');
+            const w = document.getElementById('width-input');
+            const h = document.getElementById('height-input');
             const msg = document.getElementById('limit-msg');
-            if (parseFloat(w.value) > 60) { w.value = 60; msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2500); }
+            
+            if (parseFloat(w.value) > 60) { 
+                w.value = 60; 
+                msg.classList.remove('hidden'); 
+                setTimeout(() => msg.classList.add('hidden'), 2500); 
+            }
+            if (parseFloat(h.value) > 1200) { 
+                h.value = 1200; 
+                msg.classList.remove('hidden'); 
+                setTimeout(() => msg.classList.add('hidden'), 2500); 
+            }
+            // IMPORTANTE: Llamar a estas dos para que el visualizador y el precio reaccionen
             updateOrderedLabels();
             calculatePrice();
         }
 
         function calculatePrice() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const turnVal = document.getElementById('turn-select').value;
-            const finishAdd = parseFloat(document.getElementById('finish-select').value) || 0;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            
+            // Capturamos el extra del acabado (Contour Cut) y el turnaround
+            const finishAdd = parseFloat(document.getElementById('finish-select').value) || 0;
+            const turnVal = document.getElementById('turn-select').value;
 
             if (typeof window.getLargeFormatPrice === 'function') {
-                const pricing = window.getLargeFormatPrice(PRODUCT_ID, turnVal);
+                // 1. Obtenemos la info del motor central (multiplier y fixedFee por Rush)
+                // Usamos el ID "glass-adhere" que tienes en tu JSON
+                const pricing = window.getLargeFormatPrice("glass-adhere", { turn: turnVal });
+                
+                // 2. Calculamos el Unit Rate real:
+                // (Material base del JSON + Extra de acabado) * Multiplicador de Tier
+                const unitRate = pricing.unitPrice + (finishAdd * pricing.multiplier);
+                
+                // 3. Calculamos el área en pies cuadrados
                 const area = (w * h) / 144;
-                const unitRate = 4.00 * pricing.multiplier + (finishAdd * pricing.multiplier); 
+                
+                // 4. Total = (Tarifa x Área x Cantidad) + (Cargos fijos x Cantidad)
                 const total = (unitRate * area * qty) + (pricing.fixedFee * qty);
+
+                // Actualizamos la UI
                 document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
                 document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
+                
+                globalTotalValue = total;
             }
         }
 
         async function processFile(input) {
-            if (!input.files || !input.files[0]) return;
-            const file = input.files[0];
-            isPdf = file.type === "application/pdf";
-            document.getElementById('drop-zone').classList.add('hidden');
-            document.getElementById('validation-panel').classList.remove('hidden');
-            document.getElementById('upload-progress').style.width = '20%';
-            updateOrderedLabels();
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                isPdf = file.type === "application/pdf";
+                document.getElementById('drop-zone').classList.add('hidden');
+                document.getElementById('validation-panel').classList.remove('hidden');
+                document.getElementById('upload-progress').style.width = '20%';
+                updateOrderedLabels();
 
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const previewImg = document.getElementById('preview-thumb');
-            const canvas = document.getElementById('pdf-canvas');
+                const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+                const targetH = parseFloat(document.getElementById('height-input').value) || 1;
+                const previewImg = document.getElementById('preview-thumb');
+                const canvas = document.getElementById('pdf-canvas');
 
-            const renderArt = (w, h, contentUrl, isPdfType) => {
-                originalW = w; originalH = h;
-                const el = isPdfType ? canvas : previewImg;
-                if (!isPdfType) el.src = contentUrl;
-                el.style.width = ((w / 100) / targetW * 100) + "%";
-                el.style.display = "block";
-                updateUIInfo(w, h);
-            };
+                const renderArt = (w, h, contentUrl, isPdfType) => {
+                    originalW = w; originalH = h;
+                    const previewImg = document.getElementById('preview-thumb');
+                    const canvas = document.getElementById('pdf-canvas');
+                    const el = isPdfType ? canvas : previewImg;
 
-            if (isPdf) {
-                previewImg.style.display = "none"; canvas.classList.remove('hidden');
-                const reader = new FileReader();
-                reader.onload = async function() {
-                    const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
-                    const page = await pdf.getPage(1);
-                    const viewport = page.getViewport({ scale: 2.0 });
-                    canvas.height = viewport.height; canvas.width = viewport.width;
-                    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-                    renderArt(viewport.width, viewport.height, null, true);
+                    if (!isPdfType) el.src = contentUrl;
+
+                    // Control de visibilidad
+                    previewImg.style.display = isPdfType ? "none" : "block";
+                    if (isPdfType) canvas.classList.remove('hidden');
+
+                    // --- LÓGICA DE ESCALA REAL ---
+                    const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+                    const inchW = w / 100; // Asumiendo 100px por pulgada para previsualización
+                    const scalePercent = (inchW / targetW) * 100;
+
+                    // Estilos para forzar visibilidad y escala real
+                    el.style.position = "relative";
+                    el.style.zIndex = "50"; 
+                    el.style.width = scalePercent + "%"; 
+                    el.style.height = "auto";
+                    el.style.maxWidth = "none";
+                    el.style.maxHeight = "none";
+                    el.style.objectFit = "fill"; 
+
+                    updateUIInfo(w, h);
                 };
-                reader.readAsArrayBuffer(file);
-            } else {
-                canvas.style.display = "none"; const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => renderArt(img.width, img.height, e.target.result, false);
-                };
-                reader.readAsDataURL(file);
+
+                if (isPdf) {
+                    previewImg.style.display = "none"; canvas.classList.remove('hidden');
+                    const reader = new FileReader();
+                    reader.onload = async function() {
+                        const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+                        const page = await pdf.getPage(1);
+                        const viewport = page.getViewport({ scale: 2.0 });
+                        canvas.height = viewport.height; canvas.width = viewport.width;
+                        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                        renderArt(viewport.width, viewport.height, null, true);
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    canvas.style.display = "none"; const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.onload = () => renderArt(img.width, img.height, e.target.result, false);
+                    };
+                    reader.readAsDataURL(file);
+                }
+                uploadToRender(file);
             }
-            uploadToRender(file);
         }
 
         function updateUIInfo(w, h) {
@@ -400,8 +449,8 @@
 
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             el.style.width = "100%"; el.style.height = "100%";
             el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
             if ((originalW > originalH) !== (targetW > targetH)) {
@@ -451,72 +500,41 @@
         }
 
         function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+            if (!uploadedFileUrl) return alert("Please upload and approve artwork first");
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
-    let itemDetails = [];
-    let variantKey = "base"; // Por defecto
+            // Capturar los elementos select
+            const sidesSelect = document.getElementById('sides-select');
+            const matSelect = document.getElementById('material-select');
+            const turnSelect = document.getElementById('turn-select');
+            const finishSelect = document.getElementById('finish-select'); // Añadido
 
-    optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
+            const item = {
+                name: "Polyester Window Cling",
+                productId: "glass-adhere",
+                // Limpiar el signo de $ para guardar un número real
+                price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
+                image: document.getElementById('main-prod-img').src,
+                fileUrl: uploadedFileUrl,
+                quantity: parseInt(document.getElementById('qty-input').value),
+                width: parseFloat(document.getElementById('width-input').value),
+                height: parseFloat(document.getElementById('height-input').value),
+                // Guardar detalles formateados para la vista del carrito
+                details: `QTY: ${document.getElementById('qty-input').value} | ` +
+                        `SIZE: ${document.getElementById('width-input').value}"x${document.getElementById('height-input').value}" | ` +
+                        `SIDES: ${sidesSelect.options[sidesSelect.selectedIndex].text} | ` +
+                        `MAT: ${matSelect.options[matSelect.selectedIndex].text} | ` +
+                        `FINISH: ${finishSelect.options[finishSelect.selectedIndex].text} | ` +
+                        `TURN: ${turnSelect.options[turnSelect.selectedIndex].text}`
+            };
 
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(item);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            
+            renderCart();
+            toggleCart();
+            resetUpload();
         }
-        
-        itemDetails.push(`${label}: ${text}`);
-    });
-
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
-    
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
-
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
-    const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
-        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
-    };
-
-    // 6. GUARDAR EN LOCALSTORAGE
-    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
-    localStorage.setItem('sqft_cart', JSON.stringify(cart));
-    
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
-}
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];

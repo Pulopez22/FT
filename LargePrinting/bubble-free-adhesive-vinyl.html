@@ -283,61 +283,81 @@
         }
 
         function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            document.getElementById('ordered-w-label').innerText = w;
-            document.getElementById('ordered-h-label').innerText = h;
-            const areaBox = document.getElementById('printing-area');
-            if (areaBox && w > 0 && h > 0) {
-                const maxSize = 250;
-                if (w >= h) {
-                    areaBox.style.width = maxSize + "px";
-                    areaBox.style.height = (maxSize * (h / w)) + "px";
-                } else {
-                    areaBox.style.height = maxSize + "px";
-                    areaBox.style.width = (maxSize * (w / h)) + "px";
-                }
-            }
+    // Usamos los IDs reales del HTML: width-input y height-input
+    const wVal = document.getElementById('width-input').value || 0;
+    const hVal = document.getElementById('height-input').value || 0;
+    
+    const labelW = document.getElementById('ordered-w-label');
+    const labelH = document.getElementById('ordered-h-label');
+    
+    if (labelW) labelW.innerText = wVal;
+    if (labelH) labelH.innerText = hVal;
+    
+    const areaBox = document.getElementById('printing-area');
+    if (areaBox && wVal > 0 && hVal > 0) {
+        const maxSize = 250;
+        if (parseFloat(wVal) >= parseFloat(hVal)) {
+            areaBox.style.width = maxSize + "px";
+            areaBox.style.height = (maxSize * (hVal / wVal)) + "px";
+        } else {
+            areaBox.style.height = maxSize + "px";
+            areaBox.style.width = (maxSize * (wVal / hVal)) + "px";
+        }
+    }
+}
+
+function validateSize() {
+    const wInput = document.getElementById('width-input');
+    const hInput = document.getElementById('height-input');
+    const msg = document.getElementById('limit-msg'); // Asegúrate de tener este ID en tu HTML para alertas
+
+    // Candado para Ancho (Max 52")
+    if (parseFloat(wInput.value) > 60) { 
+        wInput.value = 60; 
+    }
+
+    // Candado para Alto (Max 120" - Ajustable)
+    if (parseFloat(hInput.value) > 1200) { 
+        hInput.value = 1200; 
+    }
+    
+    // Sincronizar etiquetas negras y cuadro naranja
+    updateOrderedLabels();
+    
+    // Recalcular el precio con las nuevas medidas bloqueadas
+    calculatePrice();
+}
+
+function calculatePrice() {
+    const w = parseFloat(document.getElementById('width-input').value) || 0;
+    const h = parseFloat(document.getElementById('height-input').value) || 0;
+    const turnVal = document.getElementById('turn-select').value;
+    const lamAdd = parseFloat(document.getElementById('lam-select').value) || 0;
+    const finishVal = document.getElementById('finish-select').value;
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+
+    if (typeof window.getLargeFormatPrice === 'function') {
+        const pricing = window.getLargeFormatPrice(PRODUCT_ID, turnVal);
+        const multiplier = pricing.multiplier;
+        
+        let unitRate = 0;
+        if(finishVal === "SPECIAL") {
+            unitRate = 5.75 * multiplier;
+            document.getElementById('lam-select').disabled = true;
+        } else {
+            const finishAdd = parseFloat(finishVal) || 0;
+            unitRate = (pricing.unitPrice) + ((lamAdd + finishAdd) * multiplier);
+            document.getElementById('lam-select').disabled = false;
         }
 
-        function validateSize() {
-            const w = document.getElementById('w-input');
-            if (parseFloat(w.value) > 53.5) { 
-                w.value = 53.5; 
-                document.getElementById('limit-msg').classList.remove('hidden'); 
-                setTimeout(() => document.getElementById('limit-msg').classList.add('hidden'), 2500); 
-            }
-            updateOrderedLabels();
-            calculatePrice();
-        }
+        let area = (w * h) / 144;
+        if (area < 1 && area > 0) area = 1; 
 
-        function calculatePrice() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const turnVal = document.getElementById('turn-select').value;
-            const lamSelect = document.getElementById('lam-select');
-            const finishSelect = document.getElementById('finish-select');
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-
-            if (typeof window.getLargeFormatPrice === 'function') {
-                const pricing = window.getLargeFormatPrice(PRODUCT_ID, turnVal);
-                let unitRate = 0;
-                if(finishSelect.value === "SPECIAL") {
-                    unitRate = 5.75 * pricing.multiplier;
-                    lamSelect.disabled = true;
-                } else {
-                    unitRate = pricing.unitPrice; 
-                    const finishAdd = parseFloat(finishSelect.value) || 0;
-                    const lamAdd = parseFloat(lamSelect.value) || 0;
-                    unitRate += (finishAdd + lamAdd) * pricing.multiplier;
-                    lamSelect.disabled = false;
-                }
-                const area = (w * h) / 144;
-                const total = (unitRate * area * qty) + (pricing.fixedFee * qty);
-                document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
-                document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
-            }
-        }
+        const total = (unitRate * area * qty) + (pricing.fixedFee * qty);
+        document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
+        document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
+    }
+}
 
         async function processFile(input) {
             if (!input.files || !input.files[0]) return;
@@ -348,8 +368,8 @@
             document.getElementById('validation-panel').classList.remove('hidden');
             updateOrderedLabels();
 
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             const previewImg = document.getElementById('preview-thumb');
             const canvas = document.getElementById('pdf-canvas');
 
@@ -393,8 +413,8 @@
     document.getElementById('file-dims-text').innerText = `${inchW}" x ${inchH}"`;
     const dpiInfo = document.getElementById('dpi-info');
     const statusTitle = document.getElementById('status-title');
-    const targetW = parseFloat(document.getElementById('w-input').value) * 100;
-    const targetH = parseFloat(document.getElementById('h-input').value) * 100;
+    const targetW = parseFloat(document.getElementById('width-input').value) * 100;
+    const targetH = parseFloat(document.getElementById('height-input').value) * 100;
 
     if (w < targetW || h < targetH) {
         statusTitle.innerText = "WARNING: ORANGE VISIBLE";
@@ -411,8 +431,8 @@
 
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             el.style.width = "100%"; el.style.height = "100%";
             el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
             if ((originalW > originalH) !== (targetW > targetH)) {
@@ -458,71 +478,37 @@
         }
 
         function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+    if (!uploadedFileUrl) return alert("Please upload and approve art first");
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
-    let itemDetails = [];
-    let variantKey = "base"; // Por defecto
-
-    optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
-
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
-        }
-        
-        itemDetails.push(`${label}: ${text}`);
-    });
-
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
+    const w = document.getElementById('width-input').value;
+    const h = document.getElementById('height-input').value;
+    const qty = document.getElementById('qty-input').value;
     
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
+    const color = document.getElementById('color-select').value;
+    const lam = document.getElementById('lam-select').options[document.getElementById('lam-select').selectedIndex].text;
+    const finish = document.getElementById('finish-select').options[document.getElementById('finish-select').selectedIndex].text;
+    const turn = document.getElementById('turn-select').options[document.getElementById('turn-select').selectedIndex].text;
 
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
+    const details = `QTY: ${qty} | SIZE: ${w}"x${h}" | COLOR: ${color} | LAM: ${lam} | FINISH: ${finish} | TURN: ${turn}`;
+
     const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
-        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
+        name: document.getElementById('prod-title').innerText,
+        productId: PRODUCT_ID,
+        price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
+        image: document.getElementById('main-prod-img').src,
+        fileUrl: uploadedFileUrl,
+        details: details,
+        quantity: parseInt(qty),
+        width: parseFloat(w),
+        height: parseFloat(h)
     };
 
-    // 6. GUARDAR EN LOCALSTORAGE
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
     cart.push(item);
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
     
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
+    renderCart();
+    toggleCart();
 }
 
         function removeItem(i) {

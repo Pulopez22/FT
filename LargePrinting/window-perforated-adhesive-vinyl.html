@@ -74,20 +74,7 @@
         </div>
     </nav>
 
-  <div id="mobile-menu" class="p-8 flex flex-col gap-6 overflow-y-auto lg:hidden text-black">
-        <div class="flex justify-between items-center border-b pb-4">
-            <span class="heavy-italic text-xl italic">Navigation</span>
-            <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
-        </div>
-        <ul class="space-y-6 text-sm font-black uppercase italic">
-            <li><a href="../index.html">Wall Art</a></li>
-            <li><a href="../Banners/banners.html">Banners</a></li>
-            <li><a href="../Displays/displays.html">Displays</a></li>
-            <li><a href="largeprinting.html" class="text-red-600">Large Format</a></li>
-        </ul>
-    </div>
-
-    <div class="flex flex-row flex-grow w-full text-black">
+   <div class="flex flex-row flex-grow w-full text-black">
         <aside class="sidebar-fixed p-10 hidden lg:block text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
@@ -100,7 +87,6 @@
                 <li class="sidebar-item cursor-pointer"><a href="../Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
             </ul>
         </aside>
-        
         <main class="main-content-scroll text-black">
             <div class="p-6 md:p-12 flex-grow text-black text-black">
                 <div class="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-12 lg:gap-16">
@@ -147,8 +133,8 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-4 text-black text-black">
-                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Width (Max 53.5")</label><input type="number" id="width-input" value="24" oninput="validateSize()" class="custom-input text-black"></div>
-                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Height (Max 1200")</label><input type="number" id="height-input" value="24" oninput="validateSize()" class="custom-input text-black"></div>
+                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Width (Max 53.5")</label><input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input text-black"></div>
+                                <div><label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic">Height (in)</label><input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input text-black"></div>
                             </div>
 
                             <div id="validator-container" class="space-y-4 text-black text-black">
@@ -280,8 +266,13 @@
         function validateSize() {
             const w = document.getElementById('w-input');
             const limitMsg = document.getElementById('limit-reached');
-            if (parseFloat(w.value) > 53.5) { 
-                w.value = 53.5; 
+            if (parseFloat(w.value) > 53) { 
+                w.value = 53; 
+                limitMsg.classList.remove('hidden'); 
+                setTimeout(() => limitMsg.classList.add('hidden'), 2500); 
+            }
+            if (parseFloat(w.value) > 1200) { 
+                w.value = 1200; 
                 limitMsg.classList.remove('hidden'); 
                 setTimeout(() => limitMsg.classList.add('hidden'), 2500); 
             }
@@ -290,68 +281,70 @@
         }
 
         function calculatePrice() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const turnVal = document.getElementById('turn-select').value;
-            const lamAdd = parseFloat(document.getElementById('lam-select').value) || 0;
+            const wVal = document.getElementById('w-input').value;
+            const hVal = document.getElementById('h-input').value;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            
+            const lamVal = document.getElementById('lam-select').value;
+            const turnVal = document.getElementById('turn-select').value;
 
             if (typeof window.getLargeFormatPrice === 'function') {
-                const pricing = window.getLargeFormatPrice(PRODUCT_ID, "Standard");
-                const area = (w * h) / 144;
-                let total = ((pricing.unitPrice + lamAdd) * area * qty) + (pricing.fixedFee * qty);
-                if (turnVal === "Rush") total += 50;
+                // Enviamos lam y turn como un objeto de opciones
+                const pricing = window.getLargeFormatPrice(PRODUCT_ID, { 
+                    lam: lamVal, 
+                    turn: turnVal 
+                });
+                
+                const w = parseFloat(wVal) || 0;
+                const h = parseFloat(hVal) || 0;
+                let area = (w * h) / 144;
+                if (area < 1 && area > 0) area = 1; // Mínimo 1 sqft
+
+                const total = (pricing.unitPrice * area * qty) + (pricing.fixedFee * qty);
 
                 document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
-                document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
+                document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft`;
             }
         }
 
         async function processFile(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                isPdf = file.type === "application/pdf";
-                document.getElementById('drop-zone').classList.add('hidden');
-                document.getElementById('validation-panel').classList.remove('hidden');
-                document.getElementById('upload-progress').style.width = '20%';
-                updateOrderedLabels();
-
-                const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-                const previewImg = document.getElementById('preview-thumb');
-                const canvas = document.getElementById('pdf-canvas');
-
-                const renderArt = (w, h, contentUrl, isPdfType) => {
-                    originalW = w; originalH = h;
-                    const el = isPdfType ? canvas : previewImg;
-                    if (!isPdfType) el.src = contentUrl;
-                    el.style.width = "100%";
-                    el.style.display = "block";
-                    updateUIInfo(w, h);
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0]; isPdf = file.type === "application/pdf";
+            document.getElementById('drop-zone').classList.add('hidden');
+            document.getElementById('validation-panel').classList.remove('hidden');
+            updateOrderedLabels();
+            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const previewImg = document.getElementById('preview-thumb');
+            const canvas = document.getElementById('pdf-canvas');
+            const renderArt = (w, h, contentUrl, isPdfType) => {
+                originalW = w; originalH = h;
+                const el = isPdfType ? canvas : previewImg;
+                if (!isPdfType) el.src = contentUrl;
+                el.style.width = ((w / 100) / targetW * 100) + "%";
+                el.style.height = ((h / 100) / targetH * 100) + "%";
+                el.style.display = "block";
+                updateUIInfo(w, h);
+            };
+            if (isPdf) {
+                previewImg.style.display = "none"; canvas.classList.remove('hidden');
+                const reader = new FileReader();
+                reader.onload = async function() {
+                    const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+                    const page = await pdf.getPage(1);
+                    const viewport = page.getViewport({ scale: 2.0 });
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height; canvas.width = viewport.width;
+                    await page.render({ canvasContext: context, viewport }).promise;
+                    renderArt(viewport.width, viewport.height, null, true);
                 };
-
-                if (isPdf) {
-                    previewImg.style.display = "none"; canvas.classList.remove('hidden');
-                    const reader = new FileReader();
-                    reader.onload = async function() {
-                        const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
-                        const page = await pdf.getPage(1);
-                        const viewport = page.getViewport({ scale: 2.0 });
-                        canvas.height = viewport.height; canvas.width = viewport.width;
-                        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-                        renderArt(viewport.width, viewport.height, null, true);
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else {
-                    canvas.style.display = "none"; const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.src = e.target.result;
-                        img.onload = () => renderArt(img.width, img.height, e.target.result, false);
-                    };
-                    reader.readAsDataURL(file);
-                }
-                uploadToRender(file);
+                reader.readAsArrayBuffer(file);
+            } else {
+                canvas.style.display = "none"; const reader = new FileReader();
+                reader.onload = (e) => { const img = new Image(); img.src = e.target.result; img.onload = () => renderArt(img.width, img.height, e.target.result, false); };
+                reader.readAsDataURL(file);
             }
+            uploadToRender(file);
         }
 
         function updateUIInfo(w, h) {
@@ -427,72 +420,24 @@
         function changeImage(el) { document.getElementById('main-prod-img').src = el.src; }
 
         function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+            if (!uploadedFileUrl) return;
+            const turnSel = document.getElementById('turn-select');
+            const lamSel = document.getElementById('lam-select');
+            const w = document.getElementById('w-input').value;
+            const h = document.getElementById('h-input').value;
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
-    let itemDetails = [];
-    let variantKey = "base"; // Por defecto
-
-    optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
-
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
+            const newItem = {
+                name: "Window Perforated Vinyl",
+                price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
+                image: "../images/Large Printing/Window-Perf-AB-Vinyl-01.png",
+                fileUrl: uploadedFileUrl,
+                details: `SIZE: ${w}"x${h}" | LAM: ${lamSel.options[lamSel.selectedIndex].text} | TURN: ${turnSel.options[turnSel.selectedIndex].text} | QTY: ${document.getElementById('qty-input').value}`
+            };
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(newItem);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            resetUpload(); toggleCart();
         }
-        
-        itemDetails.push(`${label}: ${text}`);
-    });
-
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
-    
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
-
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
-    const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
-        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
-    };
-
-    // 6. GUARDAR EN LOCALSTORAGE
-    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
-    localStorage.setItem('sqft_cart', JSON.stringify(cart));
-    
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
-}
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];

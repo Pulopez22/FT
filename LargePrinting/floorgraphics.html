@@ -137,7 +137,7 @@
                                     <label class="text-[9px] font-black uppercase text-gray-400 block mb-2 italic tracking-widest text-black text-black">Finishing Options</label>
                                     <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown text-black text-black">
                                         <option value="0">Trim to Size</option>
-                                        <option value="0.75">Contour Cut (+$.75)</option>
+                                        <option value="0.75">Contour Cut</option>
                                     </select>
                                 </div>
                                 <div>
@@ -265,8 +265,8 @@
         }
 
         function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             document.getElementById('ordered-w-label').innerText = w;
             document.getElementById('ordered-h-label').innerText = h;
             const areaBox = document.getElementById('printing-area');
@@ -283,26 +283,47 @@
         }
 
         function validateSize() {
-            const w = document.getElementById('w-input');
-            const h = document.getElementById('h-input');
-            const msg = document.getElementById('limit-msg');
-            if (parseFloat(w.value) > 53.5) { w.value = 53.5; msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2500); }
-            updateOrderedLabels();
+            const wInput = document.getElementById('width-input');
+            const hInput = document.getElementById('height-input');
+            const limitMsg = document.getElementById('limit-msg');
+
+            // Bloqueo de medida máxima para Floor Graphics
+            if (parseFloat(wInput.value) > 53.5) { 
+                wInput.value = 53.5; 
+                if (limitMsg) {
+                    limitMsg.classList.remove('hidden'); 
+                    setTimeout(() => limitMsg.classList.add('hidden'), 2500); 
+                }
+            }
+            
+            // Sincronizar etiquetas negras (Ordered W / Ordered H)
+            const labelW = document.getElementById('ordered-w-label');
+            const labelH = document.getElementById('ordered-h-label');
+            if (labelW) labelW.innerText = wInput.value || 0;
+            if (labelH) labelH.innerText = hInput.value || 0;
+
+            updateOrderedLabels(); // Redimensiona el cuadro naranja
             calculatePrice();
         }
 
         function calculatePrice() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const turnVal = document.getElementById('turn-select').value;
-            const finishAdd = parseFloat(document.getElementById('finish-select').value) || 0;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            const turnVal = document.getElementById('turn-select').value;
+            
+            // Valor del select de finishing (0 o 0.75)
+            const finishAdd = parseFloat(document.getElementById('finish-select').value) || 0;
 
             if (typeof window.getLargeFormatPrice === 'function') {
-                const pricing = window.getLargeFormatPrice(PRODUCT_ID, turnVal);
+                const pricing = window.getLargeFormatPrice("floor-graphics", { turn: turnVal });
+                
+                // El Unit Rate es: (Precio Base del material + Extra de acabado * Multiplicador)
                 const unitRate = pricing.unitPrice + (finishAdd * pricing.multiplier);
+                
                 const area = (w * h) / 144;
                 const total = (unitRate * area * qty) + (pricing.fixedFee * qty);
+
                 document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
                 document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
             }
@@ -317,18 +338,37 @@
                 document.getElementById('upload-progress').style.width = '20%';
                 updateOrderedLabels();
 
-                const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-                const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+                const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+                const targetH = parseFloat(document.getElementById('height-input').value) || 1;
                 const previewImg = document.getElementById('preview-thumb');
                 const canvas = document.getElementById('pdf-canvas');
 
                 const renderArt = (w, h, contentUrl, isPdfType) => {
                     originalW = w; originalH = h;
+                    const previewImg = document.getElementById('preview-thumb');
+                    const canvas = document.getElementById('pdf-canvas');
                     const el = isPdfType ? canvas : previewImg;
+
                     if (!isPdfType) el.src = contentUrl;
-                    el.style.width = ((w / 100) / targetW * 100) + "%";
-                    el.style.height = ((h / 100) / targetH * 100) + "%";
-                    el.style.display = "block";
+
+                    // Control de visibilidad
+                    previewImg.style.display = isPdfType ? "none" : "block";
+                    if (isPdfType) canvas.classList.remove('hidden');
+
+                    // --- LÓGICA DE ESCALA REAL ---
+                    // Detectamos el ancho que el usuario escribió en el input (width-input)
+                    const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+                    const inchW = w / 100; // Simulación: 100px = 1 pulgada
+                    const scalePercent = (inchW / targetW) * 100;
+
+                    // Estilos de fuerza para visualización
+                    el.style.position = "relative";
+                    el.style.zIndex = "50"; 
+                    el.style.width = scalePercent + "%"; 
+                    el.style.height = "auto";
+                    el.style.maxWidth = "none"; 
+                    el.style.objectFit = "fill"; 
+
                     updateUIInfo(w, h);
                 };
 
@@ -362,8 +402,8 @@
             document.getElementById('file-dims-text').innerText = `${inchW}" x ${inchH}"`;
             const dpiInfo = document.getElementById('dpi-info');
             const statusTitle = document.getElementById('status-title');
-            const targetW = parseFloat(document.getElementById('w-input').value) * 100;
-            const targetH = parseFloat(document.getElementById('h-input').value) * 100;
+            const targetW = parseFloat(document.getElementById('width-input').value) * 100;
+            const targetH = parseFloat(document.getElementById('height-input').value) * 100;
 
             if (w < targetW || h < targetH) {
                 statusTitle.innerText = "WARNING: ORANGE VISIBLE";
@@ -380,8 +420,8 @@
 
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             el.style.width = "100%"; el.style.height = "100%";
             el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
             if ((originalW > originalH) !== (targetW > targetH)) {
@@ -437,72 +477,45 @@
         }
 
         function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+            if (!uploadedFileUrl) return alert("Please upload and approve artwork first");
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
-    let itemDetails = [];
-    let variantKey = "base"; // Por defecto
+            // 1. Capturamos los valores actuales de los inputs
+            const w = document.getElementById('width-input').value;
+            const h = document.getElementById('height-input').value;
+            const qty = document.getElementById('qty-input').value;
 
-    optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
+            // 2. Obtenemos el texto del acabado seleccionado (Trim o Contour)
+            const finishSelect = document.getElementById('finish-select');
+            const finishText = finishSelect.options[finishSelect.selectedIndex].text;
+            const turnText = document.getElementById('turn-select').options[document.getElementById('turn-select').selectedIndex].text;
 
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
+            // 3. Creamos el string descriptivo que verá el usuario en el carrito
+            const details = `QTY: ${qty} PZS | SIZE: ${w}" x ${h}" | FINISH: ${finishText} | TURN: ${turnText}`;
+
+            // 4. Creamos el objeto del producto
+            const item = {
+                name: "High-Traffic Floor Graphic",
+                productId: PRODUCT_ID,
+                // Limpiamos el precio de símbolos para guardar solo el número
+                price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
+                image: document.getElementById('main-prod-img').src,
+                fileUrl: uploadedFileUrl,
+                details: details,
+                quantity: parseInt(qty),
+                width: parseFloat(w),
+                height: parseFloat(h)
+            };
+
+            // 5. Guardar en el LocalStorage
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(item);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            
+            // 6. Refrescar UI y abrir carrito
+            renderCart();
+            toggleCart();
+            resetUpload();
         }
-        
-        itemDetails.push(`${label}: ${text}`);
-    });
-
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
-    
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
-
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
-    const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
-        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
-    };
-
-    // 6. GUARDAR EN LOCALSTORAGE
-    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
-    localStorage.setItem('sqft_cart', JSON.stringify(cart));
-    
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
-}
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];

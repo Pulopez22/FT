@@ -265,23 +265,28 @@
         }
 
         function calculatePrice() {
-            const sizeKey = document.getElementById('size-select').value;
+            const sizeKey = document.getElementById('size-select').value; // Ej: "6-3"
             const turn = document.getElementById('turn-select').value;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
             const isWholesale = localStorage.getItem('userTier') === 'wholesale';
             const multiplier = isWholesale ? 1 : 2;
 
             if (window.largeFormatPricing && window.largeFormatPricing[PRODUCT_ID]) {
+                // Obtenemos el precio del tamaño específico del JSON
                 let unitPrice = window.largeFormatPricing[PRODUCT_ID].sizes[sizeKey] * multiplier;
+                
+                // Sumamos cargo de urgencia si aplica
                 if(turn === "Next Day") unitPrice += 50.00;
 
                 globalTotalValue = unitPrice * qty;
                 document.getElementById('final-price').innerText = `$${globalTotalValue.toFixed(2)}`;
 
+                // Actualizamos visualización de SqFt (informativo)
                 const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
                 const wVal = sel.getAttribute('data-w');
                 const hVal = sel.getAttribute('data-h');
-                document.getElementById('area-display').innerText = `${((wVal * hVal) / 144).toFixed(2)} sq ft`;
+                const area = (wVal * hVal) / 144;
+                document.getElementById('area-display').innerText = `${area.toFixed(2)} sq ft approx.`;
             }
         }
 
@@ -301,13 +306,32 @@
                 const canvas = document.getElementById('pdf-canvas');
 
                 const renderArt = (w, h, contentUrl, isPdfType) => {
-                    originalW = w; originalH = h;
-                    const el = isPdfType ? canvas : previewImg;
-                    if (!isPdfType) el.src = contentUrl;
-                    el.style.width = ((w / 100) / orderedW * 100) + "%";
-                    el.style.display = "block";
-                    updateUIInfo(w, h);
-                };
+                originalW = w; originalH = h;
+                const previewImg = document.getElementById('preview-thumb');
+                const canvas = document.getElementById('pdf-canvas');
+                const el = isPdfType ? canvas : previewImg;
+
+                if (!isPdfType) el.src = contentUrl;
+
+                previewImg.style.display = isPdfType ? "none" : "block";
+                if (isPdfType) canvas.classList.remove('hidden');
+
+                // --- LÓGICA DE ESCALA REAL ---
+                const sel = document.getElementById('size-select').options[document.getElementById('size-select').selectedIndex];
+                const orderedW = parseFloat(sel.getAttribute('data-w'));
+                
+                // Asumiendo 100px por pulgada para la previsualización
+                const scalePercent = ((w / 100) / orderedW) * 100;
+
+                el.style.position = "relative";
+                el.style.zIndex = "50"; 
+                el.style.width = scalePercent + "%"; 
+                el.style.height = "auto";
+                el.style.maxWidth = "none";
+                el.style.objectFit = "fill"; 
+
+                updateUIInfo(w, h);
+            };
 
                 if (isPdf) {
                     previewImg.style.display = "none"; canvas.classList.remove('hidden');
@@ -413,73 +437,37 @@
         }
 
         function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+            if (!uploadedFileUrl) return alert("Please upload and approve artwork first");
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
-    let itemDetails = [];
-    let variantKey = "base"; // Por defecto
+            const sizeSelect = document.getElementById('size-select');
+            const sizeTxt = sizeSelect.options[sizeSelect.selectedIndex].text;
+            const turnTxt = document.getElementById('turn-select').options[document.getElementById('turn-select').selectedIndex].text;
+            const qty = document.getElementById('qty-input').value;
 
-    optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
+            // Detectar si es 3 o 4 lados basado en el value
+            const sides = sizeSelect.value.includes('-3') ? "3-Sided (Open Back)" : "4-Sided (Full Coverage)";
 
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
+            const details = `QTY: ${qty} | SIZE: ${sizeTxt} | STYLE: ${sides} | TURN: ${turnTxt}`;
+
+            const item = {
+                name: "Premium Table Cover",
+                productId: PRODUCT_ID,
+                price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, '')),
+                image: document.getElementById('main-prod-img').src,
+                fileUrl: uploadedFileUrl,
+                details: details,
+                quantity: parseInt(qty)
+            };
+
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(item);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            
+            renderCart();
+            toggleCart();
+            resetUpload();
         }
         
-        itemDetails.push(`${label}: ${text}`);
-    });
-
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
-    
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
-
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
-    const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
-        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
-    };
-
-    // 6. GUARDAR EN LOCALSTORAGE
-    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
-    localStorage.setItem('sqft_cart', JSON.stringify(cart));
-    
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
-}
-
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('cart-items-container');

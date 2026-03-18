@@ -303,28 +303,36 @@
         }
 
         function calculatePrice() {
-    const select = document.getElementById('size-select');
-    const turnSelect = document.getElementById('turn-select'); // Capturamos el selector de tiempo
-    const sizeKey = select.value;
-    const qty = parseInt(document.getElementById('qty-input').value) || 1;
-    const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
-    const multiplier = isWholesale ? 1 : 2;
+            const select = document.getElementById('size-select');
+            const turnSelect = document.getElementById('turn-select');
+            const sizeKey = select.value; // Ej: "12x12"
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-    if (window.largeFormatPricing && window.largeFormatPricing[PRODUCT_ID]) {
-        const baseWholesalePrice = window.largeFormatPricing[PRODUCT_ID].sizes[sizeKey] || 0;
-        
-        // Calculamos el precio base (Retail o Wholesale)
-        currentPriceValue = (baseWholesalePrice * multiplier) * qty;
+            // 1. Validar conexión con pricing.js y objeto específico
+            if (window.largeFormatPricing && window.largeFormatPricing[PRODUCT_ID]) {
+                // 2. Obtenemos el multiplicador del Tier (Retail x2 / Wholesale x1)
+                const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
+                const multiplier = isWholesale ? 1 : 2;
 
-        // Si el usuario selecciona "NextDay", sumamos $50 fijos
-        if (turnSelect.value === "NextDay") {
-            currentPriceValue += 50;
+                // 3. Buscamos el precio base en la tabla 'sizes' de tu JSON
+                // window.largeFormatPricing["gallery-canvas"]["sizes"]["12x12"] -> 31.43
+                const baseWholesalePrice = window.largeFormatPricing[PRODUCT_ID].sizes[sizeKey] || 0;
+                
+                // 4. Calculamos: (Precio Base * Multiplicador) * Cantidad
+                currentPriceValue = (baseWholesalePrice * multiplier) * qty;
+
+                // 5. Sumamos cargo por Turnaround si es NextDay ($50 fijos por unidad)
+                if (turnSelect.value === "NextDay") {
+                    currentPriceValue += (50 * qty);
+                }
+
+                // 6. Actualizar UI con formato de moneda
+                document.getElementById('final-price').innerText = `$${currentPriceValue.toLocaleString('en-US', {
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2
+                })}`;
+            }
         }
-    }
-
-    // Formateamos el precio final con comas y decimales
-    document.getElementById('final-price').innerText = `$${currentPriceValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-}
 
         async function processFile(input) {
             if (!input.files || !input.files[0]) return;
@@ -344,13 +352,42 @@
             const canvas = document.getElementById('pdf-canvas');
 
             const renderArt = (w, h, contentUrl, isPdfType) => {
-                originalW = w; originalH = h;
-                const el = isPdfType ? canvas : previewImg;
-                if (!isPdfType) el.src = contentUrl;
-                el.style.width = ((w / 100) / orderedW * 100) + "%";
-                el.style.display = "block";
-                updateUIInfo(w, h);
-            };
+            originalW = w; originalH = h;
+            const previewImg = document.getElementById('preview-thumb');
+            const canvas = document.getElementById('pdf-canvas');
+            const el = isPdfType ? canvas : previewImg;
+
+            if (!isPdfType) el.src = contentUrl;
+
+            // Control de visibilidad
+            previewImg.style.display = isPdfType ? "none" : "block";
+            if (isPdfType) canvas.classList.remove('hidden');
+            else canvas.classList.add('hidden');
+
+            // OBTENER MEDIDAS ORDENADAS (Ej: "12x12" -> targetW = 12)
+            const select = document.getElementById('size-select');
+            const sizeText = select.options[select.selectedIndex].text;
+            const targetW = parseFloat(sizeText.split(' x ')[0]);
+
+            // --- LÓGICA DE ESCALA REAL ---
+            // Convertimos pixeles de la imagen a "pulgadas" hipotéticas (simulando 100dpi para visualización)
+            const inchW = w / 100; 
+
+            // Calculamos qué porcentaje del ancho ordenado ocupa la imagen
+            // Ej: Imagen 12" / Ordenado 24" = 0.5 (50%)
+            const scalePercent = (inchW / targetW) * 100;
+
+            // Aplicamos estilos críticos de visibilidad y escala
+            el.style.position = "relative";
+            el.style.zIndex = "50"; // Asegura que esté sobre el naranja
+            el.style.width = scalePercent + "%"; // Escala real respecto al área
+            el.style.height = "auto"; // Mantiene proporción
+            el.style.maxWidth = "none"; // Permite que la imagen se desborde si es más grande
+            el.style.maxHeight = "none";
+            el.style.objectFit = "fill"; // No forzamos contención
+
+            updateUIInfo(w, h);
+        };
 
             if (isPdf) {
                 previewImg.style.display = "none"; canvas.classList.remove('hidden');
@@ -402,13 +439,19 @@
 
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
+            
+            // Forzamos escala completa
+            el.style.width = "100%"; 
+            el.style.height = "100%";
+            el.style.objectFit = "cover"; // Cubrir todo el área naranja
+            el.style.transform = "none"; 
+            el.style.position = "relative";
+
+            // Lógica de rotación automática si las proporciones no coinciden
             const select = document.getElementById('size-select');
             const sizeText = select.options[select.selectedIndex].text;
             const targetW = parseFloat(sizeText.split(' x ')[0]);
             const targetH = parseFloat(sizeText.split(' x ')[1]);
-
-            el.style.width = "100%"; el.style.height = "100%";
-            el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
 
             if ((originalW > originalH) !== (targetW > targetH)) {
                 el.style.transform = "rotate(90deg)";
@@ -417,10 +460,13 @@
                 el.style.height = areaBox.offsetWidth + "px";
                 el.style.position = "absolute";
             }
-            document.getElementById('status-title').innerText = "AUTO-ROTATED & FITTED ✓";
+
+            // Actualizar estado
+            document.getElementById('status-title').innerText = "ROTATED & FITTED ✓";
             document.getElementById('status-title').className = "text-[10px] font-black uppercase text-blue-600 italic";
-            document.getElementById('dpi-info').innerHTML = 'FULL COVERAGE APPLIED ✅';
-            document.getElementById('dpi-info').className = "text-[11px] font-black uppercase text-blue-600 italic";
+            const dpiInfo = document.getElementById('dpi-info');
+            dpiInfo.innerHTML = 'FULL COVERAGE APPLIED ✅';
+            dpiInfo.className = "text-[11px] font-black uppercase text-blue-600 italic flex items-center gap-1";
         }
 
         async function uploadToRender(file) {
