@@ -148,6 +148,44 @@
                                 </div>
                             </div>
 
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Printing Sides</label>
+                                    <select id="side-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                        <option value="1">Single Sided</option>
+                                        <option value="2">Double Sided (+50%)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Lamination</label>
+                                    <select id="lam-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                        <option value="none" selected>No lamination</option>
+                                        <option value="uv_gloss">Gloss UV</option>
+                                        <option value="uv_matte">Matte UV</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Grommets</label>
+                                    <select id="grommet-select" onchange="calculatePrice()" class="custom-dropdown text-black text-[13px]">
+                                        <option value="none">No Grommets</option>
+                                        <option value="4corners">4 Corners</option>
+                                        <option value="custom">Custom Grommets</option>
+                                        <option value="slot">Slot Punched</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Finishing Options</label>
+                                    <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown text-black text-[13px]">
+                                        <option value="trim">Trim to Size</option>
+                                        <option value="rounded">Rounded Corners</option>
+                                        <option value="router">Router Cut to Shape</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="grid grid-cols-2 gap-4 text-black text-black">
                                 <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic text-black text-black text-black text-black text-black">Width (Max 48")</label><input type="number" id="width-input" value="24" oninput="validateSize()" class="custom-input text-black"></div>
                                 <div><label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic text-black text-black text-black text-black text-black">Height (Max 96")</label><input type="number" id="height-input" value="24" oninput="validateSize()" class="custom-input text-black"></div>
@@ -160,36 +198,36 @@
                                     <input type="file" id="file-input" class="hidden" accept="image/*,.pdf" onchange="processFile(this)">
                                 </div>
 
-                                <div id="validation-panel" class="hidden space-y-6">
-                                    <div id="validator-window" class="canvas-bg-grid shadow-inner" style="height: 350px; width: 100%; background: #f3f4f6; border-radius: 2.5rem; position: relative; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 20px;">
+                                <div id="validation-panel" class="hidden space-y-4">
+                                    <div id="validator-window" class="canvas-bg-grid shadow-inner" style="height: 350px; width: 100%; background: #f3f4f6; border-radius: 2rem; position: relative; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 20px;">
                                         <div id="printing-area" class="relative bg-orange-600 shadow-2xl flex items-center justify-center" style="transition: all 0.3s ease; max-width: 90%; max-height: 90%; outline: 6px solid white;">
                                             <div class="absolute inset-[4px] border border-dashed border-white/30 pointer-events-none z-20"></div>
                                             <canvas id="pdf-canvas" class="max-w-none bg-white z-10 hidden"></canvas>
                                             <img id="preview-thumb" class="max-w-none bg-white z-10" style="display: none;">
-                                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase bg-black text-white px-2 py-0.5 rounded whitespace-nowrap text-black">Ordered W: <span id="ordered-w-label">24</span>"</div>
-                                            <div class="absolute -right-20 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase rotate-90 bg-black text-white px-2 py-0.5 rounded whitespace-nowrap text-black">Ordered H: <span id="ordered-h-label">24</span>"</div>
+                                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase bg-black text-white px-2 py-0.5 rounded whitespace-nowrap">Ordered W: <span id="ordered-w-label">24</span>"</div>
+                                            <div class="absolute -right-20 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase rotate-90 bg-black text-white px-2 py-0.5 rounded whitespace-nowrap">Ordered H: <span id="ordered-h-label">24</span>"</div>
                                         </div>
                                     </div>
                                     
-                                    <div class="bg-white border border-gray-100 p-8 rounded-[3rem] shadow-sm space-y-5 text-black">
+                                    <div class="bg-white border border-gray-100 p-6 rounded-[2.5rem] shadow-sm space-y-4 text-black">
                                         <div class="flex justify-between items-center text-black">
                                             <h4 id="status-title" class="text-[11px] font-black uppercase italic tracking-tight">Analyzing...</h4>
                                             <button onclick="resetUpload()" class="flex items-center gap-1 text-[10px] font-black text-red-500 hover:text-black uppercase italic">
-                                                <i data-lucide="refresh-cw" class="w-4 h-4 text-black text-black"></i> CHANGE FILE
+                                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-black"></i> CHANGE FILE
                                             </button>
                                         </div>
                                         <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden text-black">
-                                            <div id="upload-progress-bar" class="bg-[#00ab66] h-full transition-all duration-500 text-black text-black" style="width: 0%;"></div>
+                                            <div id="upload-progress-bar" class="bg-[#00ab66] h-full transition-all duration-500" style="width: 0%;"></div>
                                         </div>
                                         <div class="flex justify-between items-center text-black">
                                             <span id="file-dims-text" class="text-[15px] font-black italic">0" X 0"</span>
-                                            <span id="dpi-info" class="text-[11px] font-black uppercase italic flex items-center gap-1 text-black text-black">Checking...</span>
+                                            <span id="dpi-info" class="text-[11px] font-black uppercase italic flex items-center gap-1">Checking...</span>
                                         </div>
                                     </div>
 
-                                    <div class="flex gap-4">
-                                        <button onclick="autoFitImage()" class="flex-grow bg-[#2563eb] text-white text-[12px] font-black uppercase py-5 rounded-full shadow-xl italic hover:scale-[1.02] transition-all text-black text-black">AUTO-FIT & SCALE</button>
-                                        <button id="approve-btn" onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[12px] font-black uppercase py-5 rounded-full shadow-xl italic hover:scale-[1.02] transition-all text-black text-black">APPROVE DESIGN</button>
+                                    <div class="flex gap-3 text-black">
+                                        <button onclick="autoFitImage()" class="flex-grow bg-[#2563eb] text-white text-[11px] font-black uppercase py-4 rounded-full shadow-lg italic hover:scale-[1.02] transition-all">AUTO-FIT & SCALE</button>
+                                        <button id="approve-btn" onclick="approveArt()" class="flex-grow bg-[#00ab66] text-white text-[11px] font-black uppercase py-4 rounded-full shadow-lg italic hover:scale-[1.02] transition-all">APPROVE DESIGN</button>
                                     </div>
                                 </div>
                             </div>
@@ -264,8 +302,8 @@
         }
 
         function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             document.getElementById('ordered-w-label').innerText = w;
             document.getElementById('ordered-h-label').innerText = h;
             const areaBox = document.getElementById('printing-area');
@@ -281,29 +319,52 @@
             }
         }
 
-        function validateSize() {
-            const w = document.getElementById('w-input'); const h = document.getElementById('h-input');
-            if (parseFloat(w.value) > 48) w.value = 48;
-            if (parseFloat(h.value) > 96) h.value = 96;
+       function validateSize() {
+            const wInput = document.getElementById('width-input');
+            const hInput = document.getElementById('height-input');
+            
+            // CANDADO EN TIEMPO REAL (Max 48" x 96")
+            if (parseFloat(wInput.value) > 48) wInput.value = 48;
+            if (parseFloat(hInput.value) > 96) hInput.value = 96;
+            
+            // Limpieza si queda vacío
+            if (wInput.value === "") wInput.value = 0;
+            if (hInput.value === "") hInput.value = 0;
+
             updateOrderedLabels();
             calculatePrice();
         }
 
         function calculatePrice() {
             const turnVal = document.getElementById('turn-select').value;
-            const pricing = window.getLargeFormatPrice(PRODUCT_ID, turnVal);
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            const sideMult = parseFloat(document.getElementById('side-select').value) || 1;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            
+            const thick = document.getElementById('thick-select').value;
+            const sides = document.getElementById('side-select').value;
+            const lam = document.getElementById('lam-select').value;
 
-            const area = (w * h) / 144;
-            let baseTotal = (pricing.unitPrice * sideMult * area) + pricing.fixedFee;
-            if (turnVal !== "Standard") baseTotal + 50.00;
+            if (typeof window.getLargeFormatPrice === 'function') {
+                const pricing = window.getLargeFormatPrice(PRODUCT_ID, turnVal, thick, lam);
+                const area = (w * h) / 144;
 
-            globalTotalValue = baseTotal * qty;
-            document.getElementById('final-price').innerText = `$${globalTotalValue.toFixed(2)}`;
-            document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
+                let unitRate = pricing.unitPrice; 
+
+                // Multiplicador Double Sided (+50%)
+                if(sides === "1.5" || sides === "2") {
+                    unitRate *= 1.50; 
+                }
+
+                let total = (unitRate * area * qty);
+
+                // Suma de Turnaround ($50)
+                if (turnVal !== "Standard") total += 50.00;
+
+                globalTotalValue = total;
+                document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
+                document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
+            }
         }
 
         async function processFile(input) {
@@ -314,8 +375,8 @@
             document.getElementById('validation-panel').classList.remove('hidden');
             updateOrderedLabels();
 
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             const previewImg = document.getElementById('preview-thumb');
             const canvas = document.getElementById('pdf-canvas');
 
@@ -357,8 +418,8 @@
             document.getElementById('file-dims-text').innerText = `${inchW}" X ${inchH}"`;
             const dpiInfo = document.getElementById('dpi-info');
             const statusTitle = document.getElementById('status-title');
-            const targetW = parseFloat(document.getElementById('w-input').value) * 100;
-            const targetH = parseFloat(document.getElementById('h-input').value) * 100;
+            const targetW = parseFloat(document.getElementById('width-input').value) * 100;
+            const targetH = parseFloat(document.getElementById('height-input').value) * 100;
             if (w < targetW || h < targetH) {
                 statusTitle.innerText = "WARNING: ORANGE VISIBLE"; statusTitle.className = "text-[11px] font-black uppercase text-orange-500 italic";
                 dpiInfo.innerHTML = 'LOW COVERAGE ⚠️';
@@ -370,8 +431,8 @@
 
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             el.style.width = "100%"; el.style.height = "100%";
             el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
             if ((originalW > originalH) !== (targetW > targetH)) {
@@ -408,73 +469,48 @@
             document.getElementById('add-to-cart-btn').classList.replace('bg-black', 'bg-gray-200');
         }
 
-        function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+            function addToCart() {
+                if (!uploadedFileUrl) return alert("Please upload and approve artwork first");
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
-    let itemDetails = [];
-    let variantKey = "base"; // Por defecto
+                const w = document.getElementById('width-input').value;
+                const h = document.getElementById('height-input').value;
+                const qty = document.getElementById('qty-input').value;
+                
+                const getSelText = (id) => {
+                    const el = document.getElementById(id);
+                    return el ? el.options[el.selectedIndex].text : "N/A";
+                };
 
-    optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
+                // Recopilamos todos los detalles sin dejar ninguno fuera
+                const details = [
+                    `QTY: ${qty}`,
+                    `SIZE: ${w}"x${h}"`,
+                    `THICK: ${getSelText('thick-select')}`,
+                    `SIDES: ${getSelText('side-select')}`,
+                    `LAM: ${getSelText('lam-select')}`,
+                    `GROMMETS: ${getSelText('grommet-select')}`,
+                    `FINISH: ${getSelText('finish-select')}`,
+                    `TURN: ${getSelText('turn-select')}`
+                ].join(' | ');
 
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
-        }
-        
-        itemDetails.push(`${label}: ${text}`);
-    });
+                const item = {
+                    name: "Styrene POP Sign",
+                    productId: PRODUCT_ID,
+                    price: globalTotalValue,
+                    image: document.getElementById('main-prod-img').src,
+                    fileUrl: uploadedFileUrl,
+                    details: details,
+                    quantity: parseInt(qty),
+                    width: parseFloat(w),
+                    height: parseFloat(h)
+                };
 
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
-    
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
-
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
-    const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
-        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
-    };
-
-    // 6. GUARDAR EN LOCALSTORAGE
-    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
-    localStorage.setItem('sqft_cart', JSON.stringify(cart));
-    
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
-}
+                let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+                cart.push(item);
+                localStorage.setItem('sqft_cart', JSON.stringify(cart));
+                
+                renderCart(); toggleCart(); resetUpload();
+            }
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];

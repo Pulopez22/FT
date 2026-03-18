@@ -155,6 +155,25 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Grommets</label>
+                                    <select id="grommet-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                        <option value="0">No Grommets</option>
+                                        <option value="4">4 Corners</option>
+                                        <option value="custom">Custom Grommets</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Finishing Options</label>
+                                    <select id="finish-select" onchange="calculatePrice()" class="custom-dropdown text-black">
+                                        <option value="0">Square Corner</option>
+                                        <option value="0">Round Corner</option>
+                                        <option value="0">Router Cut To Shape</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div>
                                 <label class="text-[10px] font-black uppercase text-gray-400 italic mb-3 block ml-1">Turnaround</label>
                                 <select id="turn-select" onchange="calculatePrice()" class="custom-dropdown text-black">
@@ -272,8 +291,8 @@
         }
 
         function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
             document.getElementById('ordered-w-label').innerText = w;
             document.getElementById('ordered-h-label').innerText = h;
             const areaBox = document.getElementById('printing-area');
@@ -290,36 +309,50 @@
         }
 
         function validateSize() {
-            const w = document.getElementById('w-input'); const h = document.getElementById('h-input');
-            if (parseFloat(w.value) > 48) w.value = 48;
-            if (parseFloat(h.value) > 96) h.value = 96;
+            const wInput = document.getElementById('width-input');
+            const hInput = document.getElementById('height-input');
+            
+            // Bloqueo estricto a tamaño de cama de router (4x8 ft)
+            if (parseFloat(wInput.value) > 48) wInput.value = 48;
+            if (parseFloat(hInput.value) > 96) hInput.value = 96;
+
             updateOrderedLabels();
             calculatePrice();
         }
 
         function calculatePrice() {
             const turnVal = document.getElementById('turn-select').value;
-            const pricing = window.getLargeFormatPrice(PRODUCT_ID, turnVal);
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
+            const w = parseFloat(document.getElementById('width-input').value) || 0;
+            const h = parseFloat(document.getElementById('height-input').value) || 0;
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            
             const thick = document.getElementById('thick-select').value;
             const sideMult = parseFloat(document.getElementById('side-select').value) || 1;
             const lam = document.getElementById('lam-select').value;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-            const area = (w * h) / 144;
-            let pSqFt = 3.00;
-            if (thick === "3mm") pSqFt = 4.25;
-            if (thick === "6mm") pSqFt = 6.25;
-            if (lam !== "none") pSqFt += (1.00 * pricing.multiplier);
-            if (sideMult > 1) pSqFt *= sideMult;
+            if (typeof window.getLargeFormatPrice === 'function') {
+                const pricing = window.getLargeFormatPrice(PRODUCT_ID, { turn: turnVal });
+                const area = (w * h) / 144;
 
-            let totalUnit = (pSqFt * pricing.multiplier * area) + pricing.fixedFee;
-            if (turnVal !== "Standard") totalUnit + 50.00; 
+                // 1. Precio base según grosor
+                let pSqFt = 3.00; 
+                if (thick === "3mm") pSqFt = 4.25;
+                if (thick === "6mm") pSqFt = 6.25;
+                
+                // 2. Sumar laminación ($1.00 ajustado por tier)
+                if (lam !== "none") pSqFt += (1.00 * pricing.multiplier);
+                
+                // 3. Multiplicar por caras y Tier del usuario
+                let unitRate = (pSqFt * pricing.multiplier) * sideMult;
 
-            globalTotalValue = totalUnit * qty;
-            document.getElementById('final-price').innerText = `$${globalTotalValue.toFixed(2)}`;
-            document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
+                // 4. Calcular Subtotal y sumar Rush Fee si aplica
+                let total = (unitRate * area * qty);
+                if (turnVal === "Rush") total += 50.00;
+
+                globalTotalValue = total;
+                document.getElementById('final-price').innerText = `$${total.toFixed(2)}`;
+                document.getElementById('area-display').innerText = `${area.toFixed(3)} sq ft`;
+            }
         }
 
         async function processFile(input) {
@@ -330,8 +363,8 @@
             document.getElementById('validation-panel').classList.remove('hidden');
             updateOrderedLabels();
 
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             const previewImg = document.getElementById('preview-thumb');
             const canvas = document.getElementById('pdf-canvas');
 
@@ -373,8 +406,8 @@
             document.getElementById('file-dims-text').innerText = `${inchW}" X ${inchH}"`;
             const dpiInfo = document.getElementById('dpi-info');
             const statusTitle = document.getElementById('status-title');
-            const targetW = parseFloat(document.getElementById('w-input').value) * 100;
-            const targetH = parseFloat(document.getElementById('h-input').value) * 100;
+            const targetW = parseFloat(document.getElementById('width-input').value) * 100;
+            const targetH = parseFloat(document.getElementById('height-input').value) * 100;
             if (w < targetW || h < targetH) {
                 statusTitle.innerText = "WARNING: ORANGE VISIBLE"; statusTitle.className = "text-[11px] font-black uppercase text-orange-500 italic";
                 dpiInfo.innerHTML = 'LOW COVERAGE ⚠️'; dpiInfo.className = "text-[11px] font-black uppercase text-orange-500 italic";
@@ -386,8 +419,8 @@
 
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             el.style.width = "100%"; el.style.height = "100%";
             el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
             if ((originalW > originalH) !== (targetW > targetH)) {
@@ -426,72 +459,42 @@
         }
 
         function addToCart() {
-    // 1. OBTENER DATOS BÁSICOS (IDs estandarizados en tus HTML)
-    const prodTitle = document.getElementById('prod-title')?.innerText || "Custom Product";
-    const finalPriceText = document.getElementById('final-price')?.innerText || "$0.00";
-    const qty = parseInt(document.getElementById('qty-input')?.value) || 1;
-    const mainImg = document.getElementById('main-prod-img')?.src || "";
+            if (!uploadedFileUrl) return alert("Please upload and approve artwork first");
 
-    // 2. RECOPILAR OPCIONES DE LOS SELECTS
-    // Buscamos todos los select de la página
-    const optionElements = document.querySelectorAll('select.custom-dropdown');
-    let itemDetails = [];
-    let variantKey = "base"; // Por defecto
+            const w = document.getElementById('width-input').value;
+            const h = document.getElementById('height-input').value;
+            const qty = document.getElementById('qty-input').value;
+            
+            // Capturamos textos de todos los selectores
+            const thickText = document.getElementById('thick-select').options[document.getElementById('thick-select').selectedIndex].text;
+            const colorText = document.getElementById('color-select').value;
+            const lamText = document.getElementById('lam-select').options[document.getElementById('lam-select').selectedIndex].text;
+            const sideText = document.getElementById('side-select').options[document.getElementById('side-select').selectedIndex].text;
+            const grommetText = document.getElementById('grommet-select').options[document.getElementById('grommet-select').selectedIndex].text;
+            const finishText = document.getElementById('finish-select').options[document.getElementById('finish-select').selectedIndex].text;
+            const turnText = document.getElementById('turn-select').options[document.getElementById('turn-select').selectedIndex].text;
 
-    optionElements.forEach(select => {
-        const label = select.previousElementSibling?.innerText || "Option";
-        const text = select.options[select.selectedIndex].text;
-        const value = select.value;
+            const item = {
+                name: "PVC Rigid Sign",
+                productId: PRODUCT_ID,
+                price: globalTotalValue,
+                image: document.getElementById('main-prod-img').src,
+                fileUrl: uploadedFileUrl,
+                // String de detalles completo para producción
+                details: `QTY: ${qty} | SIZE: ${w}"x${h}" | COLOR: ${colorText} | THICK: ${thickText} | LAM: ${lamText} | SIDES: ${sideText} | GROMMETS: ${grommetText} | FINISH: ${finishText} | TURN: ${turnText}`,
+                quantity: parseInt(qty),
+                width: parseFloat(w),
+                height: parseFloat(h)
+            };
 
-        // Si es el select de hardware o material, esa es nuestra variantKey para la DB
-        if (select.id.includes('hardware') || select.id.includes('material')) {
-            variantKey = value;
+            let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
+            cart.push(item);
+            localStorage.setItem('sqft_cart', JSON.stringify(cart));
+            
+            renderCart();
+            toggleCart();
+            resetUpload();
         }
-        
-        itemDetails.push(`${label}: ${text}`);
-    });
-
-    // 3. CAPTURAR MEDIDAS (Solo para Banners y Rigid Signs)
-    // Si existen los inputs de width/height los guardamos
-    const widthInput = document.getElementById('width-input');
-    const heightInput = document.getElementById('height-input');
-    
-    // 4. CAPTURAR VALIDACIÓN DE ARTE (Tu lógica de PDF/Imagen)
-    let artNote = "";
-    if (typeof uploadedFileUrl !== 'undefined' && uploadedFileUrl !== "") {
-        const previewThumb = document.getElementById('preview-thumb');
-        const pdfCanvas = document.getElementById('pdf-canvas');
-        const el = (pdfCanvas && !pdfCanvas.classList.contains('hidden')) ? pdfCanvas : previewThumb;
-        
-        const hasAutoFit = (el && el.style.objectFit === "cover") ? "YES" : "NO";
-        const isRotated = (el && el.style.transform.includes("rotate")) ? "YES" : "NO";
-        artNote = ` | AUTOFIT: ${hasAutoFit} | ROTATED: ${isRotated}`;
-    }
-
-    // 5. CREAR EL OBJETO PARA EL SERVIDOR
-    const item = {
-        name: prodTitle,
-        productId: PRODUCT_ID, // Definido al inicio del script de cada página
-        variantKey: variantKey,
-        price: parseFloat(finalPriceText.replace(/[$,]/g, '')),
-        image: mainImg,
-        fileUrl: typeof uploadedFileUrl !== 'undefined' ? uploadedFileUrl : "",
-        details: itemDetails.join(' | ') + artNote,
-        quantity: qty,
-        // Dimensiones para que el servidor calcule el precio real por sqft
-        width: widthInput ? parseFloat(widthInput.value) : 0,
-        height: heightInput ? parseFloat(heightInput.value) : 0
-    };
-
-    // 6. GUARDAR EN LOCALSTORAGE
-    let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
-    localStorage.setItem('sqft_cart', JSON.stringify(cart));
-    
-    // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
-    if (typeof resetUpload === 'function') resetUpload();
-    if (typeof toggleCart === 'function') toggleCart();
-}
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
