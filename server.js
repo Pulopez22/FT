@@ -29,15 +29,6 @@ cloudinary.config({
 app.use(cors());
 app.use(express.json());
 
-
-// Servir archivos estáticos de la carpeta raíz
-app.use(express.static(__dirname));
-
-// Agregar esto para redirigir la raíz al index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 // --- CONEXIÓN MONGODB ---
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
