@@ -327,6 +327,7 @@ app.post('/api/checkout/capture-paypal-order', async (req, res) => {
         console.error("Error capturando pago:", err);
         res.status(500).json({ success: false, error: err.message });
     }
+})
 });
 
 
