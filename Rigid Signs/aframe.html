@@ -377,26 +377,29 @@
         }
 
         function updateUIInfo(w, h) {
-            const inchW = (w / 100).toFixed(2); 
-            const inchH = (h / 100).toFixed(2);
-            document.getElementById('file-dims-text').innerText = `${inchW}" x ${inchH}"`;
-            const dpiInfo = document.getElementById('dpi-info');
-            const statusTitle = document.getElementById('status-title');
-            const targetW = 2400; 
-            const targetH = 3600;
+    const inchW = (w / 100).toFixed(2); 
+    const inchH = (h / 100).toFixed(2);
 
-            if (w < targetW || h < targetH) {
-                statusTitle.innerText = "WARNING: ORANGE VISIBLE";
-                statusTitle.className = "text-[10px] font-black uppercase text-orange-500 italic";
-                dpiInfo.innerHTML = 'LOW COVERAGE ⚠️';
-                dpiInfo.className = "text-[11px] font-black uppercase text-orange-500 italic";
-            } else {
-                statusTitle.innerText = "READY TO APPROVE ✓";
-                statusTitle.className = "text-[10px] font-black uppercase text-blue-600 italic";
-                dpiInfo.innerHTML = 'FULL COVERAGE APPLIED ✅';
-                dpiInfo.className = "text-[11px] font-black uppercase text-blue-600 italic";
-            }
-        }
+    document.getElementById('file-dims-text').innerText = `${inchW}" x ${inchH}"`;
+
+    const dpiInfo = document.getElementById('dpi-info');
+    const statusTitle = document.getElementById('status-title');
+
+    const targetW = parseFloat(document.getElementById('width-input').value) * 100;
+    const targetH = parseFloat(document.getElementById('height-input').value) * 100;
+
+    if (w < targetW || h < targetH) {
+        statusTitle.innerText = "WARNING: ORANGE VISIBLE";
+        statusTitle.className = "text-[10px] font-black uppercase text-orange-500 italic";
+        dpiInfo.innerHTML = 'LOW COVERAGE ⚠️';
+        dpiInfo.className = "text-[11px] font-black uppercase text-orange-500 italic";
+    } else {
+        statusTitle.innerText = "READY TO APPROVE ✓";
+        statusTitle.className = "text-[10px] font-black uppercase text-blue-600 italic";
+        dpiInfo.innerHTML = 'FULL COVERAGE APPLIED ✅';
+        dpiInfo.className = "text-[11px] font-black uppercase text-blue-600 italic";
+    }
+}
 
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
