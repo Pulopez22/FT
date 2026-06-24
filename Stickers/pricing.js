@@ -1,43 +1,35 @@
-// Stickers/pricing.js - Base de Datos Centralizada de Stickers (Precios Wholesale)
-
-// Usamos window.stickerPricing para que sea global y acumulativo
-window.stickerPricing = window.stickerPricing || {};
-
 window.stickerPricing = {
     "custom-sticker": {
-        "material": 0, // No aplica precio por sq/ft directo
-        "suffix": "unit",
-        // Matriz de precios por cantidad (Precio base Wholesale)
-        "quantities": {
-            "50": 18.00,
-            "100": 26.00,
-            "250": 47.50,
-            "500": 80.00
+        suffix: "sq/ft",
+        minOrder: 50,
+
+        material: {
+            matte: 2.00,
+            gloss: 2.75,
+            clear: 3.50
         }
     }
 };
 
-/**
- * Función global para obtener el precio "Desde" de un sticker
- * @param {string} productID - ID del producto (ej: 'custom-sticker')
- */
-function getStickerStartPrice(productID) {
-    const isWholesale = localStorage.getItem('userTier') === 'wholesale';
-    const multiplier = isWholesale ? 1 : 2;
-    
-    try {
-        const product = window.stickerPricing[productID];
-        if (!product) return 0;
+function getStickerSqftRate(productID, material) {
 
-        // Obtenemos la primera cantidad disponible (ej: 50)
-        const firstQtyKey = Object.keys(product.quantities)[0];
-        // Obtenemos el precio Wholesale de esa cantidad (ej: 18.00)
-        const baseWholesalePrice = product.quantities[firstQtyKey];
-        
-        // Retornamos el precio final según el tier del usuario
-        return baseWholesalePrice * multiplier;
-    } catch (e) {
-        console.error("Error obteniendo precio base de sticker:", productID, e);
-        return 0;
-    }
+    const isWholesale = localStorage.getItem('userTier') === 'wholesale';
+
+    const multiplier = isWholesale ? 1 : 2;
+
+    return window.stickerPricing[productID].material[material] * multiplier;
+}
+
+function calculateStickerPrice(productID, width, height, qty, material) {
+    const rate = getStickerSqftRate(productID, material);
+    const sqftEach = (width * height) / 144;
+    const subtotal = sqftEach * qty * rate;
+    const total = subtotal < 50 ? 50 : subtotal;
+
+    return {
+        total,
+        subtotal,
+        rate,
+        sqftEach
+    };
 }

@@ -107,10 +107,52 @@
                                 <div class="icon-box">◯</div> <span>Circle</span>
                             </button>
                         </div>
-                        <select id="finish-select" onchange="updateSummary()" class="w-full p-4 border border-gray-100 rounded-2xl bg-white font-black text-xs uppercase outline-none focus:border-black transition-all text-black">
-                            <option value="glossy">Glossy Finish</option>
-                            <option value="matte">Matte Finish</option>
-                        </select>
+                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4">
+                            Material Finish
+                        </h3>
+
+                        <div id="finish-options" class="options-container shadow-sm">
+
+                            <button onclick="selectItem(this,'finish')" class="selectable-item item-active">
+                                <div class="icon-box">
+                                    <i data-lucide="circle"></i>
+                                </div>
+
+                                <span
+                                    data-value="matte">
+                                    Matte White
+                                </span>
+
+                            </button>
+
+                            <button onclick="selectItem(this,'finish')" class="selectable-item">
+
+                                <div class="icon-box">
+                                    <i data-lucide="sparkles"></i>
+                                </div>
+
+                                <span
+                                    data-value="gloss">
+                                    Glossy Finish
+                                </span>
+
+                            </button>
+
+                            <button onclick="selectItem(this,'finish')" class="selectable-item">
+
+                                <div class="icon-box">
+                                    <i data-lucide="square"></i>
+                                </div>
+
+                                <span
+                                    data-value="clear">
+                                    Clear (Transparent)
+                                </span>
+
+                            </button>
+
+                        </div>
+                       
                     </section>
                 </div>
 
@@ -200,20 +242,20 @@
                 badgeContainer.innerHTML = `<div class="mt-4 text-[9px] font-black uppercase px-4 py-2 bg-gray-100 text-gray-400 rounded-full w-fit italic border">Public Retail Prices</div>`;
             }
 
-            renderQtyOptions(isWholesale);
+            renderQtyOptions();
             updateSummary();
         }
 
-        function renderQtyOptions(isWholesale) {
+        function renderQtyOptions() {
             const container = document.getElementById('qty-options');
-            const multiplier = isWholesale ? 1 : 2;
-            const product = window.stickerPricing['custom-sticker'];
-            if (!product) return;
-            container.innerHTML = Object.entries(product.quantities).map(([qty, price], index) => `
+
+            const quantities = [50, 100, 250, 500];
+
+            container.innerHTML = quantities.map((qty, index) => `
                 <button onclick="selectItem(this, 'qty')" class="selectable-item ${index === 0 ? 'item-active' : ''} justify-between">
-                    <span>${qty} pcs</span> 
-                    <span class="font-black">$${(price * multiplier).toFixed(2)}</span>
-                </button>`).join('');
+                    <span>${qty} pcs</span>
+                </button>
+            `).join('');
         }
 
         function toggleCart() {
@@ -282,40 +324,111 @@
             updateSummary(); 
         }
 
-        function updateSummary() {
-            const shape = document.querySelector('#shape-options .item-active span')?.innerText;
-            const finish = document.getElementById('finish-select')?.options[document.getElementById('finish-select').selectedIndex].text;
-            const qtyItem = document.querySelector('#qty-options .item-active');
-            if(!shape || !qtyItem) return;
-            const sizeBtn = document.querySelector('#size-options .item-active');
-            const sizeText = sizeBtn.innerText.includes('Custom') ? `${document.getElementById('custom-w').value}x${document.getElementById('custom-h').value} in` : sizeBtn.innerText;
-            document.getElementById('order-summary').innerText = `Sticker / ${shape} / ${finish} / ${sizeText} / ${qtyItem.querySelector('span').innerText}`;
-            document.getElementById('final-price').innerText = qtyItem.querySelector('.font-black').innerText;
+        function updateSummary(){
+
+            const shape =
+            document.querySelector('#shape-options .item-active span');
+
+            const finish =
+            document.querySelector('#finish-options .item-active span');
+
+            const qtyItem =
+            document.querySelector('#qty-options .item-active');
+
+            if(!shape || !finish || !qtyItem) return;
+
+            const sizeBtn =
+            document.querySelector('#size-options .item-active');
+
+            let width = 2;
+            let height = 2;
+
+            if(sizeBtn.innerText.includes('Custom')){
+
+                width =
+                parseFloat(document.getElementById('custom-w').value);
+
+                height =
+                parseFloat(document.getElementById('custom-h').value);
+
+            }
+
+            if(sizeBtn.innerText.includes('4 x 4')){
+
+                width = 4;
+                height = 4;
+
+            }
+
+            const qty =
+            parseInt(qtyItem.querySelector('span').innerText);
+
+            const result =
+            calculateStickerPrice(
+                "custom-sticker",
+                width,
+                height,
+                qty,
+                finish.dataset.value
+            );
+
+            document.getElementById("order-summary").innerHTML=
+
+        `Sticker /
+        ${shape.innerText} /
+        ${finish.innerText} /
+        ${width} x ${height} in /
+        ${qty} pcs`;
+
+            document.getElementById("final-price").innerText=
+                `$${result.total.toFixed(2)}`;
         }
 
         function handleFileAndRedirect(input) {
-            const file = input.files[0]; if (!file) return;
-            const shape = document.querySelector('#shape-options .item-active span').innerText;
-            const finish = document.getElementById('finish-select').options[document.getElementById('finish-select').selectedIndex].text;
+            const file = input.files[0];
+            if (!file) return;
+
+            const shape = document.querySelector('#shape-options .item-active span');
+            const finish = document.querySelector('#finish-options .item-active span');
             const sizeBtn = document.querySelector('#size-options .item-active');
-            const sizeValue = sizeBtn.innerText.includes('Custom') ? `${document.getElementById('custom-w').value}x${document.getElementById('custom-h').value}` : sizeBtn.innerText.split(' ')[0];
-            const qtyValue = document.querySelector('#qty-options .item-active span').innerText;
+            const qtyItem = document.querySelector('#qty-options .item-active');
+
+            const width = sizeBtn.innerText.includes('Custom')
+                ? parseFloat(document.getElementById('custom-w').value) || 0
+                : sizeBtn.innerText.includes('4 x 4') ? 4 : 2;
+
+            const height = sizeBtn.innerText.includes('Custom')
+                ? parseFloat(document.getElementById('custom-h').value) || 0
+                : sizeBtn.innerText.includes('4 x 4') ? 4 : 2;
+
+            const qty = parseInt(qtyItem.querySelector('span').innerText) || 1;
+            const sizeValue = `${width}x${height}`;
+
+            const details = `SHAPE: ${shape.innerText.toUpperCase()} | MATERIAL: ${finish.innerText.toUpperCase()} | SIZE: ${sizeValue.toUpperCase()} | QTY: ${qty} PCS`;
 
             const reader = new FileReader();
+
             reader.onload = (e) => {
                 localStorage.setItem('tempStickerImage', e.target.result);
-                // ESTANDARIZACIÓN DE DETALLES: String plano para el sidebar
-                const details = `SHAPE: ${shape.toUpperCase()} | FINISH: ${finish.toUpperCase()} | SIZE: ${sizeValue.toUpperCase()} | QTY: ${qtyValue.toUpperCase()}`;
-                
+
                 localStorage.setItem('tempStickerConfig', JSON.stringify({
-                    name: 'Custom Sticker', 
+                    name: 'Custom Sticker',
+                    shape: shape.innerText,
+                    finish: finish.dataset.value,
+                    finishText: finish.innerText,
+                    width: width,
+                    height: height,
+                    qty: qty,
                     details: details,
                     price: parseFloat(document.getElementById('final-price').innerText.replace(/[$,]/g, ''))
                 }));
+
                 window.location.href = 'editor.html';
             };
+
             reader.readAsDataURL(file);
         }
+        
     </script>
 </body>
 </html>

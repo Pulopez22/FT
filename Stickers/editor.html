@@ -177,6 +177,7 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
+    <script src="pricing.js"></script>
     <script>
         lucide.createIcons();
         const canvas = document.getElementById('sticker-canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -244,11 +245,15 @@
             
             document.getElementById('text-h').innerText = document.getElementById('text-v').innerText = `${size}"`;
             
-            const basePrice = 36;
-            const price = size > 2 ? (basePrice * (1 + (size - 2) * 0.15)) : basePrice;
-            const subtotal = price * qty;
-            
-            document.getElementById('price-display').innerText = `$${subtotal.toFixed(2)}`;
+            const result = calculateStickerPrice(
+                "custom-sticker",
+                size,
+                size,
+                qty,
+                currentMaterialType
+            );
+
+            document.getElementById('price-display').innerText = `$${result.total.toFixed(2)}`;
 
             const padding = 120;
             const targetSide = Math.max(originalImg.width, originalImg.height);
@@ -280,13 +285,25 @@
         }
 
         function applyMaterial(type, btn) {
+            currentMaterialType = type;
+
             document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
+
             container.classList.remove('active-gloss-brillo', 'material-clear', 'material-matte', 'material-glossy');
-            
-            if(type === 'matte') { container.classList.add('material-matte'); currentMaterialLabel = "MATTE WHITE"; }
-            else if(type === 'gloss') { container.classList.add('material-glossy', 'active-gloss-brillo'); currentMaterialLabel = "GLOSSY"; }
-            else if(type === 'clear') { container.classList.add('material-clear'); currentMaterialLabel = "CLEAR (TRANSPARENT)"; }
+
+            if(type === 'matte') { 
+                container.classList.add('material-matte'); 
+                currentMaterialLabel = "MATTE WHITE"; 
+            } else if(type === 'gloss') { 
+                container.classList.add('material-glossy', 'active-gloss-brillo'); 
+                currentMaterialLabel = "GLOSSY FINISH"; 
+            } else if(type === 'clear') { 
+                container.classList.add('material-clear'); 
+                currentMaterialLabel = "CLEAR (TRANSPARENT)"; 
+            }
+
+            renderAll();
             syncLayers();
         }
 
