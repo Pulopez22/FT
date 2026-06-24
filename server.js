@@ -250,7 +250,7 @@ app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
     }
 });
 
-app.post('/api/checkout/create-paypal-order', async (req, res) => {
+
 app.post('/api/checkout/create-paypal-order', async (req, res) => {
     try {
         const { items, userEmail } = req.body;
@@ -327,7 +327,36 @@ app.post('/api/checkout/capture-paypal-order', async (req, res) => {
         console.error("Error capturando pago:", err);
         res.status(500).json({ success: false, error: err.message });
     }
-})
+});
+
+app.get('/api/orders/track/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId.trim();
+
+        const order = await Order.findOne({
+            order_id: orderId
+        });
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            order_id: order.order_id,
+            status: order.status,
+            items: order.order_items || []
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
 });
 
 
