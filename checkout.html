@@ -352,7 +352,6 @@ function renderPayPalButtons() {
         function loadCheckoutData() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('order-items-list');
-            let subtotal = 0;
 
             document.getElementById('item-count').innerText = `${cart.length} ITEMS`;
 
@@ -364,6 +363,7 @@ function renderPayPalButtons() {
             }
 
             const groupTotals = {};
+            const groupMinimums = {};
 
             cart.forEach(item => {
                 const key = item.productId || item.name;
@@ -371,7 +371,19 @@ function renderPayPalButtons() {
                     ? parseFloat(item.price.replace(/[$,]/g, ''))
                     : Number(item.price) || 0;
 
+                const minOrder = Number(item.minOrder ?? 50);
+
                 groupTotals[key] = (groupTotals[key] || 0) + price;
+                groupMinimums[key] = minOrder;
+            });
+
+            let subtotal = 0;
+
+            Object.keys(groupTotals).forEach(key => {
+                const groupTotal = groupTotals[key];
+                const minOrder = groupMinimums[key] || 0;
+
+                subtotal += Math.max(groupTotal, minOrder);
             });
 
             container.innerHTML = cart.map((item, index) => {
@@ -381,11 +393,8 @@ function renderPayPalButtons() {
 
                 const groupKey = item.productId || item.name;
                 const groupTotal = groupTotals[groupKey];
-
-                const groupNeedsMinimum = groupTotal < 50;
-                const displayPrice = pNum;
-
-                subtotal += displayPrice;
+                const minOrder = groupMinimums[groupKey] || 0;
+                const groupNeedsMinimum = groupTotal < minOrder;
 
                 return `
                     <div class="border-b border-gray-50 pb-6 mb-6 last:border-0 text-black">
@@ -393,6 +402,7 @@ function renderPayPalButtons() {
                             <div class="w-16 h-16 bg-white border rounded-xl overflow-hidden shrink-0 flex items-center justify-center p-1">
                                 <img src="${item.image}" class="max-h-full max-w-full object-contain">
                             </div>
+
                             <div class="flex-grow">
                                 <div class="flex justify-between items-start">
                                     <span class="font-black text-[11px] uppercase italic leading-none">${item.name}</span>
@@ -400,20 +410,28 @@ function renderPayPalButtons() {
                                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 </div>
+
                                 <p class="text-[8px] text-gray-400 font-bold uppercase mt-1 leading-tight">
                                     ${item.details || item.specs || "Standard Specs"}
                                 </p>
-                                <div class="font-black text-sm mt-2">$${displayPrice.toFixed(2)}</div>
+
+                                <div class="font-black text-sm mt-2">$${pNum.toFixed(2)}</div>
                             </div>
                         </div>
-                    </div>`;
-            }).join('');
 
-            Object.keys(groupTotals).forEach(key => {
-                if (groupTotals[key] < 50) {
-                    subtotal += (50 - groupTotals[key]);
-                }
-            });
+                        ${groupNeedsMinimum ? `
+                            <div class="bg-red-50 border border-red-100 p-3 rounded-xl space-y-2 mt-2">
+                                <p class="text-[8px] font-black uppercase text-red-600 leading-tight">
+                                    ⚠️ This product group is below the $${minOrder.toFixed(2)} minimum.
+                                </p>
+                                <p class="text-[8px] font-bold uppercase text-red-500 leading-tight">
+                                    Current group total: $${groupTotal.toFixed(2)}. Checkout will charge $${minOrder.toFixed(2)} for this product group.
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
 
             const finalTotal = currentMethod === 'shipping'
                 ? subtotal + UPS_SHIPPING_FEE
