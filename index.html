@@ -86,9 +86,15 @@
         </div>
         <ul class="space-y-6 text-sm font-black uppercase italic text-black">
             <li><a href="index.html" onclick="toggleMobileMenu()">Wall Art</a></li>
-            <li><a href="Banners/banners.html" onclick="toggleMobileMenu()">Banners</a></li>
-            <li><a href="Stickers/stickers.html" onclick="toggleMobileMenu()">Stickers</a></li>
+            <li><a href="LargePrinting/largeprinting.html" onclick="toggleMobileMenu()">Large Format Printing</a></li>
             <li><a href="Rigid Signs/rigidsigns.html" onclick="toggleMobileMenu()">Rigid Signs</a></li>
+            <li><a href="Banners/banners.html" onclick="toggleMobileMenu()">Banners</a></li>
+            <li><a href="Stickers/stickers.html" onclick="toggleMobileMenu()">Stickers</a></li
+            <li><a href="Displays/displays.html" onclick="toggleMobileMenu()">Displays</a></li>
+            <li><a href="PrintedFabric/printed-fabric.html" onclick="toggleMobileMenu()">Printed Fabric</a></li>
+            <li><a href="AdvertisingFlags/advertising-flags.html" onclick="toggleMobileMenu()">Advertising Flags</a></li>
+
+            
         </ul>
     </div>
 
@@ -96,13 +102,15 @@
         <aside class="w-72 border-r h-[calc(100vh-73px)] sticky top-[73px] p-8 hidden lg:block bg-white overflow-y-auto text-black">
             <h3 class="text-[10px] font-black uppercase mb-8 text-gray-300 tracking-widest border-b pb-2">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase text-black">
-                <li class="sidebar-item cursor-pointer text-black"><a href="AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+               <li class="sidebar-item cursor-pointer text-black"><a href="LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
+                 <li class="sidebar-item cursor-pointer text-black"><a href="Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li> 
                 <li class="sidebar-item cursor-pointer text-black"><a href="Banners/banners.html" class="block w-full">Banners</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="Displays/displays.html" class="block w-full">Displays</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
                 <li class="sidebar-item cursor-pointer text-black"><a href="Stickers/stickers.html" class="block w-full">Stickers</a></li>
-                <li class="sidebar-item cursor-pointer text-black"><a href="Rigid Signs/rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+                
+                <li class="sidebar-item cursor-pointer text-black"><a href="Displays/displays.html" class="block w-full">Displays</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
+                <li class="sidebar-item cursor-pointer text-black"><a href="AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
+               
             </ul>
         </aside>
 
@@ -164,13 +172,14 @@
         lucide.createIcons();
 
         const products = [
-            { name: 'Advertising Flags', img: 'images/AdvertisingFlags..png', desc: 'Custom outdoor promotional flags.', url: 'AdvertisingFlags/advertising-flags.html' },
-            { name: 'Banners', img: 'images/Banners.png', desc: 'High-quality vinyl banners.', url: 'Banners/banners.html' },
-            { name: 'Displays', img: 'images/Displays.png', desc: 'Trade show and event booth displays.', url: 'Displays/displays.html' },
             { name: 'Large Format Printing', img: 'images/Large-Format-Printing.png', desc: 'Oversized high-definition prints.', url: 'LargePrinting/largeprinting.html' },
-            { name: 'Printed Fabric', img: 'images/Printed-Fabric.png', desc: 'Seamless silicone edge fabric graphics.', url: 'PrintedFabric/printed-fabric.html' },
+            { name: 'Rigid Signs', img: 'images/Rigid-Signs.png', desc: 'Durable foam core and plastic boards.', url: 'Rigid Signs/rigidsigns.html' },            
+            { name: 'Banners', img: 'images/Banners.png', desc: 'High-quality vinyl banners.', url: 'Banners/banners.html' },
             { name: 'Stickers', img: 'images/AMS_Stickers6..png', desc: 'Custom die-cut vinyl stickers.', url: 'Stickers/stickers.html' },
-            { name: 'Rigid Signs', img: 'images/Rigid-Signs.png', desc: 'Durable foam core and plastic boards.', url: 'Rigid Signs/rigidsigns.html' }
+            { name: 'Displays', img: 'images/Displays.png', desc: 'Trade show and event booth displays.', url: 'Displays/displays.html' },
+            { name: 'Printed Fabric', img: 'images/Printed-Fabric.png', desc: 'Seamless silicone edge fabric graphics.', url: 'PrintedFabric/printed-fabric.html' },
+            { name: 'Advertising Flags', img: 'images/AdvertisingFlags..png', desc: 'Custom outdoor promotional flags.', url: 'AdvertisingFlags/advertising-flags.html' },
+              
         ];
 
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }

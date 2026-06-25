@@ -6,6 +6,7 @@
     <title>Sticker Studio Pro - Premium Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; background-color: #f9fafb; color: #111827; overflow-x: hidden; }
@@ -207,6 +208,7 @@
 
     <script src="pricing.js"></script>
     <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
         lucide.createIcons();
         const canvas = document.getElementById('sticker-canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
         const master = document.getElementById('master-wrapper'), container = document.getElementById('sticker-container');
@@ -217,6 +219,14 @@
             originalImg.crossOrigin = "anonymous";
             originalImg.src = localStorage.getItem('tempStickerImage') || 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/star.svg';
             
+            const fileData = localStorage.getItem('tempStickerImage');
+            const fileType = localStorage.getItem('tempStickerFileType');
+
+            if (fileType === "application/pdf") {
+                renderPdfPreview(fileData);
+            } else {
+                originalImg.src = fileData || 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/star.svg';
+            }
             // CARGA DE CONFIGURACIÓN PREVIA
             const config = JSON.parse(localStorage.getItem('tempStickerConfig') || '{}');
             if (config.details) {
@@ -485,6 +495,35 @@
             document.getElementById('layer-gloss').style.backgroundPosition = `${50 + (x * 50)}% ${50 + (y * 50)}%`;
         });
         master.addEventListener('mouseleave', () => container.style.transform = 'none');
+
+        async function renderPdfPreview(pdfDataUrl) {
+            const pdfData = atob(pdfDataUrl.split(',')[1]);
+            const uint8Array = new Uint8Array(pdfData.length);
+
+            for (let i = 0; i < pdfData.length; i++) {
+                uint8Array[i] = pdfData.charCodeAt(i);
+            }
+
+            const pdf = await pdfjsLib.getDocument({ data: uint8Array }).promise;
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 1.5 });
+
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+
+            tempCanvas.width = viewport.width;
+            tempCanvas.height = viewport.height;
+
+            await page.render({
+                canvasContext: tempCtx,
+                viewport: viewport
+            }).promise;
+
+            originalImg.src = tempCanvas.toDataURL('image/png');
+            originalImg.onload = () => {
+                renderAll();
+            };
+        }
     </script>
 </body>
 </html>

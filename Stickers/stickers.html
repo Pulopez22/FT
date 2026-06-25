@@ -303,7 +303,7 @@
                             <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest text-black">Total</span>
                             <span id="final-price" class="text-4xl font-black italic tracking-tighter text-black">$0.00</span>
                         </div>
-                        <input type="file" id="file-input" class="hidden text-black" accept="image/*" onchange="handleFileAndRedirect(this)">
+                        <input type="file" id="file-input" class="hidden text-black" accept="image/*,.pdf" onchange="handleFileAndRedirect(this)">
                         <button id="main-upload-btn" onclick="document.getElementById('file-input').click()" class="w-full bg-black hover:bg-red-600 text-white font-black py-6 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl transition-all text-center">
                             Upload Artwork
                         </button>
@@ -512,6 +512,20 @@
             const file = input.files[0];
             if (!file) return;
 
+            const allowedTypes = [
+                "image/png",
+                "image/jpeg",
+                "image/jpg",
+                "application/pdf"
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+                alert("Please upload a JPG, PNG or PDF.");
+                input.value = "";
+                return;
+            }
+            if (!file) return;
+
             const shape = document.querySelector('#shape-options .item-active span');
             const finish = document.querySelector('#finish-options .item-active span');
     
@@ -531,6 +545,8 @@
             reader.onload = (e) => {
                 localStorage.setItem('tempStickerImage', e.target.result);
 
+                localStorage.setItem('tempStickerFileType', file.type);
+
                 localStorage.setItem('tempStickerConfig', JSON.stringify({
                     name: 'Custom Sticker',
                     shape: shape.innerText,
@@ -544,6 +560,7 @@
                 }));
 
                 window.location.href = 'editor.html';
+                
             };
 
             reader.readAsDataURL(file);
