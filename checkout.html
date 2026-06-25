@@ -353,18 +353,38 @@ function renderPayPalButtons() {
             const cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
             const container = document.getElementById('order-items-list');
             let subtotal = 0;
+
             document.getElementById('item-count').innerText = `${cart.length} ITEMS`;
 
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center py-10 text-gray-300 font-black uppercase italic text-[11px]">Bag is empty</div>`;
+                document.getElementById('subtotal-display').innerText = `$0.00`;
                 document.getElementById('final-price-display').innerText = `$0.00`;
                 return;
             }
 
+            const groupTotals = {};
+
+            cart.forEach(item => {
+                const key = item.productId || item.name;
+                const price = typeof item.price === 'string'
+                    ? parseFloat(item.price.replace(/[$,]/g, ''))
+                    : Number(item.price) || 0;
+
+                groupTotals[key] = (groupTotals[key] || 0) + price;
+            });
+
             container.innerHTML = cart.map((item, index) => {
-                let pNum = typeof item.price === 'string' ? parseFloat(item.price.replace(/[$,]/g, '')) : item.price;
-                const isTooLow = pNum < 50 && !item.isMinimumApplied;
-                const displayPrice = isTooLow ? 50.00 : pNum;
+                const pNum = typeof item.price === 'string'
+                    ? parseFloat(item.price.replace(/[$,]/g, ''))
+                    : Number(item.price) || 0;
+
+                const groupKey = item.productId || item.name;
+                const groupTotal = groupTotals[groupKey];
+
+                const groupNeedsMinimum = groupTotal < 50;
+                const displayPrice = pNum;
+
                 subtotal += displayPrice;
 
                 return `
@@ -376,26 +396,32 @@ function renderPayPalButtons() {
                             <div class="flex-grow">
                                 <div class="flex justify-between items-start">
                                     <span class="font-black text-[11px] uppercase italic leading-none">${item.name}</span>
-                                    <button onclick="removeItem(${index})" class="text-gray-300 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                    <button onclick="removeItem(${index})" class="text-gray-300 hover:text-red-600">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
                                 </div>
-                                <p class="text-[8px] text-gray-400 font-bold uppercase mt-1 leading-tight">${item.details || item.specs || "Standard Specs"}</p>
-                                <div class="font-black text-sm mt-2 ${isTooLow ? 'text-red-600' : 'text-black'}">$${displayPrice.toFixed(2)}</div>
+                                <p class="text-[8px] text-gray-400 font-bold uppercase mt-1 leading-tight">
+                                    ${item.details || item.specs || "Standard Specs"}
+                                </p>
+                                <div class="font-black text-sm mt-2">$${displayPrice.toFixed(2)}</div>
                             </div>
                         </div>
-                        ${isTooLow ? `
-                        <div class="bg-red-50 border border-red-100 p-3 rounded-xl space-y-2 mt-2">
-                            <p class="text-[8px] font-black uppercase text-red-600 leading-tight">⚠️ Small Order Adjustment: Item must be $50.00 minimum.</p>
-                            <div class="flex gap-2">
-                                <button onclick="confirmAdjustment(${index})" class="flex-1 bg-black text-white text-[7px] font-black uppercase py-1.5 rounded-lg italic">Accept $50</button>
-                                <button onclick="window.location.href='index.html'" class="flex-1 border border-black text-black text-[7px] font-black uppercase py-1.5 rounded-lg italic">Increase Size</button>
-                            </div>
-                        </div>` : ''}
                     </div>`;
             }).join('');
 
-            const finalTotal = currentMethod === 'shipping' ? (subtotal + UPS_SHIPPING_FEE) : subtotal;
+            Object.keys(groupTotals).forEach(key => {
+                if (groupTotals[key] < 50) {
+                    subtotal += (50 - groupTotals[key]);
+                }
+            });
+
+            const finalTotal = currentMethod === 'shipping'
+                ? subtotal + UPS_SHIPPING_FEE
+                : subtotal;
+
             document.getElementById('subtotal-display').innerText = `$${subtotal.toFixed(2)}`;
             document.getElementById('final-price-display').innerText = `$${finalTotal.toFixed(2)}`;
+
             lucide.createIcons();
         }
 
