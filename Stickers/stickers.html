@@ -11,12 +11,60 @@
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-x: hidden; color: #000; }
         .heavy-italic { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.05em; }
         .options-container { border-radius: 20px; overflow: hidden; border: 1px solid #f3f4f6; background-color: white; }
-        .selectable-item { padding: 16px; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; width: 100%; text-align: left; font-size: 13px; font-weight: 600; }
-        .selectable-item:last-child { border-bottom: none; }
-        .item-active { background-color: #f9fafb !important; font-weight: 900 !important; color: #000 !important; border-left: 4px solid #000; }
+        .selectable-item {
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .item-active {
+            background-color: #f9fafb !important;
+            font-weight: 900 !important;
+            color: #000 !important;
+            border-left: 4px solid #000;
+        }
+
+        .option-card {
+            min-height: 48px;
+            padding: 10px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            background: white;
+            font-weight: 800;
+            text-align: center;
+            transition: all .2s;
+            cursor: pointer;
+        }
+
+        .option-card.item-active {
+            background: #000 !important;
+            color: #fff !important;
+            border-color: #000;
+            border-left: none !important;
+        }
+        
         .icon-box { width: 32px; height: 32px; margin-right: 12px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background-color: #f3f4f6; font-size: 14px; }
-        #custom-size-panel { transition: all 0.3s ease; max-height: 0; overflow: hidden; opacity: 0; }
-        #custom-size-panel.open { max-height: 400px; opacity: 1; border-top: 1px solid #f3f4f6; padding: 20px; }
+       #custom-size-panel {
+        transition: all 0.3s ease;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+            }
+
+        #custom-size-panel.open {
+            max-height: 600px;
+            opacity: 1;
+            margin-top: 14px;
+            padding: 24px;
+            overflow: visible;
+        }
         .sidebar-item:hover { color: #000; padding-left: 6px; transition: all 0.2s ease; }
         
         #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
@@ -95,16 +143,16 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 text-black">
                 <div class="space-y-8 text-black">
                     <section class="text-black">
-                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4 text-black">1. Shape & Finish</h3>
+                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4 text-black">Shape</h3>
                         <div id="shape-options" class="options-container shadow-sm mb-4 text-black">
                             <button onclick="selectItem(this, 'shape')" class="selectable-item item-active">
-                                <div class="icon-box">🐱</div> <span>Contour Cut</span>
+                                <div <i data-lucide="scissors"></i>></div> <span>Contour Cut</span>
                             </button>
                             <button onclick="selectItem(this, 'shape')" class="selectable-item">
-                                <div class="icon-box">⬜</div> <span>Square</span>
+                                <div <i data-lucide="square"></i>></div> <span>Square</span>
                             </button>
                             <button onclick="selectItem(this, 'shape')" class="selectable-item">
-                                <div class="icon-box">◯</div> <span>Circle</span>
+                                <div <i data-lucide="circle"></i>></div> <span>Circle</span>
                             </button>
                         </div>
                         <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4">
@@ -141,7 +189,7 @@
                             <button onclick="selectItem(this,'finish')" class="selectable-item">
 
                                 <div class="icon-box">
-                                    <i data-lucide="square"></i>
+                                    <i data-lucide="layers"></i>
                                 </div>
 
                                 <span
@@ -154,41 +202,110 @@
                         </div>
                        
                     </section>
+                   
                 </div>
 
                 <div class="space-y-8 text-black">
                     <section class="text-black">
-                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4 text-black">2. Size & Quantity</h3>
-                        <div id="size-options" class="options-container shadow-sm mb-6 text-black">
-                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item item-active">2 x 2 in</button>
-                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item">4 x 4 in</button>
-                            <button onclick="toggleCustomControls(true); selectItem(this, 'size')" class="selectable-item text-red-600">Custom Size (MAX 11")</button>
-                            
-                            <div id="custom-size-panel" class="bg-gray-50 text-black">
-                                <div class="grid grid-cols-2 gap-4 mb-2 text-black">
-                                    <input type="number" id="custom-w" value="3.0" step="0.1" oninput="validateInputLimit(this)" class="p-3 border rounded-xl font-black text-center outline-none text-black">
-                                    <input type="number" id="custom-h" value="3.0" step="0.1" oninput="validateInputLimit(this)" class="p-3 border rounded-xl font-black text-center outline-none text-black">
+                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4 text-black">Size</h3>
+                        <div id="size-options" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item item-active justify-center rounded-2xl border">2" x 2"</button>
+                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item justify-center rounded-2xl border">3" x 3"</button>
+                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item justify-center rounded-2xl border">4" x 4"</button>
+                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item justify-center rounded-2xl border">5" x 5"</button>
+                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item justify-center rounded-2xl border">6" x 6"</button>
+                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item justify-center rounded-2xl border">8" x 8"</button>
+                            <button onclick="toggleCustomControls(false); selectItem(this, 'size')" class="selectable-item justify-center rounded-2xl border">10" x 10"</button>
+                            <button onclick="toggleCustomControls(true); selectItem(this, 'size')" class="selectable-item text-red-600 justify-center rounded-2xl border col-span-2 sm:col-span-3">+ Custom Size</button>
+                      
+                            <div id="custom-size-panel" class="col-span-2 sm:col-span-3 w-full bg-gray-50 text-black rounded-2xl p-6">
+                                <div class="grid grid-cols-2 gap-6 mb-4 text-black">
+
+                                    <div>
+                                        <label class="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">
+                                            Width
+                                        </label>
+                                          <input
+                                            type="number"
+                                            id="custom-w"
+                                            value="3.00"
+                                            min="1"
+                                            max="11"
+                                            step="0.25"
+                                            oninput="validateInputLimit(this)"
+                                            class="w-full min-w-[120px] h-16 bg-white text-black border-2 border-gray-300 rounded-2xl text-2xl font-black text-center">
+                                        </div>
+
+                                    <div>
+                                        <label class="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">
+                                            Height
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="custom-h"
+                                            value="3.00"
+                                            min="1"
+                                            max="11"
+                                            step="0.25"
+                                            oninput="validateInputLimit(this)"
+                                            class="w-full min-w-[120px] h-16 bg-white text-black border-2 border-gray-300 rounded-2xl text-2xl font-black text-center">
+                                        </div>
+
                                 </div>
+
+                                <p class="text-[9px] font-bold uppercase tracking-widest text-gray-400 text-center">
+                                    Max 11" × 11"
+                                </p>
                             </div>
                         </div>
 
+                        <h3 class="font-black text-[10px] uppercase text-gray-400 tracking-[0.2em] mb-4">
+                            Quantity
+                        </h3>
                         <div id="qty-options" class="options-container shadow-sm text-black"></div>
                     </section>
+
+                    
                 </div>
+
+                
 
                 <div class="lg:sticky lg:top-32 h-fit text-black">
                     <div class="bg-white p-8 border border-gray-100 rounded-[2.5rem] shadow-2xl text-black">
                         <h3 class="text-xl font-black mb-6 uppercase italic tracking-tighter text-black">Order Summary</h3>
-                        <div id="order-summary" class="bg-gray-50 p-5 rounded-2xl mb-8 border border-gray-100 text-[10px] font-black text-gray-500 uppercase leading-relaxed tracking-widest text-black">
-                            Sticker / Contour Cut / Glossy / 2x2 in / 50 pcs
+                        <div id="order-summary" class="bg-gray-50 p-5 rounded-2xl mb-8 border border-gray-100 text-black space-y-4">
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                            <span class="text-gray-400">Product</span>
+                            <span>Sticker</span>
                         </div>
+
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                            <span class="text-gray-400">Shape</span>
+                            <span id="summary-shape">Contour Cut</span>
+                        </div>
+
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                            <span class="text-gray-400">Material</span>
+                            <span id="summary-finish">Matte White</span>
+                        </div>
+
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                            <span class="text-gray-400">Size</span>
+                            <span id="summary-size">2 x 2 in</span>
+                        </div>
+
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                            <span class="text-gray-400">Quantity</span>
+                            <span id="summary-qty">50 pcs</span>
+                        </div>
+                    </div>
                         <div class="flex justify-between items-end mb-10 px-2 text-black">
                             <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest text-black">Total</span>
                             <span id="final-price" class="text-4xl font-black italic tracking-tighter text-black">$0.00</span>
                         </div>
                         <input type="file" id="file-input" class="hidden text-black" accept="image/*" onchange="handleFileAndRedirect(this)">
                         <button id="main-upload-btn" onclick="document.getElementById('file-input').click()" class="w-full bg-black hover:bg-red-600 text-white font-black py-6 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl transition-all text-center">
-                            Upload & Edit ↓
+                            Upload Artwork
                         </button>
                     </div>
                 </div>
@@ -247,15 +364,30 @@
         }
 
         function renderQtyOptions() {
+
             const container = document.getElementById('qty-options');
 
-            const quantities = [50, 100, 250, 500];
+            const quantities = [50,100,250,500];
 
-            container.innerHTML = quantities.map((qty, index) => `
-                <button onclick="selectItem(this, 'qty')" class="selectable-item ${index === 0 ? 'item-active' : ''} justify-between">
-                    <span>${qty} pcs</span>
+            container.className =
+                "grid grid-cols-2 gap-3";
+
+            container.innerHTML = quantities.map((qty,index)=>`
+
+                <button
+                    onclick="selectItem(this,'qty')"
+                    class="selectable-item
+                        justify-center
+                        rounded-2xl
+                        border
+                        ${index===0 ? 'item-active' : ''}">
+
+                    <span>${qty}</span>
+
                 </button>
+
             `).join('');
+
         }
 
         function toggleCart() {
@@ -316,7 +448,22 @@
             renderCart();
         }
 
-        function validateInputLimit(input) { if (parseFloat(input.value) > 11) input.value = 11; updateSummary(); }
+        function validateInputLimit(input) {
+            let value = parseFloat(input.value);
+
+            if (isNaN(value)) return;
+
+            // Redondear al múltiplo más cercano de 0.25
+            value = Math.round(value / 0.25) * 0.25;
+
+            // Límites
+            value = Math.max(1, Math.min(11, value));
+
+            // Mostrar siempre 2 decimales
+            input.value = value.toFixed(2);
+
+            updateSummary();
+        }
         function toggleCustomControls(show) { show ? document.getElementById('custom-size-panel').classList.add('open') : document.getElementById('custom-size-panel').classList.remove('open'); updateSummary(); }
         function selectItem(element, category) { 
             document.querySelectorAll(`#${category}-options .selectable-item`).forEach(i => i.classList.remove('item-active'));
@@ -328,37 +475,16 @@
 
             const shape =
             document.querySelector('#shape-options .item-active span');
-
             const finish =
             document.querySelector('#finish-options .item-active span');
-
             const qtyItem =
             document.querySelector('#qty-options .item-active');
 
             if(!shape || !finish || !qtyItem) return;
 
-            const sizeBtn =
-            document.querySelector('#size-options .item-active');
-
-            let width = 2;
-            let height = 2;
-
-            if(sizeBtn.innerText.includes('Custom')){
-
-                width =
-                parseFloat(document.getElementById('custom-w').value);
-
-                height =
-                parseFloat(document.getElementById('custom-h').value);
-
-            }
-
-            if(sizeBtn.innerText.includes('4 x 4')){
-
-                width = 4;
-                height = 4;
-
-            }
+            const selectedSize = getSelectedSize();
+            let width = selectedSize.width;
+            let height = selectedSize.height;
 
             const qty =
             parseInt(qtyItem.querySelector('span').innerText);
@@ -372,13 +498,11 @@
                 finish.dataset.value
             );
 
-            document.getElementById("order-summary").innerHTML=
-
-        `Sticker /
-        ${shape.innerText} /
-        ${finish.innerText} /
-        ${width} x ${height} in /
-        ${qty} pcs`;
+            updateStickerPreview(shape.innerText, width, height);
+            document.getElementById("summary-shape").innerText = shape.innerText;
+            document.getElementById("summary-finish").innerText = finish.innerText;
+            document.getElementById("summary-size").innerText = `${width} x ${height} in`;
+            document.getElementById("summary-qty").innerText = `${qty} pcs`;
 
             document.getElementById("final-price").innerText=
                 `$${result.total.toFixed(2)}`;
@@ -390,16 +514,12 @@
 
             const shape = document.querySelector('#shape-options .item-active span');
             const finish = document.querySelector('#finish-options .item-active span');
-            const sizeBtn = document.querySelector('#size-options .item-active');
+    
             const qtyItem = document.querySelector('#qty-options .item-active');
 
-            const width = sizeBtn.innerText.includes('Custom')
-                ? parseFloat(document.getElementById('custom-w').value) || 0
-                : sizeBtn.innerText.includes('4 x 4') ? 4 : 2;
-
-            const height = sizeBtn.innerText.includes('Custom')
-                ? parseFloat(document.getElementById('custom-h').value) || 0
-                : sizeBtn.innerText.includes('4 x 4') ? 4 : 2;
+            const selectedSize = getSelectedSize();
+            const width = selectedSize.width;
+            const height = selectedSize.height;
 
             const qty = parseInt(qtyItem.querySelector('span').innerText) || 1;
             const sizeValue = `${width}x${height}`;
@@ -428,7 +548,7 @@
 
             reader.readAsDataURL(file);
         }
-        
+
     </script>
 </body>
 </html>
