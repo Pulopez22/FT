@@ -57,6 +57,15 @@
         .theme-dark #cart-sidebar { background: #111827; border-left: 1px solid #374151; }
         .theme-dark #cart-sidebar .bg-white { background-color: #111827 !important; }
         .theme-dark #cart-sidebar .bg-gray-50 { background-color: #1f2937 !important; }
+        #cut-line-canvas {
+            position: absolute;
+            z-index: 45;
+            pointer-events: none;
+            max-width: 100%;
+            max-height: 100%;
+            filter: url(#cut-line-filter);
+            opacity: 0.75;
+        }
     </style>
 </head>
 <body class="theme-light flex flex-col min-h-screen">
@@ -65,20 +74,42 @@
         <filter id="matte-contour-filter" color-interpolation-filters="sRGB">
             <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
             <feComponentTransfer in="blur" result="limit"><feFuncA type="discrete" tableValues="0 0 0 1 1" /></feComponentTransfer>
-            <feMorphology in="limit" operator="dilate" radius="15" result="border" />
-            <feFlood flood-color="white" flood-opacity="1" result="pure-white"/>
+            <feMorphology id="matte-border-size" in="limit" operator="dilate" radius="10" result="border" />
+            <feFlood id="matte-border-color" flood-color="white" flood-opacity="1" result="pure-white"/>
             <feComposite in="pure-white" in2="border" operator="in" result="final-border" />
             <feMerge><feMergeNode in="final-border" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
         <filter id="clear-contour-filter" color-interpolation-filters="sRGB">
             <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
-            <feComponentTransfer in="blur" result="limit"><feFuncA type="discrete" tableValues="0 0 0 1 1" /></feComponentTransfer>
-            <feMorphology in="limit" operator="dilate" radius="15" result="border" />
-            <feFlood flood-color="white" flood-opacity="0.3" result="transparent-edge"/>
+            <feComponentTransfer in="blur" result="limit">
+                <feFuncA type="discrete" tableValues="0 0 0 1 1" />
+            </feComponentTransfer>
+            <feMorphology id="clear-border-size" in="limit" operator="dilate" radius="10" result="border" />
+            <feFlood id="clear-border-color" flood-color="white" flood-opacity="0.3" result="transparent-edge"/>
             <feComposite in="transparent-edge" in2="border" operator="in" result="final-border" />
-            <feMerge><feMergeNode in="final-border" /><feMergeNode in="SourceGraphic" /></feMerge>
+            <feMerge>
+                <feMergeNode in="final-border" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
         </filter>
-    </svg>
+        <filter id="cut-line-filter" color-interpolation-filters="sRGB">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur" />
+            <feComponentTransfer in="blur" result="limit">
+                <feFuncA type="discrete" tableValues="0 0 0 1 1" />
+            </feComponentTransfer>
+
+            <feMorphology id="cut-line-size" in="limit" operator="dilate" radius="18" result="outer" />
+            <feMorphology id="cut-line-inner" in="limit" operator="dilate" radius="12" result="inner" />
+
+            <feComposite in="outer" in2="inner" operator="out" result="cut-ring" />
+            <feFlood flood-color="#ff3b30" flood-opacity="0.8" result="cut-red" />
+            <feComposite in="cut-red" in2="cut-ring" operator="in" result="final-cut" />
+
+            <feMerge>
+                <feMergeNode in="final-cut" />
+            </feMerge>
+        </filter>
+    </svg>  
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
         <div class="flex items-center gap-4 md:gap-8">
@@ -95,7 +126,7 @@
 
     <div class="flex flex-grow w-full overflow-hidden">
         <main class="flex-grow bg-grid relative flex items-center justify-center overflow-hidden">
-            <div class="absolute top-8 left-8 z-50">
+           <div class="fixed top-28 left-8 z-[999]">
                 <div class="relative bg-gray-200 p-1 rounded-full flex w-36 shadow-inner cursor-pointer" onclick="toggleTheme()">
                     <div id="pill-bg" class="absolute top-1 left-1 bottom-1 w-[calc(50%-4px)] bg-black rounded-full transition-all duration-300"></div>
                     <button class="relative z-10 flex-1 py-1.5 text-[9px] font-900 uppercase italic tracking-widest text-white">Light</button>
@@ -111,8 +142,20 @@
                     <span class="measure-text" id="text-v" style="left: -85px; top: 50%; transform: translateY(-50%) rotate(-90deg); position:absolute;">2"</span>
                     
                     <canvas id="sticker-canvas"></canvas>
+                    <canvas id="cut-line-canvas"></canvas>
                     <div id="layer-gloss" class="effect-layer"></div>
                 </div>
+            </div>
+
+            <div id="cut-line-legend" class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white shadow-xl rounded-2xl px-6 py-4 border text-black z-50">
+                <div class="flex items-center gap-3 text-[11px] font-black uppercase">
+                    <span class="w-10 border-t-2 border-dashed border-red-500"></span>
+                    <span>Cut Line</span>
+                    <span class="text-gray-400 normal-case font-bold">(Final Cut)</span>
+                </div>
+                <p class="text-[10px] text-gray-400 font-bold mt-2">
+                    The red line shows where your sticker will be cut.
+                </p>
             </div>
         </main>
 
@@ -129,7 +172,9 @@
                         min="1"
                         max="11"
                         step="0.25"
-                        oninput="enforceLimit(this)"
+                        oninput="syncShapeDimensions(this); renderAll()"
+                        onchange="enforceLimit(this); syncShapeDimensions(this); renderAll()"
+                        onblur="enforceLimit(this); syncShapeDimensions(this); renderAll()"
                         class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold outline-none text-black">
                 </div>
 
@@ -142,18 +187,49 @@
                         min="1"
                         max="11"
                         step="0.25"
-                        oninput="enforceLimit(this)"
+                        oninput="syncShapeDimensions(this); renderAll()"
+                        onchange="enforceLimit(this); syncShapeDimensions(this); renderAll()"
+                        onblur="enforceLimit(this); syncShapeDimensions(this); renderAll()"
                         class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold outline-none text-black">
                 </div>
                 <div class="space-y-1">
                     <label class="text-[9px] font-black uppercase tracking-widest">Cut Type</label>
-                    <select id="select-shape" onchange="renderAll()" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-black">
+                    <select id="select-shape" onchange="handleShapeChange()" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-black">
                         <option value="contour cut">Contour Cut</option>
                         <option value="circle">Circle Cut</option>
                         <option value="square">Square Cut</option>
                     </select>
                 </div>
+
             </div>
+
+                <div id="border-options" class="space-y-4">
+                    <div class="space-y-3">
+                        <p class="text-[10px] font-black uppercase text-indigo-500 tracking-widest italic">
+                            Border Thickness
+                        </p>
+
+                        <div class="grid gap-2">
+                            <button class="border-card option-card active p-3 rounded-xl flex justify-between items-center"
+                                    onclick="setBorderThickness(10,this)">
+                                <span class="text-[10px] font-black uppercase italic">Standard</span>
+                                <span class="w-8 h-8 rounded-full bg-white border-[6px] border-gray-300"></span>
+                            </button>
+
+                            <button class="border-card option-card p-3 rounded-xl flex justify-between items-center"
+                                    onclick="setBorderThickness(5,this)">
+                                <span class="text-[10px] font-black uppercase italic">Thin</span>
+                                <span class="w-8 h-8 rounded-full bg-white border-[3px] border-gray-300"></span>
+                            </button>
+
+                            <button class="border-card option-card p-3 rounded-xl flex justify-between items-center"
+                                    onclick="setBorderThickness(15,this)">
+                                <span class="text-[10px] font-black uppercase italic">Medium</span>
+                                <span class="w-8 h-8 rounded-full bg-white border-[8px] border-gray-300"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
             <div class="space-y-3">
                 <p class="text-[10px] font-black uppercase text-indigo-500 tracking-widest italic">Material Finish</p>
@@ -210,10 +286,33 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
         lucide.createIcons();
+        const cutCanvas = document.getElementById('cut-line-canvas');
+        const cutCtx = cutCanvas.getContext('2d');
         const canvas = document.getElementById('sticker-canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
         const master = document.getElementById('master-wrapper'), container = document.getElementById('sticker-container');
         let originalImg = new Image();
         let currentMaterialLabel = "MATTE WHITE";
+        let currentBorderRadius = 10;
+        let currentBorderLabel = "Standard";
+
+
+        function setBorderThickness(radius, btn) {
+            currentBorderRadius = radius;
+            currentBorderLabel = btn.innerText.trim();
+
+            document.querySelectorAll(".border-card")
+                .forEach(card => card.classList.remove("active"));
+
+            btn.classList.add("active");
+
+            document.getElementById("matte-border-size").setAttribute("radius", radius);
+            document.getElementById("clear-border-size").setAttribute("radius", radius);
+
+            document.getElementById("cut-line-size").setAttribute("radius", radius + 8);
+            document.getElementById("cut-line-inner").setAttribute("radius", radius + 4);
+
+            renderAll();
+        }
 
         window.onload = function() {
             originalImg.crossOrigin = "anonymous";
@@ -296,12 +395,26 @@
             let height = parseFloat(document.getElementById('input-height').value) || 1;
             let qty = parseInt(document.getElementById('qty-input').value) || 1;
             let shape = document.getElementById('select-shape').value;
+            const borderOptions = document.getElementById("border-options");
 
+            if (shape === "contour cut") {
+                borderOptions.style.display = "block";
+            } else {
+                borderOptions.style.display = "none";
+            }
+
+            const widthInput = document.getElementById('input-width');
+        const heightInput = document.getElementById('input-height');
+
+        if (document.activeElement !== widthInput) {
             width = Math.max(1, Math.min(11, Math.round(width / 0.25) * 0.25));
-            height = Math.max(1, Math.min(11, Math.round(height / 0.25) * 0.25));
+            widthInput.value = width.toFixed(2);
+        }
 
-            document.getElementById('input-width').value = width.toFixed(2);
-            document.getElementById('input-height').value = height.toFixed(2);
+        if (document.activeElement !== heightInput) {
+            height = Math.max(1, Math.min(11, Math.round(height / 0.25) * 0.25));
+            heightInput.value = height.toFixed(2);
+        }
 
             document.getElementById('text-h').innerText = `${width.toFixed(2)}"`;
             document.getElementById('text-v').innerText = `${height.toFixed(2)}"`;
@@ -318,10 +431,15 @@
             document.getElementById('each-price').innerText =
             `$${(result.total / qty).toFixed(2)} each`;
 
-            const scale = 55;
+            const maxPreviewSize = 420;
+            const padding = 80;
+
+            const largestSide = Math.max(width, height);
+
+            const scale = maxPreviewSize / largestSide;
+
             const canvasW = width * scale;
             const canvasH = height * scale;
-            const padding = 120;
 
             canvas.width = canvasW + padding;
             canvas.height = canvasH + padding;
@@ -333,21 +451,64 @@
             ctx.save();
 
             if (shape === 'circle') {
-                const side = Math.min(canvasW, canvasH);
-                ctx.beginPath();
-                ctx.arc(canvas.width / 2, canvas.height / 2, side / 2, 0, Math.PI * 2);
-                ctx.clip();
-                drawCoverImage(ctx, originalImg, canvas.width / 2 - side / 2, canvas.height / 2 - side / 2, side, side);
-            } else if (shape === 'square') {
-                ctx.beginPath();
-                ctx.rect(drawX, drawY, canvasW, canvasH);
-                ctx.clip();
-                drawCoverImage(ctx, originalImg, drawX, drawY, canvasW, canvasH);
-            } else {
-                drawCoverImage(ctx, originalImg, drawX, drawY, canvasW, canvasH);
-            }
+    const side = Math.min(canvasW, canvasH);
+    const circleX = canvas.width / 2;
+    const circleY = canvas.height / 2;
+    const radius = side / 2;
+
+    // Crear base circular
+    ctx.beginPath();
+    ctx.arc(circleX, circleY, radius, 0, Math.PI * 2);
+    ctx.closePath();
+
+    ctx.fillStyle = getStickerBackground();
+    ctx.fill();
+
+    // Recortar la imagen dentro del círculo
+    ctx.clip();
+
+    drawCoverImage(
+        ctx,
+        originalImg,
+        circleX - radius,
+        circleY - radius,
+        side,
+        side
+    );
+
+    } else if (shape === 'square') {
+        // Crear base cuadrada/rectangular
+        ctx.fillStyle = getStickerBackground();
+        ctx.fillRect(drawX, drawY, canvasW, canvasH);
+
+        // Recortar la imagen dentro del cuadrado
+        ctx.beginPath();
+        ctx.rect(drawX, drawY, canvasW, canvasH);
+        ctx.clip();
+
+        drawCoverImage(
+            ctx,
+            originalImg,
+            drawX,
+            drawY,
+            canvasW,
+            canvasH
+        );
+
+    } else {
+        // Contour Cut: conservar transparencia original
+        drawCoverImage(
+            ctx,
+            originalImg,
+            drawX,
+            drawY,
+            canvasW,
+            canvasH
+        );
+    }
 
             ctx.restore();
+            drawCutLine(shape, drawX, drawY, canvasW, canvasH);
 
             container.style.width = `${canvas.width}px`;
             container.style.height = `${canvas.height}px`;
@@ -363,10 +524,18 @@
             ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
         }
 
+        function getStickerBackground() {
+            if (currentMaterialType === 'clear') {
+                return 'rgba(255, 255, 255, 0.25)';
+            }
+
+            return '#ffffff';
+        }
+
         function applyMaterial(type, btn) {
             currentMaterialType = type;
 
-            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.material-card').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
 
             container.classList.remove('active-gloss-brillo', 'material-clear', 'material-matte', 'material-glossy');
@@ -412,7 +581,8 @@
                 `CUT TYPE: ${shape}`,
                 `MATERIAL: ${currentMaterialLabel}`,
                 `SIZE: ${width.toFixed(2)}" x ${height.toFixed(2)}"`,
-                `QTY: ${qty} PCS`
+                `QTY: ${qty} PCS`,
+                `CUT BORDER: ${currentBorderLabel}`,
             ].join(" | ");
 
             const item = {
@@ -487,6 +657,95 @@
             renderCart();
         }
 
+        function drawCutLine(shape, x, y, w, h) {
+            cutCanvas.width = canvas.width;
+            cutCanvas.height = canvas.height;
+
+            cutCtx.clearRect(0, 0, cutCanvas.width, cutCanvas.height);
+            cutCtx.save();
+
+            // En círculo y cuadrado dibujamos la línea directamente
+            if (shape === 'circle') {
+                cutCanvas.style.filter = 'none';
+
+                const side = Math.min(w, h);
+                const radius = side / 2 + 4;
+
+                cutCtx.strokeStyle = '#ff3b30';
+                cutCtx.lineWidth = 3;
+                cutCtx.setLineDash([8, 6]);
+
+                cutCtx.beginPath();
+                cutCtx.arc(
+                    cutCanvas.width / 2,
+                    cutCanvas.height / 2,
+                    radius,
+                    0,
+                    Math.PI * 2
+                );
+                cutCtx.stroke();
+
+            } else if (shape === 'square') {
+                cutCanvas.style.filter = 'none';
+
+                cutCtx.strokeStyle = '#ff3b30';
+                cutCtx.lineWidth = 3;
+                cutCtx.setLineDash([8, 6]);
+
+                cutCtx.strokeRect(
+                    x - 4,
+                    y - 4,
+                    w + 8,
+                    h + 8
+                );
+
+            } else {
+                // Contour Cut: utilizar el filtro que sigue la silueta
+                cutCanvas.style.filter = 'url(#cut-line-filter)';
+
+                drawCoverImage(
+                    cutCtx,
+                    originalImg,
+                    x,
+                    y,
+                    w,
+                    h
+                );
+            }
+
+            cutCtx.restore();
+        }
+
+        function syncShapeDimensions(changedInput) {
+            const shape = document.getElementById('select-shape').value;
+
+            if (shape !== 'circle' && shape !== 'square') return;
+
+            const widthInput = document.getElementById('input-width');
+            const heightInput = document.getElementById('input-height');
+
+            if (changedInput.id === 'input-width') {
+                heightInput.value = changedInput.value;
+            } else {
+                widthInput.value = changedInput.value;
+            }
+        }
+
+        function handleShapeChange() {
+            const shape = document.getElementById('select-shape').value;
+            const widthInput = document.getElementById('input-width');
+            const heightInput = document.getElementById('input-height');
+
+            if (shape === 'circle' || shape === 'square') {
+                const size = parseFloat(widthInput.value) || 1;
+
+                widthInput.value = size.toFixed(2);
+                heightInput.value = size.toFixed(2);
+            }
+
+            renderAll();
+        }
+
         master.addEventListener('mousemove', (e) => {
             const rect = master.getBoundingClientRect();
             const x = (e.clientX - (rect.left + rect.width/2)) / (rect.width/2);
@@ -522,6 +781,7 @@
             originalImg.src = tempCanvas.toDataURL('image/png');
             originalImg.onload = () => {
                 renderAll();
+
             };
         }
     </script>
