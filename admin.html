@@ -146,28 +146,130 @@
                         <td colspan="6" class="p-6 border-x border-b rounded-b-[2rem]">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 ${order.order_items ? order.order_items.map(item => `
-                                    <div class="flex gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-                                       
-                                        <div class="flex-grow">
-    <div class="flex justify-between items-start mb-2">
-        <h4 class="font-black text-xs uppercase italic">${item.name}</h4>
-        <span class="text-[10px] font-black text-gray-400">$${item.price}</span>
-    </div>
-    
-    <ul class="text-[9px] text-gray-500 font-bold uppercase space-y-1 mb-4">
-        ${item.details ? item.details.split(/[|\n]/).map(d => d.trim()).filter(d => d).map(d => `
-            <li class="flex items-start gap-1">
-                <span class="text-red-600">•</span> ${d}
-            </li>
-        `).join('') : '<li>Standard Specs</li>'}
-    </ul>
+    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+        <div class="flex flex-col sm:flex-row gap-5">
 
-    <div class="flex gap-3">
-        ${item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="bg-black text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase italic hover:bg-red-600 transition-colors">Download Art</a>` : ''}
-    </div>
-</div>
+            <div class="w-full sm:w-32 h-32 bg-gray-50 border rounded-2xl flex items-center justify-center overflow-hidden shrink-0">
+                ${
+                    item.productionImage || item.image
+                        ? `
+                            <img
+                                src="${item.productionImage || item.image}"
+                                alt="${item.name || 'Production preview'}"
+                                class="max-w-full max-h-full object-contain p-2">
+                        `
+                        : `
+                            <div class="text-[9px] font-black uppercase text-gray-300 text-center px-3">
+                                No Preview
+                            </div>
+                        `
+                }
+            </div>
+
+            <div class="flex-grow min-w-0">
+
+                <div class="flex justify-between items-start gap-4 mb-3">
+                    <h4 class="font-black text-xs uppercase italic">
+                        ${item.name || 'Product'}
+                    </h4>
+
+                    <span class="text-[10px] font-black text-gray-400 shrink-0">
+                        $${Number(item.price || 0).toFixed(2)}
+                    </span>
+                </div>
+
+                <ul class="text-[9px] text-gray-500 font-bold uppercase space-y-1 mb-4">
+                    ${
+                        item.details
+                            ? item.details
+                                .split(/[|\n]/)
+                                .map(detail => detail.trim())
+                                .filter(Boolean)
+                                .map(detail => `
+                                    <li class="flex items-start gap-1">
+                                        <span class="text-red-600">•</span>
+                                        <span>${detail}</span>
+                                    </li>
+                                `)
+                                .join('')
+                            : '<li>Standard Specs</li>'
+                    }
+                </ul>
+
+                ${
+                    item.productionImage
+                        ? `
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-2 bg-gray-50 rounded-2xl p-4 mb-4 text-[9px] font-black uppercase">
+                                <div>
+                                    <span class="text-gray-400">Cut</span>
+                                    <div>${item.cutType || 'Contour Cut'}</div>
+                                </div>
+
+                                <div>
+                                    <span class="text-gray-400">Border</span>
+                                    <div>${item.borderThickness || 'Standard'}</div>
+                                </div>
+
+                                <div>
+                                    <span class="text-gray-400">Size</span>
+                                    <div>
+                                        ${Number(item.width || 0).toFixed(2)}"
+                                        ×
+                                        ${Number(item.height || 0).toFixed(2)}"
                                     </div>
-                                `).join('') : ''}
+                                </div>
+
+                                <div>
+                                    <span class="text-gray-400">Quantity</span>
+                                    <div>${item.quantity || 1}</div>
+                                </div>
+                            </div>
+                        `
+                        : ''
+                }
+
+                <div class="flex gap-3 flex-wrap">
+
+                    ${
+                        item.productionImage
+                            ? `
+                                <a
+                                    href="${item.productionImage}"
+                                    target="_blank"
+                                    rel="noopener"
+                                    class="bg-red-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase italic hover:bg-black transition-colors">
+                                    Open Production File
+                                </a>
+
+                                <a
+                                    href="${item.productionImage}"
+                                    download="production-${order.order_id || 'order'}.png"
+                                    class="bg-black text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase italic hover:bg-red-600 transition-colors">
+                                    Download Production File
+                                </a>
+                            `
+                            : ''
+                    }
+
+                    ${
+                        item.fileUrl
+                            ? `
+                                <a
+                                    href="${item.fileUrl}"
+                                    target="_blank"
+                                    rel="noopener"
+                                    class="border border-black text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase italic hover:bg-black hover:text-white transition-colors">
+                                    Original Art
+                                </a>
+                            `
+                            : ''
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+`).join('') : ''}
                             </div>
                         </td>
                     </tr>
