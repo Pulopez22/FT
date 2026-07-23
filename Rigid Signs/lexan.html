@@ -72,11 +72,15 @@
             <span class="heavy-italic text-xl italic">Navigation</span>
             <button onclick="toggleMobileMenu()"><i data-lucide="x" class="w-8 h-8 text-black"></i></button>
         </div>
-        <ul class="space-y-6 text-sm font-black uppercase italic">
-            <li><a href="../index.html">Wall Art</a></li>
-            <li><a href="../Banners/banners.html">Banners</a></li>
-            <li><a href="../Displays/displays.html">Displays</a></li>
-            <li><a href="largeprinting.html" class="text-red-600">Large Format</a></li>
+        <ul class="space-y-6 text-sm font-black uppercase italic text-black">
+            <li><a href="../index.html" onclick="toggleMobileMenu()">Wall Art</a></li>
+            <li><a href="../LargePrinting/largeprinting.html" onclick="toggleMobileMenu()">Large Format Printing</a></li>
+            <li><a href="rigidsigns.html" onclick="toggleMobileMenu()">Rigid Signs</a></li>
+            <li><a href="../Banners/banners.html" onclick="toggleMobileMenu()">Banners</a></li>
+            <li><a href="../Stickers/stickers.html" onclick="toggleMobileMenu()">Stickers</a></li>
+            <li><a href="../Displays/displays.html" onclick="toggleMobileMenu()">Displays</a></li>
+            <li><a href="../PrintedFabric/printed-fabric.html" onclick="toggleMobileMenu()">Printed Fabric</a></li>
+            <li><a href="../AdvertisingFlags/advertising-flags.html" onclick="toggleMobileMenu()">Advertising Flags</a></li>            
         </ul>
     </div>
 
@@ -84,13 +88,13 @@
         <aside class="sidebar-fixed p-10 hidden lg:block text-black">
             <h3 class="text-[10px] font-black uppercase mb-10 text-gray-300 tracking-[0.2em] border-b pb-4 text-black text-black">Product Categories</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
                 <li class="sidebar-item cursor-pointer"><a href="../LargePrinting/largeprinting.html" class="block w-full">Large Format Printing</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
-                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
                 <li class="sidebar-item cursor-pointer active text-black"><a href="rigidsigns.html" class="block w-full">Rigid Signs</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Banners/banners.html" class="block w-full">Banners</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Stickers/stickers.html" class="block w-full">Stickers</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../Displays/displays.html" class="block w-full">Displays</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../PrintedFabric/printed-fabric.html" class="block w-full">Printed Fabric</a></li>
+                <li class="sidebar-item cursor-pointer"><a href="../AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
             </ul>
         </aside>
 
