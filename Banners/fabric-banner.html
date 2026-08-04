@@ -115,7 +115,7 @@
                             <div class="text-[14px] leading-[1.8] space-y-6 font-medium text-black">
                                 <p>Our printable fabric is a three layered woven fabric that is 100% Polyester. This fabric is wrinkle resistant with minimal light reflection.</p>
                                 <ul class="list-disc pl-5 space-y-3 text-[13px]">
-                                    <li>Maximum size 8’ x 100’ (96" Width).</li>
+                                    <li>Custom sizes available.</li>
                                     <li>High resolution digitally printed.</li>
                                     <li>Washable and dye sublimation.</li>
                                 </ul>
@@ -175,15 +175,14 @@
                             </div>
 
                             <div class="relative">
-                                <div id="limit-msg" class="hidden absolute -top-8 left-0 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest">Limit reached (96"x1200")</div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Width (Inches)</label>
-                                        <input type="number" id="width-input" value="24" oninput="validateSize()" class="custom-input">
+                                        <input type="number" id="width-input" value="24" min="0.01" max="40000" step="0.01" oninput="updateWhileTyping()" onblur="validateSize()" class="custom-input">
                                     </div>
                                     <div>
                                         <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Height (Inches)</label>
-                                        <input type="number" id="height-input" value="24" oninput="validateSize()" class="custom-input">
+                                        <input type="number" id="height-input" value="24" min="0.01" max="40000" step="0.01" oninput="updateWhileTyping()" onblur="validateSize()" class="custom-input">
                                     </div>
                                 </div>
                             </div>
@@ -265,6 +264,7 @@
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script src="pricing.js"></script>
+    <script src="banner-common.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         lucide.createIcons();
@@ -298,26 +298,6 @@
             calculatePrice();
         }
 
-        function validateSize() {
-    const w = document.getElementById('width-input');
-    const h = document.getElementById('height-input');
-    const msg = document.getElementById('limit-msg');
-    
-    // Límite de tela: 96" de ancho
-    if (parseFloat(w.value) > 96) { 
-        w.value = 96; 
-        msg.classList.remove('hidden'); 
-        setTimeout(()=>msg.classList.add('hidden'), 2000); 
-    }
-    if (parseFloat(h.value) > 1200) { 
-        h.value = 1200; 
-        msg.classList.remove('hidden'); 
-        setTimeout(()=>msg.classList.add('hidden'), 2000); 
-    }
-    updateOrderedLabels();
-    calculatePrice();
-}
-
         function calculatePrice() {
     const w = parseFloat(document.getElementById('width-input').value) || 0;
     const h = parseFloat(document.getElementById('height-input').value) || 0;
@@ -349,23 +329,6 @@
         })}`;
     }
 }
-
-        function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('width-input').value) || 0;
-            const h = parseFloat(document.getElementById('height-input').value) || 0;
-            if(document.getElementById('ordered-w-label')) document.getElementById('ordered-w-label').innerText = w;
-            if(document.getElementById('ordered-h-label')) document.getElementById('ordered-h-label').innerText = h;
-            const areaBox = document.getElementById('printing-area');
-            if (w > 0 && h > 0) {
-                if (w >= h) {
-                    areaBox.style.width = "300px";
-                    areaBox.style.height = (300 * (h / w)) + "px";
-                } else {
-                    areaBox.style.height = "300px";
-                    areaBox.style.width = (300 * (w / h)) + "px";
-                }
-            }
-        }
 
         async function processFile(input) {
             if (!input.files || !input.files[0]) return;

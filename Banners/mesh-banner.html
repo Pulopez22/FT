@@ -114,7 +114,7 @@
                             <div class="text-[14px] leading-[1.8] space-y-6 font-medium text-black">
                                 <p>Mesh banners are printed on 10 oz. heavy-duty banner material. Specially designed for large outdoor displays where wind load is a factor.</p>
                                 <ul class="list-disc pl-5 space-y-3 text-[13px] text-black">
-                                    <li>Single piece maximum size: 10’ x 145’ (120" x 1740")</li>
+                                    <li>Available in custom dimensions.</li>
                                     <li>High resolution digitally printed at 720 x 720</li>
                                     <li>Wind-resistant perforated material</li>
                                     <li>Durable and waterproof for long-term outdoor use</li>
@@ -158,15 +158,14 @@
 </div>
 
 <div class="relative">
-                                <div id="limit-msg" class="hidden absolute -top-8 left-0 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest text-white">Limit reached (120"x1740")</div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Width (Inches)</label>
-                                        <input type="number" id="width-input" value="24" oninput="validateSize()" class="custom-input">
+                                        <input type="number" id="width-input" value="24" min="0.01" max="40000" step="0.01" oninput="updateWhileTyping()" onblur="validateSize()" class="custom-input">
                                     </div>
                                     <div>
                                         <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Height (Inches)</label>
-                                        <input type="number" id="height-input" value="24" oninput="validateSize()" class="custom-input">
+                                        <input type="number" id="height-input" value="24" min="0.01" max="40000" step="0.01" oninput="updateWhileTyping()" onblur="validateSize()" class="custom-input">
                                     </div>
                                 </div>
                             </div>
@@ -244,6 +243,7 @@
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script src="pricing.js"></script>
+    <script src="banner-common.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         lucide.createIcons();
@@ -270,26 +270,6 @@
             }
             calculatePrice();
         }
-
-        function validateSize() {
-    const w = document.getElementById('width-input');
-    const h = document.getElementById('height-input');
-    const msg = document.getElementById('limit-msg');
-    
-    // Límite para Mesh Banner es 120" de ancho
-    if (parseFloat(w.value) > 120) { 
-        w.value = 120; 
-        msg.classList.remove('hidden'); 
-        setTimeout(()=>msg.classList.add('hidden'), 2000); 
-    }
-    if (parseFloat(h.value) > 1740) { 
-        h.value = 1740; 
-        msg.classList.remove('hidden'); 
-        setTimeout(()=>msg.classList.add('hidden'), 2000); 
-    }
-    updateOrderedLabels();
-    calculatePrice();
-}
 
         function calculatePrice() {
     const w = parseFloat(document.getElementById('width-input').value) || 0;
@@ -319,18 +299,6 @@
         })}`;
     }
 }
-
-        function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('width-input').value) || 0;
-            const h = parseFloat(document.getElementById('height-input').value) || 0;
-            document.getElementById('ordered-w-label').innerText = w;
-            document.getElementById('ordered-h-label').innerText = h;
-            const areaBox = document.getElementById('printing-area');
-            if (w > 0 && h > 0) {
-                if (w >= h) { areaBox.style.width = "300px"; areaBox.style.height = (300 * (h / w)) + "px"; }
-                else { areaBox.style.height = "300px"; areaBox.style.width = (300 * (w / h)) + "px"; }
-            }
-        }
 
         async function processFile(input) {
             if (!input.files || !input.files[0]) return;

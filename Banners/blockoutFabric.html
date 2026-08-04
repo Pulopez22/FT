@@ -176,11 +176,11 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black text-black">Width (Inches)</label>
-                                    <input type="number" id="width-input" value="24" oninput="validateSize()" class="custom-input text-black text-black">
+                                    <input type="number" id="width-input" value="24" min="0.01" max="40000" step="0.01" oninput="updateWhileTyping()" onblur="validateSize()" class="custom-input">
                                 </div>
                                 <div>
                                     <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest text-black text-black">Height (Inches)</label>
-                                    <input type="number" id="height-input" value="24" oninput="validateSize()" class="custom-input text-black text-black">
+                                    <input type="number" id="height-input" value="24" min="0.01" max="40000" step="0.01" oninput="updateWhileTyping()" onblur="validateSize()" class="custom-input text-black text-black">
                                 </div>
                             </div>
 
@@ -230,7 +230,6 @@
 </div>
 
                             <div class="price-row border-none pt-8 relative text-black text-black">
-                                <div id="limit-msg" class="hidden absolute -top-4 left-0 bg-red-600 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-full z-20 shadow-xl italic tracking-widest text-white">Limit reached (96"x1800")</div>
                                 <div class="flex flex-col text-black text-black text-black">
                                     <span class="text-[11px] font-black uppercase tracking-widest italic text-black leading-none">Estimated Total</span>
                                     <span class="text-[10px] font-bold text-gray-400 uppercase mt-1" id="area-display">4.00 sq ft</span>
@@ -270,6 +269,7 @@
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script src="pricing.js"></script>
+    <script src="banner-common.js"></script>
     <script>
         lucide.createIcons();
         
@@ -302,23 +302,6 @@
             calculatePrice();
         }
 
-        function validateSize() {
-    const w = document.getElementById('width-input');
-    const h = document.getElementById('height-input');
-    const msg = document.getElementById('limit-msg');
-    
-    // Límite de Blockout Fabric: 96"
-    if (parseFloat(w.value) > 96) { w.value = 96; msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 2000); }
-    if (parseFloat(h.value) > 1800) { h.value = 1800; msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 2000); }
-    
-    // Actualizar etiquetas de la caja naranja
-    document.getElementById('ordered-w-label').innerText = w.value;
-    document.getElementById('ordered-h-label').innerText = h.value;
-
-    updateOrderedLabels(); 
-    calculatePrice();
-}
-
         function calculatePrice() {
             const w = parseFloat(document.getElementById('width-input').value) || 0;
             const h = parseFloat(document.getElementById('height-input').value) || 0;
@@ -343,34 +326,15 @@
 let isPdf = false;
 let originalW = 0, originalH = 0;
 
-function updateOrderedLabels() {
-    const w = parseFloat(document.getElementById('width-input').value) || 0;
-    const h = parseFloat(document.getElementById('height-input').value) || 0;
-    
-    if(document.getElementById('ordered-w-label')) document.getElementById('ordered-w-label').innerText = w;
-    if(document.getElementById('ordered-h-label')) document.getElementById('ordered-h-label').innerText = h;
-    
-    const areaBox = document.getElementById('printing-area');
-    if (w > 0 && h > 0) {
-        if (w >= h) {
-            areaBox.style.width = "300px";
-            areaBox.style.height = (300 * (h / w)) + "px";
-        } else {
-            areaBox.style.height = "300px";
-            areaBox.style.width = (300 * (w / h)) + "px";
-        }
-    }
-}
+function updateWhileTyping() {
+    const width = document.getElementById('width-input').value;
+    const height = document.getElementById('height-input').value;
 
-function validateSize() {
-    const w = document.getElementById('width-input');
-    const h = document.getElementById('height-input');
-    const msg = document.getElementById('limit-msg');
-    
-    if (parseFloat(w.value) > 96) { w.value = 96; msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 2000); }
-    if (parseFloat(h.value) > 1800) { h.value = 1800; msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 2000); }
-    
-    updateOrderedLabels(); // <--- Agrega esto aquí para que el cuadro naranja responda al teclado
+    if (width === "" || height === "") {
+        return;
+    }
+
+    updateOrderedLabels();
     calculatePrice();
 }
 

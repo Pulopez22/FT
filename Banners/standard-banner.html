@@ -113,7 +113,7 @@
                             <div class="text-[14px] leading-[1.8] space-y-6 font-medium text-black">
                                 <p>We use a premium heavy weight 13 oz. scrim vinyl banner. Suitable for billboards, building wraps, trade show signage, and parades.</p>
                                 <ul class="list-disc pl-5 space-y-3 text-[13px]">
-                                    <li>Single piece maximum size: 5ft x 145ft (60" Width)</li>
+                                    <li>Available in custom dimensions.</li>
                                     <li>Full Color Digitally printed High Resolution</li>
                                     <li>Indoor and outdoor use, waterproof and UV safe</li>
                                 </ul>
@@ -159,12 +159,12 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Width (Max 60")</label>
-                                    <input type="number" id="w-input" value="24" oninput="validateSize()" class="custom-input text-black">
+                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Width</label>
+                                    <input type="number" id="width-input" value="24" min="0.01" max="40000" step="0.01" oninput="updateWhileTyping()" onblur="validateSize()" class="custom-input">
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Height (Inches)</label>
-                                    <input type="number" id="h-input" value="24" oninput="validateSize()" class="custom-input text-black">
+                                    <label class="text-[10px] font-black uppercase text-gray-400 block mb-3 italic tracking-widest">Height</label>
+                                    <input type="number" id="height-input" value="24" min="0.01" max="40000" step="0.01" oninput="updateWhileTyping()" onblur="validateSize()" class="custom-input text-black">
                                 </div>
                             </div>
 
@@ -246,6 +246,7 @@
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script src="pricing.js"></script>
+    <script src="banner-common.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         lucide.createIcons();
@@ -273,19 +274,9 @@
             calculatePrice();
         }
 
-        function validateSize() {
-            const w = document.getElementById('w-input');
-            const h = document.getElementById('h-input');
-            const msg = document.getElementById('limit-msg');
-            if (parseFloat(w.value) > 60) { w.value = 60; msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 2000); }
-            if (parseFloat(h.value) > 1740) { h.value = 1740; msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 2000); }
-            updateOrderedLabels();
-            calculatePrice();
-        }
-
        function calculatePrice() {
-    const w = parseFloat(document.getElementById('w-input').value) || 0;
-    const h = parseFloat(document.getElementById('h-input').value) || 0;
+    const w = parseFloat(document.getElementById('width-input').value) || 0;
+    const h = parseFloat(document.getElementById('height-input').value) || 0;
     const qty = parseInt(document.getElementById('qty-input').value) || 1;
     
     const finishVal = document.getElementById('finish-select').value;
@@ -309,17 +300,6 @@
     })}`;
 }
 
-        function updateOrderedLabels() {
-            const w = parseFloat(document.getElementById('w-input').value) || 0;
-            const h = parseFloat(document.getElementById('h-input').value) || 0;
-            if(document.getElementById('ordered-w-label')) document.getElementById('ordered-w-label').innerText = w;
-            if(document.getElementById('ordered-h-label')) document.getElementById('ordered-h-label').innerText = h;
-            const areaBox = document.getElementById('printing-area');
-            if (w > 0 && h > 0) {
-                if (w >= h) { areaBox.style.width = "300px"; areaBox.style.height = (300 * (h / w)) + "px"; }
-                else { areaBox.style.height = "300px"; areaBox.style.width = (300 * (w / h)) + "px"; }
-            }
-        }
 
         async function processFile(input) {
             if (!input.files || !input.files[0]) return;
