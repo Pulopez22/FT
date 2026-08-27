@@ -4,7 +4,7 @@
   "description": "Square Foot Printing Server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node launcher.js"
   },
   "repository": {
     "type": "git",
