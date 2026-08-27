@@ -35,7 +35,6 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
-const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
 const paypal = require('@paypal/checkout-server-sdk');
 
