@@ -1,4 +1,33 @@
 require('dotenv').config();
+const fs = require('fs');
+const net = require('net');
+
+const mongoTestHost =
+  'ac-ercnu4d-shard-00-00.lce6y98.mongodb.net';
+
+const mongoTest = net.createConnection({
+  host: mongoTestHost,
+  port: 27017,
+  timeout: 10000
+});
+
+mongoTest.on('connect', () => {
+  console.log('✅ MongoDB TCP 27017 reachable from GoDaddy');
+  mongoTest.destroy();
+});
+
+mongoTest.on('timeout', () => {
+  console.log('❌ MongoDB TCP 27017 TIMEOUT from GoDaddy');
+  mongoTest.destroy();
+});
+
+mongoTest.on('error', (err) => {
+  console.log(
+    '❌ MongoDB TCP connection error:',
+    err.code,
+    err.message
+  );
+});
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
