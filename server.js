@@ -180,6 +180,32 @@ const Order = mongoose.model(
 );
 
 
+const PricingOverride = mongoose.model(
+    'PricingOverride',
+    new mongoose.Schema({
+        path: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true
+        },
+        value: {
+            type: Number,
+            required: true
+        },
+        updatedBy: {
+            type: String,
+            default: ''
+        },
+        updatedAt: {
+            type: Date,
+            default: Date.now
+        }
+    })
+);
+
+
+
 // -----------------------------------------------------
 // STRIPE WEBHOOK
 // -----------------------------------------------------
@@ -979,6 +1005,119 @@ app.post(
                     error:
                         error.message
                 });
+        }
+    }
+);
+
+
+
+// -----------------------------------------------------
+// PRICING OVERRIDES
+// -----------------------------------------------------
+
+// Public read endpoint. The storefront will use this in the next step.
+app.get('/api/pricing-overrides', async (req, res) => {
+    try {
+        const records = await PricingOverride.find().sort({ path: 1 }).lean();
+        res.json(records.map(record => ({
+            path: record.path,
+            value: record.value,
+            updatedAt: record.updatedAt
+        })));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.put(
+    '/api/admin/pricing-overrides',
+    authMiddleware,
+    async (req, res) => {
+        try {
+            if (req.user.role !== 'admin') {
+                return res.status(403).json({ msg: 'Forbidden' });
+            }
+
+            const changes = Array.isArray(req.body?.changes)
+                ? req.body.changes
+                : [];
+
+            if (!changes.length) {
+                return res.status(400).json({ msg: 'No pricing changes supplied.' });
+            }
+
+            const safePath = /^[A-Za-z0-9_$.-]+$/;
+            const operations = [];
+
+            for (const change of changes) {
+                const path = String(change?.path || '').trim();
+                const value = Number(change?.value);
+
+                if (!path || !safePath.test(path) || !Number.isFinite(value) || value < 0) {
+                    return res.status(400).json({
+                        msg: `Invalid pricing value for ${path || 'unknown field'}`
+                    });
+                }
+
+                operations.push({
+                    updateOne: {
+                        filter: { path },
+                        update: {
+                            $set: {
+                                value,
+                                updatedBy: req.user.email || req.user.id || 'admin',
+                                updatedAt: new Date()
+                            }
+                        },
+                        upsert: true
+                    }
+                });
+            }
+
+            await PricingOverride.bulkWrite(operations);
+
+            res.json({
+                success: true,
+                saved: operations.length
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+);
+
+app.delete(
+    '/api/admin/pricing-overrides/:encodedPath',
+    authMiddleware,
+    async (req, res) => {
+        try {
+            if (req.user.role !== 'admin') {
+                return res.status(403).json({ msg: 'Forbidden' });
+            }
+
+            const path = decodeURIComponent(req.params.encodedPath || '');
+            await PricingOverride.deleteOne({ path });
+
+            res.json({ success: true });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+);
+
+app.delete(
+    '/api/admin/pricing-overrides',
+    authMiddleware,
+    async (req, res) => {
+        try {
+            if (req.user.role !== 'admin') {
+                return res.status(403).json({ msg: 'Forbidden' });
+            }
+
+            const result = await PricingOverride.deleteMany({});
+            res.json({ success: true, deleted: result.deletedCount || 0 });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
     }
 );

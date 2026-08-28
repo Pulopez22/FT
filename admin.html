@@ -6,6 +6,7 @@
     <title>Admin Dashboard - Square Foot Printing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="pricing.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #fff; overflow-x: hidden; color: #000; }
@@ -51,8 +52,8 @@
         <aside class="w-72 border-r h-[calc(100vh-73px)] sticky top-[73px] p-8 hidden lg:block bg-white overflow-y-auto">
             <h3 class="text-[10px] font-black uppercase mb-8 text-gray-300 tracking-widest border-b pb-2">Management</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li class="sidebar-item cursor-pointer text-black font-black"><i data-lucide="layout-dashboard" class="w-4 h-4 inline mr-2"></i> Orders History</li>
-                <li class="sidebar-item cursor-pointer hover:text-black transition-colors"><i data-lucide="tags" class="w-4 h-4 inline mr-2"></i> Edit Pricing</li>
+                <li id="orders-menu" onclick="showOrders()" class="sidebar-item cursor-pointer text-black font-black"><i data-lucide="layout-dashboard" class="w-4 h-4 inline mr-2"></i> Orders History</li>
+                <li id="pricing-menu" onclick="showPricing()" class="sidebar-item cursor-pointer hover:text-black transition-colors"><i data-lucide="tags" class="w-4 h-4 inline mr-2"></i> Edit Pricing</li>
                   <li class="sidebar-item cursor-pointer text-black"><a href="AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer text-black"><a href="Banners/banners.html" class="block w-full">Banners</a></li>
                 <li class="sidebar-item cursor-pointer text-black"><a href="Displays/displays.html" class="block w-full">Displays</a></li>
@@ -65,6 +66,7 @@
         </aside>
 
         <main class="flex-grow p-6 md:p-12">
+            <section id="orders-section">
             <header class="mb-12">
                 <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter">Orders History</h1>
                 <div class="h-2 w-24 bg-red-600 rounded-full mb-8"></div>
@@ -87,6 +89,32 @@
                     </tbody>
                 </table>
             </div>
+
+            </section>
+
+            <section id="pricing-section" class="hidden">
+                <header class="mb-10">
+                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+                        <div>
+                            <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter">Edit Pricing</h1>
+                            <div class="h-2 w-24 bg-red-600 rounded-full"></div>
+                            <p class="mt-5 text-xs text-gray-500 font-semibold max-w-2xl">
+                                Changes are saved as MongoDB overrides. The original values in pricing.js remain your defaults.
+                            </p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="resetAllPricing()" class="px-5 py-3 rounded-xl border border-gray-200 text-[10px] font-black uppercase hover:border-black">Reset All</button>
+                            <button onclick="savePricing()" class="px-6 py-3 rounded-xl bg-red-600 text-white text-[10px] font-black uppercase hover:bg-black">Save Changes</button>
+                        </div>
+                    </div>
+                </header>
+
+                <div id="pricing-status" class="hidden mb-6 p-4 rounded-xl text-xs font-bold"></div>
+                <div id="pricing-editor" class="space-y-6">
+                    <div class="text-gray-400 italic text-sm">Loading pricing...</div>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -302,6 +330,239 @@
         function toggleDetails(id) { document.getElementById(id).classList.toggle('hidden'); }
         function logout() { localStorage.clear(); window.location.href = 'login.html'; }
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
+
+
+        const API_BASE = 'https://ft-f34l.onrender.com';
+        let pricingDefaults = {};
+        let pricingOverrides = {};
+
+        const PRICING_SOURCES = [
+            ['Banners', 'bannerPricing'],
+            ['Displays', 'displaysPricing'],
+            ['Advertising Flags', 'masterPricing'],
+            ['Large Format Printing', 'largeFormatPricing'],
+            ['Rigid Signs', 'rigidsigns'],
+            ['Stickers', 'stickerPricing'],
+            ['Printed Fabric', 'printedFabricPricing']
+        ];
+
+        function showOrders() {
+            document.getElementById('orders-section').classList.remove('hidden');
+            document.getElementById('pricing-section').classList.add('hidden');
+            document.getElementById('orders-menu').classList.add('text-black', 'font-black');
+            document.getElementById('pricing-menu').classList.remove('text-black', 'font-black');
+        }
+
+        async function showPricing() {
+            document.getElementById('orders-section').classList.add('hidden');
+            document.getElementById('pricing-section').classList.remove('hidden');
+            document.getElementById('pricing-menu').classList.add('text-black', 'font-black');
+            document.getElementById('orders-menu').classList.remove('text-black', 'font-black');
+            await loadPricingEditor();
+        }
+
+        function flattenNumeric(obj, prefix = '', out = {}) {
+            if (!obj || typeof obj !== 'object') return out;
+            Object.entries(obj).forEach(([key, value]) => {
+                const path = prefix ? `${prefix}.${key}` : key;
+                if (typeof value === 'number' && Number.isFinite(value)) {
+                    out[path] = value;
+                } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+                    flattenNumeric(value, path, out);
+                }
+            });
+            return out;
+        }
+
+        function labelFromPath(path) {
+            return path.split('.').pop()
+                .replace(/[-_]/g, ' ')
+                .replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        function productFromPath(path) {
+            const bits = path.split('.');
+            return bits.length > 1 ? bits[1].replace(/[-_]/g, ' ').toUpperCase() : 'GENERAL';
+        }
+
+        function pricingStatus(message, ok = true) {
+            const box = document.getElementById('pricing-status');
+            box.className = `mb-6 p-4 rounded-xl text-xs font-bold ${ok ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`;
+            box.textContent = message;
+            box.classList.remove('hidden');
+        }
+
+        async function loadPricingEditor() {
+            const editor = document.getElementById('pricing-editor');
+            editor.innerHTML = '<div class="text-gray-400 italic text-sm">Loading pricing...</div>';
+
+            pricingDefaults = {};
+            const categories = [];
+
+            // Production minimums are editable too.
+            const minimums = flattenNumeric(window.SFP_PRICING_CONFIG || {}, 'SFP_PRICING_CONFIG');
+            Object.assign(pricingDefaults, minimums);
+            categories.push(['Production Minimums', minimums]);
+
+            PRICING_SOURCES.forEach(([label, globalName]) => {
+                const source = window[globalName];
+                if (!source || typeof source !== 'object') return;
+                const flat = flattenNumeric(source, globalName);
+                Object.assign(pricingDefaults, flat);
+                categories.push([label, flat]);
+            });
+
+            try {
+                const response = await fetch(`${API_BASE}/api/pricing-overrides`);
+                if (!response.ok) throw new Error('Could not load saved overrides');
+                const records = await response.json();
+                pricingOverrides = {};
+                records.forEach(record => {
+                    pricingOverrides[record.path] = Number(record.value);
+                });
+            } catch (error) {
+                pricingOverrides = {};
+                pricingStatus('Defaults loaded, but MongoDB overrides could not be loaded.', false);
+            }
+
+            editor.innerHTML = categories.map(([category, fields]) => {
+                const entries = Object.entries(fields);
+                if (!entries.length) return '';
+
+                const grouped = {};
+                entries.forEach(([path, defaultValue]) => {
+                    const product = productFromPath(path);
+                    (grouped[product] ||= []).push([path, defaultValue]);
+                });
+
+                return `
+                    <div class="border border-gray-100 rounded-[2rem] overflow-hidden">
+                        <div class="bg-black text-white px-6 py-5">
+                            <h2 class="font-black uppercase italic tracking-wide">${category}</h2>
+                        </div>
+                        <div class="p-5 md:p-7 space-y-6">
+                            ${Object.entries(grouped).map(([product, productFields]) => `
+                                <div class="border-b border-gray-100 pb-6 last:border-0">
+                                    <h3 class="text-xs font-black uppercase italic mb-4">${product}</h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                                        ${productFields.map(([path, defaultValue]) => {
+                                            const current = Object.prototype.hasOwnProperty.call(pricingOverrides, path)
+                                                ? pricingOverrides[path]
+                                                : defaultValue;
+                                            const overridden = Object.prototype.hasOwnProperty.call(pricingOverrides, path);
+                                            return `
+                                                <label class="block bg-gray-50 rounded-2xl p-4 border ${overridden ? 'border-red-200' : 'border-gray-100'}">
+                                                    <span class="block text-[9px] font-black uppercase text-gray-500 mb-2">${labelFromPath(path)}</span>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-black">$</span>
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            step="0.01"
+                                                            data-pricing-path="${path}"
+                                                            data-default="${defaultValue}"
+                                                            value="${current}"
+                                                            class="w-full bg-white border rounded-xl px-3 py-2 text-sm font-black outline-none focus:border-black">
+                                                    </div>
+                                                    <div class="mt-2 text-[8px] uppercase font-bold text-gray-400">
+                                                        Default: $${Number(defaultValue).toFixed(2)}
+                                                        ${overridden ? '<span class="text-red-600 ml-2">MongoDB override</span>' : ''}
+                                                    </div>
+                                                </label>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function savePricing() {
+            const token = localStorage.getItem('token');
+            const inputs = [...document.querySelectorAll('[data-pricing-path]')];
+
+            const values = inputs
+                .map(input => ({
+                    path: input.dataset.pricingPath,
+                    value: Number(input.value)
+                }))
+                .filter(item => Number.isFinite(item.value) && item.value >= 0);
+
+            const changes = values.filter(item =>
+                item.value !== Number(pricingDefaults[item.path])
+            );
+
+            const resets = values.filter(item =>
+                item.value === Number(pricingDefaults[item.path]) &&
+                Object.prototype.hasOwnProperty.call(pricingOverrides, item.path)
+            );
+
+            if (!changes.length && !resets.length) {
+                pricingStatus('No pricing changes to save.');
+                return;
+            }
+
+            try {
+                let saved = 0;
+                let reset = 0;
+
+                if (changes.length) {
+                    const response = await fetch(`${API_BASE}/api/admin/pricing-overrides`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-auth-token': token
+                        },
+                        body: JSON.stringify({ changes })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.msg || data.error || 'Save failed');
+                    saved = data.saved || 0;
+                }
+
+                for (const item of resets) {
+                    const response = await fetch(
+                        `${API_BASE}/api/admin/pricing-overrides/${encodeURIComponent(item.path)}`,
+                        {
+                            method: 'DELETE',
+                            headers: { 'x-auth-token': token }
+                        }
+                    );
+                    if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        throw new Error(data.msg || data.error || `Could not reset ${item.path}`);
+                    }
+                    reset++;
+                }
+
+                pricingStatus(`${saved} override(s) saved. ${reset} field(s) reset to pricing.js defaults.`);
+                await loadPricingEditor();
+            } catch (error) {
+                pricingStatus(error.message, false);
+            }
+        }
+
+        async function resetAllPricing() {
+            if (!confirm('Reset every saved pricing override back to pricing.js defaults?')) return;
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/pricing-overrides`, {
+                    method: 'DELETE',
+                    headers: { 'x-auth-token': token }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.msg || data.error || 'Reset failed');
+                pricingStatus('All MongoDB pricing overrides were removed.');
+                await loadPricingEditor();
+            } catch (error) {
+                pricingStatus(error.message, false);
+            }
+        }
+
 
         window.onload = fetchOrders;
     </script>
