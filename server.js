@@ -37,6 +37,7 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 const cloudinary = require('cloudinary').v2;
 const paypal = require('@paypal/checkout-server-sdk');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Configuración de PayPal
 let environment = new paypal.core.SandboxEnvironment(
@@ -317,6 +318,78 @@ app.post('/api/upload-preview', (req, res) => {
     });
 });
 
+// --- STRIPE CHECKOUT (TEST MODE) ---
+app.post('/api/checkout/create-stripe-session', async (req, res) => {
+    try {
+        const { orderDatabaseId } = req.body;
+
+        if (!orderDatabaseId) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing order ID'
+            });
+        }
+
+        // Buscamos la orden directamente en MongoDB
+        const order = await Order.findById(orderDatabaseId);
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                error: 'Order not found'
+            });
+        }
+
+        const amount = Math.round(parseFloat(order.total_price) * 100);
+
+        if (!Number.isInteger(amount) || amount < 50) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid order total'
+            });
+        }
+
+        const session = await stripe.checkout.sessions.create({
+            mode: 'payment',
+
+            payment_method_types: ['card'],
+
+            line_items: [{
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: `Square Foot Printing - Order ${order.order_id}`
+                    },
+                    unit_amount: amount
+                },
+                quantity: 1
+            }],
+
+            customer_email: order.customer_email || undefined,
+
+            metadata: {
+                orderDatabaseId: order._id.toString(),
+                orderId: order.order_id || ''
+            },
+
+            success_url: 'https://sqftprinting.com/order-confirmation.html?stripe_session={CHECKOUT_SESSION_ID}',
+            cancel_url: 'https://sqftprinting.com/checkout.html?payment=cancelled'
+        });
+
+        res.json({
+            success: true,
+            sessionId: session.id,
+            url: session.url
+        });
+
+    } catch (error) {
+        console.error('❌ Stripe Session Error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
 
 app.post('/api/checkout/create-paypal-order', async (req, res) => {
     try {

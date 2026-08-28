@@ -151,8 +151,10 @@
                                 <div class="flex items-start gap-3">
                                     <i data-lucide="shield-check" class="text-red-600 shrink-0"></i>
                                     <div>
-                                        <p class="text-sm font-black uppercase italic">Credit / Debit Card — Coming Soon</p>
-                                        <p class="text-[10px] font-bold uppercase text-gray-400 mt-2 leading-relaxed">Card payments are intentionally disabled until a secure payment processor is connected. Card numbers and CVV will never be stored by this website.</p>
+                                        <p class="text-sm font-black uppercase italic">Credit / Debit Card</p>
+                                        <p class="text-[10px] font-bold uppercase text-gray-400 mt-2 leading-relaxed">
+                                            Secure card payment powered by Stripe. Your card information is entered securely on Stripe and is never stored by this website.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -398,9 +400,9 @@
             if (method === 'zelle') {
                 renderZelleConfiguration();
                 placeBtn.innerText = 'Place Zelle Order';
-            } else if (method === 'card') {
-                placeBtn.innerText = 'Card Payments Coming Soon';
-            } else {
+            }   else if (method === 'card') {
+                placeBtn.innerText = 'Pay Securely With Card';
+                }else {
                 placeBtn.innerText = 'Place Order Now';
             }
         }
@@ -769,11 +771,6 @@ async function prepareOrderItems(cart, orderNumber) {
                 return;
             }
 
-            if (currentPayment === 'card') {
-                alert('Credit / Debit Card payments are not enabled yet. Please use Zelle or PayPal.');
-                return;
-            }
-
             if (currentPayment === 'zelle') {
                 if (!ZELLE_RECIPIENT.trim()) {
                     alert('Zelle is prepared but not live yet. Add the company Zelle recipient in the checkout configuration first.');
@@ -853,6 +850,40 @@ async function prepareOrderItems(cart, orderNumber) {
                         "Could not create order"
                     );
                 }
+
+                // STRIPE CARD PAYMENT
+if (currentPayment === 'card') {
+    btn.innerText = "OPENING SECURE PAYMENT...";
+
+    const stripeRes = await fetch(
+        'https://ft-f34l.onrender.com/api/checkout/create-stripe-session',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                orderDatabaseId: result.id
+            })
+        }
+    );
+
+    const stripeData = await stripeRes.json();
+
+    if (!stripeRes.ok || !stripeData.url) {
+        throw new Error(
+            stripeData.error ||
+            'Could not start Stripe payment'
+        );
+    }
+
+    // Conservamos carrito y número de orden hasta confirmar el pago.
+    sessionStorage.setItem('stripeOrderNumber', oNum);
+    sessionStorage.setItem('stripeMongoOrderId', result.id);
+
+    window.location.href = stripeData.url;
+    return;
+}
 
                 if (currentPayment === 'zelle') {
                     sessionStorage.setItem('zellePendingOrder', JSON.stringify({
