@@ -28,11 +28,15 @@
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
-    <nav class="border-b py-3 px-4 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
+    <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm text-black">
         <div class="flex items-center gap-4">
             <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
-            <a href="../index.html" class="bg-black p-1.5 rounded-lg shadow-lg">
-                <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 md:h-8 w-auto">
+            <a href="../index.html" class="flex items-center group text-black">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg"
+                        alt="Logo"
+                        class="h-8 md:h-10 w-auto object-contain">
+                </div>
             </a>
             <div class="hidden xl:flex gap-6 text-[10px] font-black uppercase text-gray-400 tracking-widest italic">
                 <a href="../index.html" class="hover:text-black transition-colors">Wall Art</a>
@@ -99,8 +103,8 @@
             </div>
 
             <footer class="bg-white border-t py-12 px-10 text-center w-full mt-auto">
-                <div class="bg-black p-2 rounded-xl inline-block mb-6 shadow-2xl">
-                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-6 md:h-8 w-auto">
+                <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
+                    <img src="../images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto">
                 </div>
                 <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
             </footer>
