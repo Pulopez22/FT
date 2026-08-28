@@ -227,10 +227,10 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         let uploadedFileUrl = ""; let isPdf = false; let originalW = 0, originalH = 0;
         const PRODUCT_ID = "backdrop"; // O el ID que corresponda a Step & Repeat
@@ -267,10 +267,10 @@
     const turn = document.getElementById('turn-select').value;    
     const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-    if (typeof getBannerTotalUnit === 'function') {
+    if (typeof getDisplayPrice === 'function') {
         // Le pasamos los datos al JS. 
-        // Nota: getBannerTotalUnit ya aplica el multiplicador x2 de Retail
-        const pricing = getBannerTotalUnit(PRODUCT_ID, mat, turn, size, hw);
+        // Nota: getDisplayPrice ya aplica el multiplicador x2 de Retail
+        const pricing = getDisplayPrice(PRODUCT_ID, mat, turn, size, hw);
         
         let unitPrice = pricing.pricePerSqFt; 
         let total = unitPrice * qty;
@@ -466,7 +466,7 @@
 
     // 6. GUARDAR EN LOCALSTORAGE
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
+    cart.push(window.SFP_prepareCartItem(item, "displays"));
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
     
     // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
@@ -491,7 +491,7 @@
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }

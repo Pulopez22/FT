@@ -167,7 +167,7 @@
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
     <script>
-        lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 
         const products = [
             { name: 'Large Format Printing', img: 'images/Large-Format-Printing.png', desc: 'Oversized high-definition prints.', url: 'LargePrinting/largeprinting.html' },
@@ -283,7 +283,7 @@
     }
     if(document.getElementById('cart-total-price')) document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
     if(document.getElementById('cart-count-text')) document.getElementById('cart-count-text').innerText = `${cart.length} items`;
-    lucide.createIcons();
+    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 }
 
         function removeItem(i) {

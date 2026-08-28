@@ -248,10 +248,10 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         let uploadedFileUrl = ""; 
         let isPdf = false;
@@ -513,7 +513,7 @@
             };
 
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push(item);
+            cart.push(window.SFP_prepareCartItem(item, "largePrinting"));
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
             renderCart(); toggleCart(); resetUpload();
         }
@@ -549,7 +549,7 @@
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) {

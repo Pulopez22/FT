@@ -337,9 +337,9 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 
         window.onload = () => {
             checkAuth();
@@ -442,7 +442,7 @@
             if(totalDisp) totalDisp.innerText = `$${total.toFixed(2)}`;
             const countDisp = document.getElementById('cart-count-text');
             if(countDisp) countDisp.innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) {

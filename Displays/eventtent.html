@@ -247,10 +247,10 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         let uploadedFileUrl = ""; let isPdf = false; let originalW = 0, originalH = 0;
         const PRODUCT_ID = "eventtent";
@@ -283,9 +283,9 @@
     const hWalls = parseInt(document.getElementById('halfwall-select').value) || 0;
     const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-    if (typeof getBannerTotalUnit === 'function') {
+    if (typeof getDisplayPrice === 'function') {
         // Obtenemos el precio desde pricing.js pasando el objeto de paredes {fw, hw}
-        const res = getBannerTotalUnit(PRODUCT_ID, kitType, turn, acc, { fw: fWalls, hw: hWalls });
+        const res = getDisplayPrice(PRODUCT_ID, kitType, turn, acc, { fw: fWalls, hw: hWalls });
         
         // Multiplicamos por cantidad (multiplier ya viene aplicado en res)
         const finalTotal = res.pricePerSqFt * qty;
@@ -449,7 +449,7 @@ function updateOrderedLabels() {
     };
 
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
+    cart.push(window.SFP_prepareCartItem(item, "displays"));
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
     
     renderCart();
@@ -510,7 +510,7 @@ function updateOrderedLabels() {
     document.getElementById('cart-count-text').innerText = `${cart.length} items`;
     
     // Reiniciar iconos de Lucide para que aparezca el basurero
-    lucide.createIcons();
+    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 }
 
         function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }

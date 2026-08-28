@@ -102,7 +102,7 @@
             });
         })();
 
-        lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 
         async function fetchOrders() {
             const token = localStorage.getItem('token');
@@ -274,7 +274,7 @@
                         </td>
                     </tr>
                 `).join('');
-                lucide.createIcons();
+                if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-red-500">Error connecting to server.</td></tr>`;
             }

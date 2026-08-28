@@ -239,11 +239,11 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script src="banner-common.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         let uploadedFileUrl = ""; let isPdf = false; let originalW = 0, originalH = 0;
         const PRODUCT_ID = "mesh-banner";
@@ -451,7 +451,7 @@
 
     // 7. GUARDADO EN LOCALSTORAGE
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
+    cart.push(window.SFP_prepareCartItem(item, "banners"));
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
 
     // 8. FEEDBACK VISUAL Y RESET
@@ -474,13 +474,13 @@
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('cart-count-text').innerText = `${cart.length} items`; lucide.createIcons();
+            document.getElementById('cart-count-text').innerText = `${cart.length} items`; if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }
         function changeImage(el) { document.getElementById('main-prod-img').src = el.src; document.querySelectorAll('.thumb-img').forEach(i => i.classList.remove('thumb-active')); el.classList.add('thumb-active'); }
         function logout() { localStorage.clear(); window.location.reload(); }
-        window.onload = () => { checkAuth(); renderCart(); updateOrderedLabels(); };
+        window.addEventListener('load', () => { checkAuth(); renderCart(); updateOrderedLabels(); if (typeof calculatePrice === 'function') calculatePrice(); });
     </script>
 </body>
 </html>

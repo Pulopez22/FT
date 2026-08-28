@@ -23,6 +23,7 @@
         #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
         #mobile-menu.open { transform: translateX(0); }
     </style>
+    <script src="pricing.js"></script>
 </head>
 <body class="flex flex-col min-h-screen text-black">
 
@@ -234,7 +235,7 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         let mongoDatabaseId = null; 
         let currentMethod = 'pickup', currentPayment = '';
 
@@ -555,10 +556,13 @@ function renderPayPalButtons() {
                     ? parseFloat(item.price.replace(/[$,]/g, ''))
                     : Number(item.price) || 0;
 
-                const minOrder = Number(item.minOrder ?? 50);
+                const configuredMinimum = window.SFP_PRICING_CONFIG?.productionTypes?.[key]?.minimumOrder;
+                const minOrder = Number(
+                    item.minOrder ?? configuredMinimum ?? window.SFP_PRICING_CONFIG?.defaultMinimumOrder ?? 50
+                );
 
                 groupTotals[key] = (groupTotals[key] || 0) + price;
-                groupMinimums[key] = minOrder;
+                groupMinimums[key] = Math.max(groupMinimums[key] || 0, minOrder);
             });
 
             let subtotal = 0;
@@ -571,67 +575,108 @@ function renderPayPalButtons() {
             });
 
             container.innerHTML = cart.map((item, index) => {
-                const pNum = typeof item.price === 'string'
-                    ? parseFloat(item.price.replace(/[$,]/g, ''))
-                    : Number(item.price) || 0;
+    const pNum = typeof item.price === 'string'
+        ? parseFloat(item.price.replace(/[$,]/g, ''))
+        : Number(item.price) || 0;
 
-                const groupKey = item.productionType || item.productId || item.name;
-                const groupTotal = groupTotals[groupKey];
-                const minOrder = groupMinimums[groupKey] || 0;
-                const groupNeedsMinimum = groupTotal < minOrder;
+    const groupKey =
+        item.productionType ||
+        item.productId ||
+        item.name;
 
-                return `
-                    <div class="border-b border-gray-50 pb-6 mb-6 last:border-0 text-black">
-                        <div class="flex gap-4 items-center">
-                            <div class="w-16 h-16 bg-white border rounded-xl overflow-hidden shrink-0 flex items-center justify-center p-1">
-                                <img src="${item.productionImage || item.image || ''}"
-                                class="max-h-full max-w-full object-contain"
-                                alt="${item.name || 'Product preview'}">
-                            </div>
+    const groupTotal = groupTotals[groupKey];
+    const minOrder = groupMinimums[groupKey] || 0;
+    const groupNeedsMinimum = groupTotal < minOrder;
 
-                            <div class="flex-grow">
-                                <div class="flex justify-between items-start">
-                                    <span class="font-black text-[11px] uppercase italic leading-none">${item.name}</span>
-                                    <button onclick="removeItem(${index})" class="text-gray-300 hover:text-red-600">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
+    // ¿Es este el último producto de este tipo de producción?
+    const isLastOfGroup = !cart
+        .slice(index + 1)
+        .some(nextItem => {
+            const nextKey =
+                nextItem.productionType ||
+                nextItem.productId ||
+                nextItem.name;
 
-                                <p class="text-[8px] text-gray-400 font-bold uppercase mt-1 leading-tight">
-                                    ${item.details || item.specs || "Standard Specs"}
-                                </p>
+            return nextKey === groupKey;
+        });
 
-                                ${item.productionImage ? `
-                                <div class="mt-2 text-[8px] font-bold uppercase text-gray-500 leading-relaxed">
-                                    <div>Cut: ${item.cutType || 'Contour Cut'}</div>
-                                    <div>
-                                        Final Size:
-                                        ${Number(item.width || 0).toFixed(2)}"
-                                        ×
-                                        ${Number(item.height || 0).toFixed(2)}"
-                                    </div>
-                                    <div>Border: ${item.borderThickness || 'Standard'}</div>
-                                    <div>Quantity: ${item.quantity || 1}</div>
-                                </div>
-                            ` : ''}
+    // Nombre bonito para mostrar al cliente
+    const productionLabel =
+        window.SFP_PRICING_CONFIG?.productionTypes?.[groupKey]?.label ||
+        groupKey;
 
-                                <div class="font-black text-sm mt-2">$${pNum.toFixed(2)}</div>
-                            </div>
-                        </div>
+    return `
+        <div class="border-b border-gray-50 pb-6 mb-6 last:border-0 text-black">
+            <div class="flex gap-4 items-center">
 
-                        ${groupNeedsMinimum ? `
-                            <div class="bg-red-50 border border-red-100 p-3 rounded-xl space-y-2 mt-2">
-                                <p class="text-[8px] font-black uppercase text-red-600 leading-tight">
-                                    ⚠️ This product group is below the $${minOrder.toFixed(2)} minimum.
-                                </p>
-                                <p class="text-[8px] font-bold uppercase text-red-500 leading-tight">
-                                    Current group total: $${groupTotal.toFixed(2)}. Checkout will charge $${minOrder.toFixed(2)} for this product group.
-                                </p>
-                            </div>
-                        ` : ''}
+                <div class="w-16 h-16 bg-white border rounded-xl overflow-hidden shrink-0 flex items-center justify-center p-1">
+                    <img
+                        src="${item.productionImage || item.image || ''}"
+                        class="max-h-full max-w-full object-contain"
+                        alt="${item.name || 'Product preview'}"
+                    >
+                </div>
+
+                <div class="flex-grow">
+
+                    <div class="flex justify-between items-start">
+                        <span class="font-black text-[11px] uppercase italic leading-none">
+                            ${item.name}
+                        </span>
+
+                        <button
+                            onclick="removeItem(${index})"
+                            class="text-gray-300 hover:text-red-600"
+                        >
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
                     </div>
-                `;
-            }).join('');
+
+                    <p class="text-[8px] text-gray-400 font-bold uppercase mt-1 leading-tight">
+                        ${item.details || item.specs || "Standard Specs"}
+                    </p>
+
+                    ${item.productionImage ? `
+                        <div class="mt-2 text-[8px] font-bold uppercase text-gray-500 leading-relaxed">
+                            <div>Cut: ${item.cutType || 'Contour Cut'}</div>
+
+                            <div>
+                                Final Size:
+                                ${Number(item.width || 0).toFixed(2)}"
+                                ×
+                                ${Number(item.height || 0).toFixed(2)}"
+                            </div>
+
+                            <div>Border: ${item.borderThickness || 'Standard'}</div>
+                            <div>Quantity: ${item.quantity || 1}</div>
+                        </div>
+                    ` : ''}
+
+                    <div class="font-black text-sm mt-2">
+                        $${pNum.toFixed(2)}
+                    </div>
+
+                </div>
+            </div>
+
+            ${groupNeedsMinimum && isLastOfGroup ? `
+                <div class="bg-red-50 border border-red-100 p-3 rounded-xl space-y-2 mt-4">
+
+                    <p class="text-[8px] font-black uppercase text-red-600 leading-tight">
+                        ⚠️ ${productionLabel} — $${minOrder.toFixed(2)} MINIMUM PRODUCTION ORDER
+                    </p>
+
+                    <p class="text-[8px] font-bold uppercase text-red-500 leading-tight">
+                        COMBINED ${productionLabel} PRODUCTS: $${groupTotal.toFixed(2)}.
+                        A $${minOrder.toFixed(2)} PRODUCTION MINIMUM HAS BEEN APPLIED.
+                    </p>
+
+                </div>
+            ` : ''}
+
+        </div>
+    `;
+}).join('');
 
             const finalTotal = currentMethod === 'shipping'
                 ? subtotal + currentShippingFee
@@ -646,7 +691,7 @@ function renderPayPalButtons() {
                 shippingServiceText.innerText = selectedUpsRate ? selectedUpsRate.serviceName : 'UPS Shipping';
             }
 
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function dataUrlToBlob(dataUrl) {

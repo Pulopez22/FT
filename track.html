@@ -204,7 +204,7 @@
     </footer>
 
     <script>
-        lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 
         function checkAuth() {
             const userName = localStorage.getItem('userName');
@@ -260,7 +260,7 @@ itemsContainer.innerHTML = data.items.map(item => {
 }).join('');
 
                     updateVisualStatus(data.status);
-                    lucide.createIcons();
+                    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
                 } else {
                     alert("Order not found.");
                 }
@@ -288,7 +288,7 @@ itemsContainer.innerHTML = data.items.map(item => {
                     }
                 }
             });
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }

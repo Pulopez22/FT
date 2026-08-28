@@ -246,11 +246,11 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
         
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         
         let uploadedFileUrl = ""; 
@@ -364,9 +364,9 @@
             // IMPORTANTE: Crea la llave igual que en pricing.js (ej: "white_1/8")
             const variantKey = `${mat}_${thick}`;
 
-            if (typeof window.getLargeFormatPrice === 'function') {
+            if (typeof window.getRigidSignPrice === 'function') {
                 // Llamamos al cerebro del pricing.js
-                const pricing = window.getLargeFormatPrice("Acrylic", turnVal, variantKey, finish);
+                const pricing = window.getRigidSignPrice("Acrylic", turnVal, variantKey, finish);
                 const area = (w * h) / 144;
                 
                 // unitPrice ya trae el precio base x Multiplicador de Tier (Retail/Wholesale)
@@ -561,7 +561,7 @@
 
     // 6. GUARDAR EN LOCALSTORAGE
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
+    cart.push(window.SFP_prepareCartItem(item, "rigidSigns"));
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
     
     // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
@@ -609,7 +609,7 @@
             if(totalDisp) totalDisp.innerText = `$${total.toFixed(2)}`;
             const countDisp = document.getElementById('cart-count-text');
             if(countDisp) countDisp.innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) {

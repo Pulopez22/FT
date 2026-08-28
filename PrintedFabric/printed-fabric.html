@@ -124,13 +124,9 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="../Banners/pricing.js"></script>
-    <script src="../Displays/pricing.js"></script>
-    <script src="../AdvertisingFlags/pricing.js"></script>
-    <script src="../LargePrinting/pricing.js"></script>
-
-    <script>
-        lucide.createIcons();
+    <script src="../pricing.js"></script>
+<script>
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 
         const products = [
             { id: 'wrinkle-free', category: 'fabric', name: 'Wrinkle Free Fabric', img: '../images/Banners/AMS-Fabric-6.png', desc: 'Polyester fabric with matte finishing.', url: '../Banners/fabric-banner.html' },
@@ -209,7 +205,7 @@
                         </div>
                     </div>`;
             }).join('');
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function toggleCart() {
@@ -251,7 +247,7 @@
             }
             document.getElementById('cart-total-price').innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} Items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) {

@@ -252,10 +252,10 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         let uploadedFileUrl = ""; 
         let isPdf = false;
@@ -322,8 +322,8 @@
             const h = parseFloat(document.getElementById('height-input').value);
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-            if (typeof window.getLargeFormatPrice === 'function') {
-                const pricing = window.getLargeFormatPrice("Acrylic-art", turnVal);
+            if (typeof window.getRigidSignPrice === 'function') {
+                const pricing = window.getRigidSignPrice("Acrylic-art", turnVal);
                 const area = (w * h) / 144;
                 
                 // Stand-offs negros: +$10.00 base (Wholesale)
@@ -476,13 +476,13 @@
 
             // 3. Guardamos el objeto en el carrito
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push({ 
+            cart.push(window.SFP_prepareCartItem({ 
                 name: "ACRYLIC ART PRINT", 
                 price: globalCalculatedPrice, 
                 image: document.getElementById('main-prod-img').src, 
                 fileUrl: uploadedFileUrl, 
                 details: details 
-            });
+            }, "rigidSigns"));
             
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
 
@@ -532,7 +532,7 @@
             if(totalDisp) totalDisp.innerText = `$${total.toFixed(2)}`;
             const countDisp = document.getElementById('cart-count-text');
             if(countDisp) countDisp.innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) {

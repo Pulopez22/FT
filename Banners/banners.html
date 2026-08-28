@@ -134,9 +134,9 @@
         <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">© 2026 Square Foot Printing - Las Vegas</p>
     </footer>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 
         const banners = [
             { id: 'standard-banner', name: '13oz Standard Banner', img: '../images/Banners/AMS-Banner2..png', desc: 'Durable scrim vinyl for indoor and outdoor use.', url: 'standard-banner.html', suffix: 'sq/ft' },
@@ -158,20 +158,10 @@
         function logout() { localStorage.clear(); window.location.reload(); }
 
         function getBannerPrice(id) {
-            let price = 0;
-            const basePrices = {
-                'standard-banner': 1.00,
-                'super-smooth': 3.50,
-                'mesh-banner': 3.00,
-                'wrinkle-free': 4.50,
-                'hd-banner-18oz': 5.00,
-                'tension-fabric': 5.50,
-                'blockout-fabric': 6.00,
-                'pole-banners': 39.34
-            };
-            price = basePrices[id] || 0;
+            const product = window.bannerPricing?.[id];
+            const base = Number(product?.startingPrice ?? product?.material ?? 0);
             const multiplier = (localStorage.getItem('userTier') === 'wholesale') ? 1 : 2;
-            return price * multiplier;
+            return base * multiplier;
         }
 
         function checkAuth() {
@@ -225,7 +215,7 @@
                     </div>
                 </div>`;
             }).join('');
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function applySort(type, btn) {
@@ -280,7 +270,7 @@
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) {

@@ -1,0 +1,10 @@
+FULL REVIEW SUMMARY
+
+- One global pricing.js only.
+- Fixed Banner/Displays global function collision.
+- Banner product pages use resilient initialization if PDF.js/Lucide CDN is unavailable.
+- Banners category starting prices now come from global pricing.js (same displayed values preserved).
+- New cart items are tagged with productionType and minOrder individually.
+- Checkout groups the $50 minimum by production type and loads global pricing config.
+- Global and inline JavaScript syntax checked.
+- Banner pricing functions runtime-tested with representative default options.

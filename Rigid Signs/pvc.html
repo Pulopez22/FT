@@ -267,10 +267,10 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         let uploadedFileUrl = ""; 
         let isPdf = false;
@@ -331,8 +331,8 @@
             const sideMult = parseFloat(document.getElementById('side-select').value) || 1;
             const lam = document.getElementById('lam-select').value;
 
-            if (typeof window.getLargeFormatPrice === 'function') {
-                const pricing = window.getLargeFormatPrice(PRODUCT_ID, { turn: turnVal });
+            if (typeof window.getRigidSignPrice === 'function') {
+                const pricing = window.getRigidSignPrice(PRODUCT_ID, { turn: turnVal });
                 const area = (w * h) / 144;
 
                 // 1. Precio base según grosor
@@ -489,7 +489,7 @@
             };
 
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push(item);
+            cart.push(window.SFP_prepareCartItem(item, "rigidSigns"));
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
             
             renderCart();
@@ -521,7 +521,7 @@
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) {

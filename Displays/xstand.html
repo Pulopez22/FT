@@ -239,10 +239,10 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()" class="text-black"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         let uploadedFileUrl = "";
         let isPdf = false;
@@ -298,9 +298,9 @@
     const turn = document.getElementById('turn-select').value;      // turnVal: "Standard" o "Next Day"
     const qty = parseInt(document.getElementById('qty-input').value) || 1;
 
-    if (typeof getBannerTotalUnit === 'function') {
+    if (typeof getDisplayPrice === 'function') {
         // Tu JS espera: productID, opt1 (size), turnVal, opt2 (material)
-        const pricing = getBannerTotalUnit(PRODUCT_ID, size, turn, mat);
+        const pricing = getDisplayPrice(PRODUCT_ID, size, turn, mat);
         
         const finalTotal = (pricing.pricePerSqFt + pricing.fixedFee) * qty;
 
@@ -486,7 +486,7 @@
 
     // 6. GUARDAR EN LOCALSTORAGE
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
+    cart.push(window.SFP_prepareCartItem(item, "displays"));
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
     
     // 7. UI: AVISAR AL USUARIO Y REFRESCAR EL CARRITO LATERAL
@@ -510,7 +510,7 @@
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }

@@ -265,10 +265,10 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         let uploadedFileUrl = ""; 
         let isPdf = false;
@@ -337,7 +337,7 @@ function autoFitImage() {
     dpiInfo.innerText = "FULL COVERAGE APPLIED ✅";
     dpiInfo.className = "text-[#2563eb] font-black italic text-[10px]";
     
-    lucide.createIcons();
+    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 }
 
         function checkAuth() {
@@ -495,7 +495,7 @@ function autoFitImage() {
         statusTitle.innerText = "READY TO APPROVE";
         statusTitle.className = "text-[10px] font-black uppercase text-gray-500 italic";
     }
-    lucide.createIcons();
+    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 }
 
         async function uploadToRender(file) {
@@ -539,7 +539,7 @@ function autoFitImage() {
             const qty = document.getElementById('qty-input').value;
             const details = `SIZE: ${w}X${h} | PRINT: ${side.options[side.selectedIndex].text.toUpperCase()} | FINISHING: ${finish.value.toUpperCase()} | TURNAROUND: ${turn.options[turn.selectedIndex].text.toUpperCase()} | QTY: ${qty}`;
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push({ name: "CUSTOM POLE FLAG", price: globalTotal, image: "../images/Advertising Flags/Custom-Pole-Flag-02-1.png", fileUrl: uploadedFileUrl, details: details });
+            cart.push(window.SFP_prepareCartItem({ name: "CUSTOM POLE FLAG", price: globalTotal, image: "../images/Advertising Flags/Custom-Pole-Flag-02-1.png", fileUrl: uploadedFileUrl, details: details }, "advertisingFlags"));
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
             resetUpload();
             toggleCart();
@@ -562,7 +562,7 @@ function autoFitImage() {
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }

@@ -265,10 +265,10 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script src="banner-common.js"></script>
     <script>
-        lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         // --- NUEVAS DECLARACIONES ---
         let uploadedFileUrl = ""; 
@@ -318,7 +318,7 @@
         }
 
         // --- PROCESAMIENTO CON SUBIDA REAL A RENDER ---
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 let isPdf = false;
 let originalW = 0, originalH = 0;
@@ -547,7 +547,7 @@ function approveArt() {
 
     // 7. GUARDADO EN LOCALSTORAGE
     let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-    cart.push(item);
+    cart.push(window.SFP_prepareCartItem(item, "banners"));
     localStorage.setItem('sqft_cart', JSON.stringify(cart));
 
     // 8. FEEDBACK VISUAL Y RESET
@@ -575,7 +575,7 @@ function approveArt() {
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
             document.getElementById('cart-count-text').innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) { let cart = JSON.parse(localStorage.getItem('sqft_cart')) || []; cart.splice(i, 1); localStorage.setItem('sqft_cart', JSON.stringify(cart)); renderCart(); }
@@ -585,7 +585,7 @@ function approveArt() {
             el.classList.add('thumb-active');
         }
         function logout() { localStorage.clear(); window.location.reload(); }
-        window.onload = () => { checkAuth(); renderCart(); updateOrderedLabels(); };
+        window.addEventListener('load', () => { checkAuth(); renderCart(); updateOrderedLabels(); if (typeof calculatePrice === 'function') calculatePrice(); });
     </script>
 </body>
 </html>

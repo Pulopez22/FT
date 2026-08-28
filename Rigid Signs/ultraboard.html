@@ -258,10 +258,10 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        lucide.createIcons();
+        if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
         let uploadedFileUrl = ""; 
         let isPdf = false;
@@ -351,9 +351,9 @@
             const sides = document.getElementById('side-select').value;
             const lam = document.getElementById('lam-select').value;
 
-            if (typeof window.getLargeFormatPrice === 'function') {
+            if (typeof window.getRigidSignPrice === 'function') {
                 // Obtenemos el precio base combinando material y grosor
-                const pricing = window.getLargeFormatPrice(PRODUCT_ID, turnVal, thick, lam);
+                const pricing = window.getRigidSignPrice(PRODUCT_ID, turnVal, thick, lam);
                 const area = (w * h) / 144;
 
                 let unitRate = pricing.unitPrice; 
@@ -508,7 +508,7 @@
             };
 
             let cart = JSON.parse(localStorage.getItem('sqft_cart')) || [];
-            cart.push(item);
+            cart.push(window.SFP_prepareCartItem(item, "rigidSigns"));
             localStorage.setItem('sqft_cart', JSON.stringify(cart));
             
             renderCart(); toggleCart(); resetUpload();
@@ -538,7 +538,7 @@
                 });
             }
             document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) {

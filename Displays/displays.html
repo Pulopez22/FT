@@ -135,9 +135,9 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="pricing.js"></script>
+    <script src="../pricing.js"></script>
     <script>
-        lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 
         const products = [
             { id: 'gallery-canvas', name: 'Gallery Canvas', cat: 'paper', basePrice: 29.34, img: '../images/Large Printing/GalleryCanvas-01.png', desc: '1.5" MDF stretcher frame gallery wrap.', url: '../LargePrinting/gcanvas.html' },
@@ -161,8 +161,8 @@
             }
 
             // Si no tiene basePrice, intenta usar el calculador de banners (respaldo)
-            if (typeof window.getBannerTotalUnit === 'function') {
-                const res = window.getBannerTotalUnit(p.id, "none", "0");
+            if (typeof window.getDisplayPrice === 'function') {
+                const res = window.getDisplayPrice(p.id, "none", "0");
                 return res.pricePerSqFt || 0;
             }
 
@@ -212,7 +212,7 @@
                     </div>
                 </div>`;
             }).join('');
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         // REPARACIÓN DEL CARRITO: Blindado contra UNDEFINED
@@ -258,7 +258,7 @@
             if(totalDisp) totalDisp.innerText = `$${total.toFixed(2)}`;
             const countDisp = document.getElementById('cart-count-text');
             if(countDisp) countDisp.innerText = `${cart.length} items`;
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         }
 
         function removeItem(i) {
