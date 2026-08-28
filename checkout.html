@@ -550,7 +550,7 @@ function renderPayPalButtons() {
             const groupMinimums = {};
 
             cart.forEach(item => {
-                const key = item.productId || item.name;
+                const key = item.productionType || item.productId || item.name;
                 const price = typeof item.price === 'string'
                     ? parseFloat(item.price.replace(/[$,]/g, ''))
                     : Number(item.price) || 0;
@@ -575,7 +575,7 @@ function renderPayPalButtons() {
                     ? parseFloat(item.price.replace(/[$,]/g, ''))
                     : Number(item.price) || 0;
 
-                const groupKey = item.productId || item.name;
+                const groupKey = item.productionType || item.productId || item.name;
                 const groupTotal = groupTotals[groupKey];
                 const minOrder = groupMinimums[groupKey] || 0;
                 const groupNeedsMinimum = groupTotal < minOrder;
