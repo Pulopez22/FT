@@ -1,0 +1,16 @@
+# Secrets / environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Logs / runtime
+*.log
+npm-debug.log*
+.DS_Store
+
+# Local uploads / temp
+uploads/
+tmp/

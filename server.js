@@ -54,8 +54,21 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-app.use(cors());
-app.use(express.json());
+// CORS: si ALLOWED_ORIGINS está configurado, limita el backend a esos dominios.
+// Si aún no está configurado, conserva el comportamiento actual durante pruebas.
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
+app.use(cors(allowedOrigins.length ? {
+    origin: (origin, callback) => {
+        // Permite requests sin Origin (health checks, herramientas server-to-server).
+        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error('Origin not allowed by CORS'));
+    }
+} : undefined));
+app.use(express.json({ limit: '2mb' }));
 
 // --- CONEXIÓN MONGODB ---
 mongoose.connect(process.env.MONGO_URI)
@@ -159,7 +172,21 @@ const emailTemplate = (orderData) => {
     </html>`;
 };
 
-const upload = multer({ dest: '/tmp/' });
+// Artwork uploads: conserva JPG/PNG/PDF, pero evita archivos inesperados o enormes.
+const ALLOWED_ARTWORK_TYPES = new Set([
+    'image/jpeg',
+    'image/png',
+    'application/pdf'
+]);
+
+const upload = multer({
+    dest: '/tmp/',
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
+    fileFilter: (req, file, cb) => {
+        if (ALLOWED_ARTWORK_TYPES.has(file.mimetype)) return cb(null, true);
+        cb(new Error('Only JPG, PNG and PDF artwork files are allowed'));
+    }
+});
 
 // --- RUTAS ---
 
@@ -265,17 +292,29 @@ app.patch('/api/admin/orders/:id/status', authMiddleware, async (req, res) => {
 });
 
 // 6. Carga de Archivos de Arte a Cloudinary
-app.post('/api/upload-preview', upload.single('file'), async (req, res) => {
-    try {
-        const result = await cloudinary.uploader.upload(req.file.path, { 
-            folder: 'sfp_orders',
-            resource_type: 'auto' 
-        });
-        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        res.json({ success: true, url: result.secure_url });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
+app.post('/api/upload-preview', (req, res) => {
+    upload.single('file')(req, res, async (uploadError) => {
+        if (uploadError) {
+            const status = uploadError.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+            return res.status(status).json({ success: false, error: uploadError.message });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: 'No artwork file received' });
+        }
+
+        try {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'sfp_orders',
+                resource_type: 'auto'
+            });
+            res.json({ success: true, url: result.secure_url });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        } finally {
+            if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        }
+    });
 });
 
 
