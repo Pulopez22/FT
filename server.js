@@ -1269,12 +1269,11 @@ app.post(
             }
 
 
-            const amount =
-                Math.round(
-                    parseFloat(
-                        order.total_price
-                    ) * 100
-                );
+           const numericTotal = Number(
+    String(order.total_price).replace(/[$,]/g, '')
+);
+
+const amount = Math.round(numericTotal * 100);
 
 
             if (
