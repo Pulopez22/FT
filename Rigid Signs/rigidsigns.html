@@ -141,7 +141,7 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="../pricing-v2.js"></script>
+    <script src="../pricing-v3.js"></script>
     <script>
         if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 
@@ -276,7 +276,7 @@
         window.onload = async () => {
             if (window.SFP_PRICING_READY) {
                 try { await window.SFP_PRICING_READY; } catch (error) {
-                    console.warn('Live pricing unavailable; using pricing-v2.js defaults.', error);
+                    console.warn('Live pricing unavailable; using pricing-v3.js defaults.', error);
                 }
             }
             checkAuth();

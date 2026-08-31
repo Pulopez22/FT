@@ -1,0 +1,11 @@
+MongoDB Pricing Field Guide
+
+Banners:
+- startingPrice = category/listing "Price starts at" value.
+- material = individual product calculator base rate per sq/ft (when that product uses a material base).
+
+Example: blockout-fabric
+- startingPrice: 6.75 => Banners category shows $6.75/sq ft.
+- material: 10 => Blockout individual 24x24 (4 sq ft) calculates $40 wholesale before extras.
+
+The active storefront pricing loader is pricing-v3.js. It loads /api/pricing from MongoDB first and uses local values only as fallback.
