@@ -1022,4 +1022,110 @@ function getSelectedSize() {
     return { width: 2, height: 2 };
 }
 
+// ============================================================
+// LIVE PRICING OVERRIDES - MongoDB / Render
+// Loads admin overrides on every storefront page before consumers
+// that await SFP_PRICING_READY perform their initial calculation.
+// ============================================================
+window.SFP_PRICING_OVERRIDES_ENDPOINT =
+    'https://ft-f34l.onrender.com/api/pricing-overrides';
+
+window.SFP_PRICING_SOURCES = new Set([
+    'SFP_PRICING_CONFIG',
+    'bannerPricing',
+    'displaysPricing',
+    'masterPricing',
+    'largeFormatPricing',
+    'rigidsigns',
+    'stickerPricing'
+]);
+
+window.SFP_applyPricingOverride = function(path, value) {
+    if (typeof path !== 'string' || !path.trim()) return false;
+
+    // Current Admin stores dot-delimited paths. Some pricing keys themselves
+    // contain dots (3.00, 0.040, etc.), so instead of blindly splitting on
+    // every dot we resolve the path by matching the longest real object key
+    // at each level. This preserves the existing MongoDB overrides.
+    const parts = path.split('.');
+    const sourceName = parts.shift();
+
+    if (!window.SFP_PRICING_SOURCES.has(sourceName)) return false;
+
+    let target = window[sourceName];
+    if (!target || typeof target !== 'object') return false;
+
+    const blocked = new Set(['__proto__', 'prototype', 'constructor']);
+
+    while (parts.length > 1) {
+        let matchedKey = null;
+        let consumed = 0;
+
+        // Prefer the longest key that actually exists on the current object.
+        for (let take = parts.length - 1; take >= 1; take--) {
+            const candidate = parts.slice(0, take).join('.');
+            if (blocked.has(candidate)) return false;
+            if (Object.prototype.hasOwnProperty.call(target, candidate)) {
+                matchedKey = candidate;
+                consumed = take;
+                break;
+            }
+        }
+
+        if (matchedKey === null) return false;
+        target = target[matchedKey];
+        parts.splice(0, consumed);
+
+        if (!target || typeof target !== 'object') return false;
+    }
+
+    const finalKey = parts.join('.');
+    if (!finalKey || blocked.has(finalKey)) return false;
+    if (!Object.prototype.hasOwnProperty.call(target, finalKey)) return false;
+
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue) || numericValue < 0) return false;
+
+    target[finalKey] = numericValue;
+    return true;
+};
+
+window.SFP_PRICING_READY = (async function() {
+    try {
+        const response = await fetch(window.SFP_PRICING_OVERRIDES_ENDPOINT, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            cache: 'no-store'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Pricing API returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        const overrides = Array.isArray(data)
+            ? data
+            : (Array.isArray(data.overrides) ? data.overrides : []);
+
+        let applied = 0;
+        overrides.forEach(entry => {
+            if (entry && window.SFP_applyPricingOverride(entry.path, entry.value)) {
+                applied++;
+            }
+        });
+
+        console.info(`SFP pricing ready: ${applied} MongoDB override(s) applied.`);
+        return { ok: true, applied };
+    } catch (error) {
+        // Storefront remains usable with pricing.js defaults if Render is down.
+        console.warn('SFP pricing overrides unavailable; using pricing.js defaults.', error);
+        return { ok: false, applied: 0, error };
+    }
+})();
+
+window.SFP_whenPricingReady = function(callback) {
+    return Promise.resolve(window.SFP_PRICING_READY)
+        .catch(() => null)
+        .then(() => typeof callback === 'function' ? callback() : undefined);
+};
 

@@ -558,7 +558,7 @@ function renderPayPalButtons() {
 
                 const configuredMinimum = window.SFP_PRICING_CONFIG?.productionTypes?.[key]?.minimumOrder;
                 const minOrder = Number(
-                    item.minOrder ?? configuredMinimum ?? window.SFP_PRICING_CONFIG?.defaultMinimumOrder ?? 50
+                    configuredMinimum ?? item.minOrder ?? window.SFP_PRICING_CONFIG?.defaultMinimumOrder ?? 50
                 );
 
                 groupTotals[key] = (groupTotals[key] || 0) + price;
@@ -959,8 +959,18 @@ if (currentPayment === 'card') {
             }
         }
 
-        window.onload = () => {
+        window.onload = async () => {
             checkAuth();
+
+            // Wait for MongoDB pricing overrides before calculating production minimums.
+            if (window.SFP_PRICING_READY) {
+                try {
+                    await window.SFP_PRICING_READY;
+                } catch (error) {
+                    console.warn('Pricing overrides could not be loaded. Using pricing.js defaults.', error);
+                }
+            }
+
             loadCheckoutData();
         };
     </script>
