@@ -335,6 +335,7 @@
         const API_BASE = 'https://ft-f34l.onrender.com';
         let pricingDefaults = {};
         let pricingOverrides = {};
+        let pricingMeta = {};
 
         const PRICING_SOURCES = [
             ['Banners', 'bannerPricing'],
@@ -361,28 +362,102 @@
             await loadPricingEditor();
         }
 
-        function flattenNumeric(obj, prefix = '', out = {}) {
+        function humanizeKey(value) {
+            return String(value ?? '')
+                .replace(/_/g, ' ')
+                .replace(/-/g, ' ')
+                .replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        // Keep the ORIGINAL MongoDB path exactly as-is, but also remember the
+        // real object segments. This prevents decimal keys such as "3.00"
+        // from being displayed incorrectly as only "00".
+        function flattenNumeric(obj, prefix = '', out = {}, segments = null) {
             if (!obj || typeof obj !== 'object') return out;
+
+            const currentSegments = segments || (prefix ? [prefix] : []);
+
             Object.entries(obj).forEach(([key, value]) => {
                 const path = prefix ? `${prefix}.${key}` : key;
+                const nextSegments = [...currentSegments, key];
+
                 if (typeof value === 'number' && Number.isFinite(value)) {
                     out[path] = value;
+                    pricingMeta[path] = { segments: nextSegments };
                 } else if (value && typeof value === 'object' && !Array.isArray(value)) {
-                    flattenNumeric(value, path, out);
+                    flattenNumeric(value, path, out, nextSegments);
                 }
             });
             return out;
         }
 
-        function labelFromPath(path) {
-            return path.split('.').pop()
-                .replace(/[-_]/g, ' ')
-                .replace(/\b\w/g, c => c.toUpperCase());
+        function pathSegments(path) {
+            return pricingMeta[path]?.segments || path.split('.');
         }
 
         function productFromPath(path) {
-            const bits = path.split('.');
-            return bits.length > 1 ? bits[1].replace(/[-_]/g, ' ').toUpperCase() : 'GENERAL';
+            const bits = pathSegments(path);
+            if (bits[0] === 'SFP_PRICING_CONFIG') {
+                if (bits[1] === 'productionTypes' && bits[2]) return humanizeKey(bits[2]).toUpperCase();
+                return 'GENERAL';
+            }
+            return bits.length > 1 ? humanizeKey(bits[1]).toUpperCase() : 'GENERAL';
+        }
+
+        function groupFromPath(path) {
+            const bits = pathSegments(path);
+            if (bits[0] === 'SFP_PRICING_CONFIG') return 'Minimum Order';
+            if (bits.length <= 3) return 'Base Pricing';
+            return humanizeKey(bits[bits.length - 2]);
+        }
+
+        function labelFromPath(path) {
+            const bits = pathSegments(path);
+            const key = bits[bits.length - 1];
+            const parent = bits.length > 1 ? bits[bits.length - 2] : '';
+
+            const direct = {
+                defaultMinimumOrder: 'Default Minimum Order',
+                minimumOrder: 'Minimum Order',
+                minOrder: 'Minimum Order',
+                startingPrice: 'Starting Price',
+                material: 'Material / Sq Ft',
+                rush: 'Rush Fee',
+                doubleSidedMultiplier: 'Double Sided Multiplier'
+            };
+            if (direct[key]) return direct[key];
+
+            const lower = String(key).toLowerCase();
+            const parentLower = String(parent).toLowerCase();
+
+            if (parentLower === 'turnaround') {
+                if (lower === '0') return 'Standard';
+                if (lower === '50') return 'Rush Fee';
+            }
+            if (['pocket', 'velcro', 'lamination', 'finishing', 'options', 'acc'].includes(parentLower)) {
+                if (['none', '0', 'included', 'no'].includes(lower)) return 'None / Included';
+            }
+            if (parentLower === 'pocket') {
+                if (lower === '2in') return '2 Inch';
+                if (lower === '3in' || lower === '3 inch') return '3 Inch';
+            }
+            if (parentLower === 'hem') {
+                if (key === '3.00') return 'Trim to Size';
+                if (key === '3.50') return 'Hem All Sides';
+                if (lower === 'none') return 'No Hem';
+                if (lower === 'hem') return 'Hem';
+            }
+            if (parentLower === 'hardware') {
+                if (lower === 'full-set') return 'Full Hardware Set';
+                if (lower === 'graphic-only') return 'Graphic Only';
+            }
+
+            return humanizeKey(key);
+        }
+
+        function valuePrefix(path) {
+            const key = pathSegments(path).at(-1);
+            return /multiplier/i.test(key) ? '×' : '$';
         }
 
         function pricingStatus(message, ok = true) {
@@ -397,6 +472,7 @@
             editor.innerHTML = '<div class="text-gray-400 italic text-sm">Loading pricing...</div>';
 
             pricingDefaults = {};
+            pricingMeta = {};
             const categories = [];
 
             // Production minimums are editable too.
@@ -435,6 +511,50 @@
                     (grouped[product] ||= []).push([path, defaultValue]);
                 });
 
+                // Keep all production minimums together in one compact grid.
+                if (category === 'Production Minimums') {
+                    return `
+                        <div class="border border-gray-100 rounded-[2rem] overflow-hidden">
+                            <div class="bg-black text-white px-6 py-5">
+                                <h2 class="font-black uppercase italic tracking-wide">${category}</h2>
+                            </div>
+                            <div class="p-5 md:p-7">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                                    ${entries.map(([path, defaultValue]) => {
+                                        const current = Object.prototype.hasOwnProperty.call(pricingOverrides, path)
+                                            ? pricingOverrides[path]
+                                            : defaultValue;
+                                        const overridden = Object.prototype.hasOwnProperty.call(pricingOverrides, path);
+                                        const product = productFromPath(path);
+                                        const cardTitle = product === 'GENERAL' ? 'GENERAL' : product;
+                                        return `
+                                            <label class="block bg-gray-50 rounded-2xl p-4 border ${overridden ? 'border-red-200' : 'border-gray-100'}">
+                                                <span class="block text-[10px] font-black uppercase italic text-black mb-3">${cardTitle}</span>
+                                                <span class="block text-[8px] font-black uppercase text-gray-400 mb-2">Minimum Order</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-black">$</span>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.01"
+                                                        data-pricing-path="${path}"
+                                                        data-default="${defaultValue}"
+                                                        value="${current}"
+                                                        class="w-full bg-white border rounded-xl px-3 py-2 text-sm font-black outline-none focus:border-black">
+                                                </div>
+                                                <div class="mt-2 text-[8px] uppercase font-bold text-gray-400">
+                                                    Default: $${Number(defaultValue).toFixed(2)}
+                                                    ${overridden ? '<span class="text-red-600 ml-2">MongoDB override</span>' : ''}
+                                                </div>
+                                            </label>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
                 return `
                     <div class="border border-gray-100 rounded-[2rem] overflow-hidden">
                         <div class="bg-black text-white px-6 py-5">
@@ -444,34 +564,48 @@
                             ${Object.entries(grouped).map(([product, productFields]) => `
                                 <div class="border-b border-gray-100 pb-6 last:border-0">
                                     <h3 class="text-xs font-black uppercase italic mb-4">${product}</h3>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                                        ${productFields.map(([path, defaultValue]) => {
-                                            const current = Object.prototype.hasOwnProperty.call(pricingOverrides, path)
-                                                ? pricingOverrides[path]
-                                                : defaultValue;
-                                            const overridden = Object.prototype.hasOwnProperty.call(pricingOverrides, path);
-                                            return `
-                                                <label class="block bg-gray-50 rounded-2xl p-4 border ${overridden ? 'border-red-200' : 'border-gray-100'}">
-                                                    <span class="block text-[9px] font-black uppercase text-gray-500 mb-2">${labelFromPath(path)}</span>
-                                                    <div class="flex items-center gap-2">
-                                                        <span class="font-black">$</span>
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            step="0.01"
-                                                            data-pricing-path="${path}"
-                                                            data-default="${defaultValue}"
-                                                            value="${current}"
-                                                            class="w-full bg-white border rounded-xl px-3 py-2 text-sm font-black outline-none focus:border-black">
-                                                    </div>
-                                                    <div class="mt-2 text-[8px] uppercase font-bold text-gray-400">
-                                                        Default: $${Number(defaultValue).toFixed(2)}
-                                                        ${overridden ? '<span class="text-red-600 ml-2">MongoDB override</span>' : ''}
-                                                    </div>
-                                                </label>
-                                            `;
-                                        }).join('')}
-                                    </div>
+                                    ${(() => {
+                                        const optionGroups = {};
+                                        productFields.forEach(field => {
+                                            const group = groupFromPath(field[0]);
+                                            (optionGroups[group] ||= []).push(field);
+                                        });
+
+                                        return Object.entries(optionGroups).map(([group, groupFields]) => `
+                                            <div class="mb-5 last:mb-0">
+                                                <div class="text-[9px] font-black uppercase tracking-widest text-red-600 mb-3">${group}</div>
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                                                    ${groupFields.map(([path, defaultValue]) => {
+                                                        const current = Object.prototype.hasOwnProperty.call(pricingOverrides, path)
+                                                            ? pricingOverrides[path]
+                                                            : defaultValue;
+                                                        const overridden = Object.prototype.hasOwnProperty.call(pricingOverrides, path);
+                                                        const prefix = valuePrefix(path);
+                                                        return `
+                                                            <label class="block bg-gray-50 rounded-2xl p-4 border ${overridden ? 'border-red-200' : 'border-gray-100'}">
+                                                                <span class="block text-[9px] font-black uppercase text-gray-500 mb-2">${labelFromPath(path)}</span>
+                                                                <div class="flex items-center gap-2">
+                                                                    <span class="font-black">${prefix}</span>
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        step="0.01"
+                                                                        data-pricing-path="${path}"
+                                                                        data-default="${defaultValue}"
+                                                                        value="${current}"
+                                                                        class="w-full bg-white border rounded-xl px-3 py-2 text-sm font-black outline-none focus:border-black">
+                                                                </div>
+                                                                <div class="mt-2 text-[8px] uppercase font-bold text-gray-400">
+                                                                    Default: ${prefix}${Number(defaultValue).toFixed(2)}
+                                                                    ${overridden ? '<span class="text-red-600 ml-2">MongoDB override</span>' : ''}
+                                                                </div>
+                                                            </label>
+                                                        `;
+                                                    }).join('')}
+                                                </div>
+                                            </div>
+                                        `).join('');
+                                    })()}
                                 </div>
                             `).join('')}
                         </div>

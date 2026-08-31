@@ -1046,7 +1046,7 @@ app.put(
                 return res.status(400).json({ msg: 'No pricing changes supplied.' });
             }
 
-            const safePath = /^[A-Za-z0-9_$.-]+$/;
+            const safePath = /^[A-Za-z0-9_$./ -]+$/;
             const operations = [];
 
             for (const change of changes) {
