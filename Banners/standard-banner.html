@@ -244,7 +244,7 @@
     </div>
     <div id="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="../pricing.js"></script>
+    <script src="../pricing-v2.js"></script>
     <script src="banner-common.js"></script>
     <script>
         if (window.pdfjsLib?.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -306,8 +306,8 @@
             document.getElementById('drop-zone').classList.add('hidden');
             document.getElementById('validation-panel').classList.remove('hidden');
             updateOrderedLabels();
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             const previewImg = document.getElementById('preview-thumb');
             const canvas = document.getElementById('pdf-canvas');
             const renderArt = (w, h, contentUrl, isPdfType) => {
@@ -344,8 +344,8 @@
             const inchW = (w / 100).toFixed(2); const inchH = (h / 100).toFixed(2);
             document.getElementById('file-dims').innerText = `${inchW}" x ${inchH}"`;
             const dpiInfo = document.getElementById('dpi-info'); const statusTitle = document.getElementById('status-title');
-            const targetW = parseFloat(document.getElementById('w-input').value) * 100;
-            const targetH = parseFloat(document.getElementById('h-input').value) * 100;
+            const targetW = parseFloat(document.getElementById('width-input').value) * 100;
+            const targetH = parseFloat(document.getElementById('height-input').value) * 100;
             if (w < targetW || h < targetH) {
                 statusTitle.innerText = "WARNING: ORANGE VISIBLE"; statusTitle.className = "text-[10px] font-black uppercase text-orange-500 italic";
                 dpiInfo.innerHTML = 'LOW COVERAGE ⚠️'; dpiInfo.className = "text-red-500 font-black italic text-[10px] flex items-center gap-1";
@@ -358,8 +358,8 @@
         function autoFitImage() {
             const el = isPdf ? document.getElementById('pdf-canvas') : document.getElementById('preview-thumb');
             const statusTitle = document.getElementById('status-title');
-            const targetW = parseFloat(document.getElementById('w-input').value) || 1;
-            const targetH = parseFloat(document.getElementById('h-input').value) || 1;
+            const targetW = parseFloat(document.getElementById('width-input').value) || 1;
+            const targetH = parseFloat(document.getElementById('height-input').value) || 1;
             el.style.width = "100%"; el.style.height = "100%"; el.style.objectFit = "cover"; el.style.transform = "none"; el.style.position = "relative";
             if ((originalW > originalH) !== (targetW > targetH)) {
                 el.style.transform = "rotate(90deg)"; const areaBox = document.getElementById('printing-area');
@@ -396,8 +396,8 @@
 
         function addToCart() {
             if (!uploadedFileUrl) return alert("Please upload art first");
-            const w = document.getElementById('w-input').value; 
-            const h = document.getElementById('h-input').value;
+            const w = document.getElementById('width-input').value; 
+            const h = document.getElementById('height-input').value;
             const finish = document.getElementById('finish-select');
             const pocket = document.getElementById('pocket-select');
             const turn = document.getElementById('turn-select');
