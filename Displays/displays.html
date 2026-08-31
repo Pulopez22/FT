@@ -154,19 +154,27 @@
                 function getProductPrice(p) {
             const isWholesale = (localStorage.getItem('userTier') === 'wholesale');
             const multiplier = isWholesale ? 1 : 2;
+            const live = window.displaysPricing?.[p.id];
 
-            // Si el producto tiene un basePrice definido en el array 'products' arriba, úsalo.
-            if (p.basePrice) {
-                return p.basePrice * multiplier;
-            }
+            // Each card uses the same entry point as its product calculator, so
+            // MongoDB overrides in Edit Pricing are reflected in the category.
+            const startingPriceReaders = {
+                'gallery-canvas': () => live?.material,
+                'table-cover': () => live?.material,
+                'aframe': () => live?.material,
+                'x-stand': () => live?.matrix?.['24x63']?.['13oz']?.['Standard'],
+                'retractable': () => live?.matrix?.['24']?.['Silver']?.['Standard (3-5 Days)'],
+                'backdrop': () => live?.matrix?.fabric?.['8x8']?.kit,
+                'tensionstand': () => live?.matrix?.Small?.kit?.no,
+                'stretchtable': () => live?.base?.['6'],
+                'eventtent': () => live?.base?.full_kit?.Standard
+            };
 
-            // Si no tiene basePrice, intenta usar el calculador de banners (respaldo)
-            if (typeof window.getDisplayPrice === 'function') {
-                const res = window.getDisplayPrice(p.id, "none", "0");
-                return res.pricePerSqFt || 0;
-            }
+            const liveBase = Number(startingPriceReaders[p.id]?.());
+            if (Number.isFinite(liveBase)) return liveBase * multiplier;
 
-            return 0;
+            // Fallback keeps the storefront usable if a product has no pricing map.
+            return (Number(p.basePrice) || 0) * multiplier;
         }
 
         function checkAuth() {
@@ -273,7 +281,14 @@
         function filterBy(cat, btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); const filtered = cat === 'all' ? products : products.filter(b => b.cat === cat); renderProducts(filtered); }
         function handleSearch(term) { const searchResults = products.filter(b => b.name.toLowerCase().includes(term.toLowerCase())); renderProducts(searchResults); }
         function logout() { localStorage.clear(); window.location.reload(); }
-        window.onload = checkAuth;
+        window.onload = async () => {
+            if (window.SFP_PRICING_READY) {
+                try { await window.SFP_PRICING_READY; } catch (error) {
+                    console.warn('Live pricing unavailable; using pricing-v2.js defaults.', error);
+                }
+            }
+            checkAuth();
+        };
     </script>
     <script src="../admin-storefront.js"></script>
 </body>

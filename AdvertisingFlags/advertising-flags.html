@@ -237,7 +237,14 @@
         }
 
         function logout() { localStorage.clear(); window.location.reload(); }
-        window.onload = checkAuth;
+        window.onload = async () => {
+            if (window.SFP_PRICING_READY) {
+                try { await window.SFP_PRICING_READY; } catch (error) {
+                    console.warn('Live pricing unavailable; using pricing-v2.js defaults.', error);
+                }
+            }
+            checkAuth();
+        };
     </script>
     <script src="../admin-storefront.js"></script>
 </body>
