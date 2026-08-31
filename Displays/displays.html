@@ -159,9 +159,9 @@
             // Each card uses the same entry point as its product calculator, so
             // MongoDB overrides in Edit Pricing are reflected in the category.
             const startingPriceReaders = {
-                'gallery-canvas': () => live?.material,
-                'table-cover': () => live?.material,
-                'aframe': () => live?.material,
+                'gallery-canvas': () => { const q = window.largeFormatPricing?.['gallery-canvas']; return q?.sizes ? q.sizes[Object.keys(q.sizes)[0]] : q?.material; },
+                'table-cover': () => { const q = window.largeFormatPricing?.['table-cover']; return q?.sizes ? q.sizes[Object.keys(q.sizes)[0]] : q?.material; },
+                'aframe': () => window.rigidsigns?.['aframe']?.material ?? window.rigidsigns?.['Aframe']?.material,
                 'x-stand': () => live?.matrix?.['24x63']?.['13oz']?.['Standard'],
                 'retractable': () => live?.matrix?.['24']?.['Silver']?.['Standard (3-5 Days)'],
                 'backdrop': () => live?.matrix?.fabric?.['8x8']?.kit,

@@ -178,6 +178,14 @@
                         const p = window.masterPricing[b.id];
                         priceBase = p.base || p["small-single-Printed Flag Only (No Hardware)-No"] || 0;
                     }
+                    // Products that physically belong to Displays use the same complete
+                    // pricing object as their real product HTML/calculator.
+                    if (priceBase === 0 && window.displaysPricing && window.displaysPricing[b.id]) {
+                        const p = window.displaysPricing[b.id];
+                        if (b.id === 'stretchtable' && p.base) priceBase = p.base["6"] || 0;
+                        else if (b.id === 'tensionstand' && p.matrix) priceBase = p.matrix?.Small?.kit?.no || 0;
+                        else priceBase = p.material || 0;
+                    }
                     if (priceBase === 0 && window.largeFormatPricing && window.largeFormatPricing[b.id]) {
                         const p = window.largeFormatPricing[b.id];
                         priceBase = p.material || (p.sizes ? p.sizes[Object.keys(p.sizes)[0]] : 0);
