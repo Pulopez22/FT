@@ -84,13 +84,15 @@
                 <div class="h-2 w-24 bg-red-600 rounded-full mb-8"></div>
             </header>
 
-            <div class="grid grid-cols-2 xl:grid-cols-5 gap-4 mb-10">
-                <div class="metric-card"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Orders Today</div><div id="metric-today" class="text-3xl font-black italic mt-2">0</div></div>
-                <div class="metric-card"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Pending</div><div id="metric-pending" class="text-3xl font-black italic mt-2">0</div></div>
-                <div class="metric-card"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Paid</div><div id="metric-paid" class="text-3xl font-black italic mt-2">0</div></div>
-                <div class="metric-card"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">In Production</div><div id="metric-production" class="text-3xl font-black italic mt-2">0</div></div>
-                <div class="metric-card col-span-2 xl:col-span-1"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Revenue</div><div id="metric-revenue" class="text-3xl font-black italic mt-2">$0</div></div>
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-4" id="dashboard-metrics">
+                <button type="button" data-dashboard-filter="today" onclick="setDashboardFilter('today', this)" class="metric-card text-left cursor-pointer hover:border-black transition-all"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Orders Today</div><div id="metric-today" class="text-3xl font-black italic mt-2">0</div></button>
+                <button type="button" data-dashboard-filter="awaiting" onclick="setDashboardFilter('awaiting', this)" class="metric-card text-left cursor-pointer hover:border-black transition-all"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Awaiting Payment</div><div id="metric-pending" class="text-3xl font-black italic mt-2">0</div></button>
+                <button type="button" data-dashboard-filter="paid" onclick="setDashboardFilter('paid', this)" class="metric-card text-left cursor-pointer hover:border-black transition-all"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Paid</div><div id="metric-paid" class="text-3xl font-black italic mt-2">0</div></button>
+                <button type="button" data-dashboard-filter="production" onclick="setDashboardFilter('production', this)" class="metric-card text-left cursor-pointer hover:border-black transition-all"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">In Production</div><div id="metric-production" class="text-3xl font-black italic mt-2">0</div></button>
+                <button type="button" data-dashboard-filter="ready" onclick="setDashboardFilter('ready', this)" class="metric-card text-left cursor-pointer hover:border-black transition-all"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Ready</div><div id="metric-ready" class="text-3xl font-black italic mt-2">0</div></button>
+                <button type="button" data-dashboard-filter="revenue" onclick="setDashboardFilter('revenue', this)" class="metric-card text-left cursor-pointer hover:border-black transition-all"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Revenue</div><div id="metric-revenue" class="text-3xl font-black italic mt-2">$0</div></button>
             </div>
+            <div class="mb-8 text-right"><button id="clear-dashboard-filter" onclick="setDashboardFilter('all')" class="hidden text-[9px] font-black uppercase underline text-red-600">Show All Orders</button></div>
 
             <div class="overflow-x-auto">
                 <table class="admin-table">
@@ -169,7 +171,7 @@
                 }
 
                 tbody.innerHTML = orders.map(order => `
-                    <tr class="order-row cursor-pointer" onclick="toggleDetails('details-${order._id}')">
+                    <tr class="order-row cursor-pointer" data-order-id="${order._id}" onclick="toggleDetails('details-${order._id}')">
                         <td class="font-black">#${order.order_id || order._id.substring(0,8)}</td>
                         <td>
                             <div class="font-bold uppercase">${order.customer_name}</div>
@@ -196,7 +198,7 @@
                         </td>
                         <td class="text-gray-400 font-medium">${new Date(order.createdAt).toLocaleDateString()}</td>
                     </tr>
-                    <tr id="details-${order._id}" class="hidden bg-gray-50/50">
+                    <tr id="details-${order._id}" data-order-details="${order._id}" class="hidden bg-gray-50/50">
                         <td colspan="6" class="p-6 border-x border-b rounded-b-[2rem]">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 ${order.order_items ? order.order_items.map(item => `
@@ -334,6 +336,7 @@
                     </tr>
                 `).join('');
                 if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
+                setDashboardFilter(window.activeDashboardFilter || 'all');
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-red-500">Error connecting to server.</td></tr>`;
             }
@@ -344,19 +347,100 @@
             return Number.isFinite(number) ? number : 0;
         }
 
-        function updateDashboardMetrics(orders) {
+        function normalizedStatus(order) {
+            return String(order?.status || '').trim().toLowerCase();
+        }
+
+        function normalizedPaymentStatus(order) {
+            return String(order?.payment_status || order?.paymentStatus || '').trim().toLowerCase();
+        }
+
+        function orderIsPaid(order) {
+            const status = normalizedStatus(order);
+            const payment = normalizedPaymentStatus(order);
+            if (['paid', 'succeeded', 'completed'].includes(payment)) return true;
+            // Older/manual orders may not have payment_status. Once they are moved
+            // beyond RECEIVED, the production workflow treats them as paid.
+            return ['paid', 'preflight', 'printing', 'finishing', 'ready', 'shipped', 'completed'].includes(status);
+        }
+
+        function orderIsAwaitingPayment(order) {
+            const status = normalizedStatus(order);
+            if (orderIsPaid(order)) return false;
+            const payment = normalizedPaymentStatus(order);
+            return ['pending', 'unpaid', 'awaiting payment', 'requires_payment_method', 'requires_action', ''].includes(payment)
+                && ['pending', 'received', ''].includes(status);
+        }
+
+        function orderIsInProduction(order) {
+            return ['preflight', 'printing', 'finishing'].includes(normalizedStatus(order));
+        }
+
+        function orderIsReady(order) {
+            return normalizedStatus(order) === 'ready';
+        }
+
+        function orderIsToday(order) {
+            const value = order?.createdAt || order?.created_at || order?.date;
+            if (!value) return false;
+            const d = new Date(value);
+            if (Number.isNaN(d.getTime())) return false;
             const today = new Date();
-            const isToday = value => {
-                const d = new Date(value);
-                return d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today.getDate();
-            };
-            const paid = orders.filter(o => String(o.payment_status || o.status || '').toLowerCase().includes('paid'));
-            const productionStatuses = new Set(['Preflight', 'Printing', 'Finishing', 'Ready']);
-            document.getElementById('metric-today').innerText = orders.filter(o => isToday(o.createdAt)).length;
-            document.getElementById('metric-pending').innerText = orders.filter(o => ['Pending', 'Awaiting Payment'].includes(o.status) || String(o.payment_status || '').toLowerCase().includes('pending')).length;
-            document.getElementById('metric-paid').innerText = paid.length;
-            document.getElementById('metric-production').innerText = orders.filter(o => productionStatuses.has(o.status)).length;
-            document.getElementById('metric-revenue').innerText = '$' + paid.reduce((sum, o) => sum + parseMoney(o.total_price), 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            return d.getFullYear() === today.getFullYear()
+                && d.getMonth() === today.getMonth()
+                && d.getDate() === today.getDate();
+        }
+
+        function updateDashboardMetrics(orders) {
+            document.getElementById('metric-today').innerText = orders.filter(orderIsToday).length;
+            document.getElementById('metric-pending').innerText = orders.filter(orderIsAwaitingPayment).length;
+            document.getElementById('metric-paid').innerText = orders.filter(orderIsPaid).length;
+            document.getElementById('metric-production').innerText = orders.filter(orderIsInProduction).length;
+            document.getElementById('metric-ready').innerText = orders.filter(orderIsReady).length;
+            document.getElementById('metric-revenue').innerText = '$' + orders
+                .filter(orderIsPaid)
+                .reduce((sum, o) => sum + parseMoney(o.total_price), 0)
+                .toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        window.activeDashboardFilter = 'all';
+
+        function matchesDashboardFilter(order, filter) {
+            if (filter === 'today') return orderIsToday(order);
+            if (filter === 'awaiting') return orderIsAwaitingPayment(order);
+            if (filter === 'paid' || filter === 'revenue') return orderIsPaid(order);
+            if (filter === 'production') return orderIsInProduction(order);
+            if (filter === 'ready') return orderIsReady(order);
+            return true;
+        }
+
+        function setDashboardFilter(filter, button) {
+            // Clicking the active card again returns to all orders.
+            if (filter !== 'all' && window.activeDashboardFilter === filter) filter = 'all';
+            window.activeDashboardFilter = filter;
+
+            document.querySelectorAll('[data-dashboard-filter]').forEach(card => {
+                const active = filter !== 'all' && card.dataset.dashboardFilter === filter;
+                card.classList.toggle('ring-2', active);
+                card.classList.toggle('ring-red-600', active);
+                card.classList.toggle('bg-red-50', active);
+            });
+
+            const clearButton = document.getElementById('clear-dashboard-filter');
+            if (clearButton) clearButton.classList.toggle('hidden', filter === 'all');
+
+            document.querySelectorAll('tr[data-order-id]').forEach(row => {
+                const id = row.dataset.orderId;
+                const order = window.adminOrdersById?.[id];
+                const show = !!order && matchesDashboardFilter(order, filter);
+                row.classList.toggle('hidden', !show);
+                const details = document.querySelector(`tr[data-order-details="${CSS.escape(id)}"]`);
+                if (details) {
+                    details.classList.add('hidden');
+                    if (!show) details.classList.add('dashboard-filtered-out');
+                    else details.classList.remove('dashboard-filtered-out');
+                }
+            });
         }
 
         function escapePrint(value) {

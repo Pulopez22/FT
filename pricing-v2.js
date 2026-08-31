@@ -1125,3 +1125,15 @@ window.SFP_whenPricingReady = function(callback) {
         .then(() => typeof callback === 'function' ? callback() : undefined);
 };
 
+
+
+// Guarantee that individual product calculators run once more after BOTH
+// the page scripts and MongoDB pricing overrides are ready. This avoids the
+// initial default-price race on product detail pages.
+window.addEventListener('load', async function SFP_recalculateAfterLivePricing() {
+    try { await window.SFP_PRICING_READY; } catch (error) {}
+    if (typeof window.calculatePrice === 'function') {
+        try { window.calculatePrice(); }
+        catch (error) { console.warn('Live pricing loaded, but product recalculation failed.', error); }
+    }
+});
