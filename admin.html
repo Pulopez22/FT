@@ -184,7 +184,7 @@
                         </td>
                         <td class="text-lg font-black italic">$${order.total_price || '0.00'}</td>
                         <td>
-                            <select onchange="event.stopPropagation(); updateStatus('${order._id}', this.value)" 
+                            <select data-order-status="${order._id}" onclick="event.stopPropagation()" onchange="event.stopPropagation(); updateStatus('${order._id}', this.value, this)" 
         class="status-badge ${getStatusClass(order.status)} outline-none cursor-pointer border-none bg-transparent font-black">
     <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>RECEIVED</option>
     <option value="Paid" ${order.status === 'Paid' ? 'selected' : ''}>PAID</option>
@@ -457,16 +457,45 @@
             popup.document.close();
         }
 
-        async function updateStatus(orderId, newStatus) {
+        async function updateStatus(orderId, newStatus, selectEl = null) {
             const token = localStorage.getItem('token');
+            const order = window.adminOrdersById?.[orderId];
+            const previousStatus = order?.status || 'Pending';
+            const select = selectEl || document.querySelector(`select[data-order-status="${orderId}"]`);
+
+            if (select) {
+                select.disabled = true;
+                select.style.opacity = '0.55';
+            }
+
             try {
                 const res = await fetch(`https://ft-f34l.onrender.com/api/admin/orders/${orderId}/status`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
                     body: JSON.stringify({ status: newStatus })
                 });
-                if (res.ok) fetchOrders();
-            } catch (e) { alert("Error updating status"); }
+
+                const payload = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(payload.error || payload.msg || `HTTP ${res.status}`);
+
+                if (window.adminOrdersById?.[orderId]) {
+                    window.adminOrdersById[orderId] = { ...window.adminOrdersById[orderId], ...payload, status: payload.status || newStatus };
+                    updateDashboardMetrics(Object.values(window.adminOrdersById));
+                }
+
+                if (select) {
+                    select.className = `status-badge ${getStatusClass(payload.status || newStatus)} outline-none cursor-pointer border-none bg-transparent font-black`;
+                }
+            } catch (e) {
+                console.error('Status update failed:', e);
+                if (select) select.value = previousStatus;
+                alert(`Could not update order status. ${e.message || ''}`.trim());
+            } finally {
+                if (select) {
+                    select.disabled = false;
+                    select.style.opacity = '';
+                }
+            }
         }
 
         function getStatusClass(status) {

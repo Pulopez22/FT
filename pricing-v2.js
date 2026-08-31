@@ -146,7 +146,12 @@ window.getBannerTotalUnit = function(productID, options = {}, legacyTurnVal = "0
         const product = window.bannerPricing[productID];
         if (!product) return { pricePerSqFt: 0, fixedFee: 0 };
 
-        let totalSqFtWholesale = product.material || 0;
+        // Products whose storefront "Starting Price" is also the real sq/ft calculator base.
+        // Keep products with intentionally separate formulas (hem/finishing/matrix/etc.) untouched.
+        const startingPriceCalculatorProducts = new Set(["blockout-fabric"]);
+        let totalSqFtWholesale = startingPriceCalculatorProducts.has(productID)
+            ? Number(product.startingPrice || 0)
+            : Number(product.material || 0);
 
         // Sumar extras por sq/ft
         if (velcroType && product.velcro?.[velcroType]) totalSqFtWholesale += product.velcro[velcroType];
