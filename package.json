@@ -4,7 +4,8 @@
   "description": "Square Foot Printing Server",
   "main": "server.js",
   "scripts": {
-    "start": "node launcher.js"
+    "start": "node launcher.js",
+    "migrate:pricing": "node scripts/migrate-pricing-to-mongodb.js"
   },
   "repository": {
     "type": "git",

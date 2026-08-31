@@ -1,0 +1,873 @@
+{
+  "SFP_PRICING_CONFIG": {
+    "defaultMinimumOrder": 50,
+    "productionTypes": {
+      "banners": {
+        "label": "Banners",
+        "minimumOrder": 50
+      },
+      "displays": {
+        "label": "Displays",
+        "minimumOrder": 50
+      },
+      "advertisingFlags": {
+        "label": "Advertising Flags",
+        "minimumOrder": 50
+      },
+      "largePrinting": {
+        "label": "Large Printing",
+        "minimumOrder": 50
+      },
+      "rigidSigns": {
+        "label": "Rigid Signs",
+        "minimumOrder": 50
+      },
+      "stickers": {
+        "label": "Stickers",
+        "minimumOrder": 50
+      },
+      "printedFabric": {
+        "label": "Printed Fabric",
+        "minimumOrder": 50
+      }
+    }
+  },
+  "bannerPricing": {
+    "blockout-fabric": {
+      "startingPrice": 6,
+      "material": 6.75,
+      "velcro": {
+        "1": 1.5,
+        "2": 2.5,
+        "none": 0
+      }
+    },
+    "wrinkle-free": {
+      "startingPrice": 4.5,
+      "material": 0,
+      "hem": {
+        "3.00": 3,
+        "3.50": 3.5
+      },
+      "pocket": {
+        "none": 0,
+        "2in": 1,
+        "3in": 1
+      },
+      "velcro": {
+        "0": 0,
+        "1.50": 1.5,
+        "3.00": 3
+      },
+      "turnaround": {
+        "0": 0,
+        "50": 50
+      }
+    },
+    "hd-banner-18oz": {
+      "startingPrice": 5,
+      "material": 3,
+      "pocket": {
+        "0": 0,
+        "1.00": 1
+      },
+      "turnaround": {
+        "0": 0,
+        "50": 50
+      }
+    },
+    "mesh-banner": {
+      "startingPrice": 3,
+      "material": 2,
+      "turnaround": {
+        "0": 0,
+        "50": 50
+      }
+    },
+    "super-smooth": {
+      "startingPrice": 3.5,
+      "material": 1.25,
+      "turnaround": {
+        "0": 0,
+        "50": 50
+      }
+    },
+    "standard-banner": {
+      "startingPrice": 1,
+      "material": 0,
+      "finishing": {
+        "1.00": 1,
+        "1.50": 1.5,
+        "3.00": 3
+      },
+      "pocket": {
+        "None": 0,
+        "3 inch": 1
+      },
+      "turnaround": {
+        "0": 0,
+        "50": 50
+      }
+    },
+    "tension-fabric": {
+      "startingPrice": 5.5,
+      "material": 6,
+      "hem": {
+        "none": 0,
+        "hem": 0.5
+      },
+      "pocket": {
+        "none": 0,
+        "2in": 1,
+        "3in": 1
+      },
+      "velcro": {
+        "none": 0,
+        "1.50": 1.5,
+        "2.00": 3
+      },
+      "turnaround": {
+        "0": 0,
+        "50": 50
+      }
+    },
+    "pole-banners": {
+      "startingPrice": 39.34,
+      "material": 0,
+      "sizes": {
+        "18x36": 39.34,
+        "18x60": 65.56,
+        "18x72": 78.67,
+        "18x84": 91.78,
+        "18x96": 104.89,
+        "24x36": 52.45,
+        "24x48": 69.93,
+        "24x60": 87.41,
+        "24x72": 104.89,
+        "24x84": 122.37,
+        "24x96": 139.85,
+        "30x36": 65.56,
+        "30x48": 87.41,
+        "30x60": 109.26,
+        "30x72": 131.11,
+        "30x84": 152.96,
+        "30x96": 171.66
+      },
+      "hardware": {
+        "full-set": 60,
+        "graphic-only": 0
+      },
+      "turnaround": {
+        "0": 0,
+        "50": 50
+      }
+    }
+  },
+  "displaysPricing": {
+    "gallery-canvas": {
+      "material": 29.34
+    },
+    "table-cover": {
+      "material": 120
+    },
+    "aframe": {
+      "material": 95.67
+    },
+    "x-stand": {
+      "matrix": {
+        "24x63": {
+          "13oz": {
+            "Standard": 55.5,
+            "Next Day": 88.5
+          },
+          "popup": {
+            "Standard": 72,
+            "Next Day": 121.5
+          }
+        },
+        "32x71": {
+          "13oz": {
+            "Standard": 69,
+            "Next Day": 94.5
+          },
+          "popup": {
+            "Standard": 94.5,
+            "Next Day": 166.5
+          }
+        }
+      }
+    },
+    "stretchtable": {
+      "base": {
+        "6": 140,
+        "8": 165
+      },
+      "rush": 50
+    },
+    "retractable": {
+      "matrix": {
+        "24": {
+          "Silver": {
+            "Standard (3-5 Days)": 102.25,
+            "Standard (2 Days)": 160.75
+          }
+        },
+        "33": {
+          "Silver": {
+            "Standard (2 Days)": 106.75,
+            "Next Day": 166.75,
+            "Same Day": 166.75
+          },
+          "Black": {
+            "Standard (2 Days)": 113.75,
+            "Next Day": 234.75
+          }
+        },
+        "36": {
+          "Silver": {
+            "Standard (2 Days)": 139.5,
+            "Next Day": 267
+          }
+        },
+        "47": {
+          "Silver": {
+            "Standard (2 Days)": 133.97,
+            "Next Day": 256.26
+          }
+        },
+        "48": {
+          "Silver": {
+            "Standard (3-5 Days)": 225.5,
+            "Standard (2 Days)": 404
+          }
+        },
+        "60": {
+          "Silver": {
+            "Standard (2 Days)": 238.5,
+            "Next Day": 454.5
+          }
+        }
+      }
+    },
+    "tensionstand": {
+      "matrix": {
+        "Small": {
+          "kit": {
+            "no": 261,
+            "yes": 486
+          },
+          "insert": {
+            "no": 153
+          }
+        },
+        "Medium": {
+          "kit": {
+            "no": 269,
+            "yes": 494
+          },
+          "insert": {
+            "no": 137
+          }
+        },
+        "Large": {
+          "single": {
+            "kit": {
+              "no": 421.88,
+              "yes": 596.25
+            },
+            "insert": {
+              "no": 253.13
+            }
+          },
+          "double": {
+            "kit": {
+              "no": 609.38,
+              "yes": 783.75
+            },
+            "insert": {
+              "no": 346.88
+            }
+          }
+        },
+        "X-Large": {
+          "single": {
+            "kit": {
+              "no": 515.63,
+              "yes": 690
+            },
+            "insert": {
+              "no": 346.88
+            }
+          },
+          "double": {
+            "kit": {
+              "no": 703.13,
+              "yes": 877.5
+            },
+            "insert": {
+              "no": 440.63
+            }
+          }
+        }
+      }
+    },
+    "backdrop": {
+      "matrix": {
+        "fabric": {
+          "8x8": {
+            "kit": 255,
+            "insert": 218
+          },
+          "9x8": {
+            "kit": 255,
+            "insert": 220
+          },
+          "10x8": {
+            "kit": 255,
+            "insert": 222
+          }
+        },
+        "vinyl": {
+          "8x8": {
+            "kit": 275,
+            "insert": 129
+          },
+          "9x8": {
+            "kit": 275,
+            "insert": 275
+          },
+          "10x8": {
+            "kit": 275,
+            "insert": 129
+          }
+        }
+      }
+    },
+    "eventtent": {
+      "base": {
+        "full_kit": {
+          "Standard": 492.9,
+          "Quick": 640
+        },
+        "canopy_only": {
+          "Standard": 295,
+          "Quick": 395
+        }
+      },
+      "extras": {
+        "fullwall": 185,
+        "halfwall": 145,
+        "acc": {
+          "none": 0,
+          "bag": 45,
+          "sand": 60,
+          "both": 105
+        }
+      }
+    }
+  },
+  "masterPricing": {
+    "custom-pole-flag": {
+      "base": 10,
+      "double": 18.5
+    },
+    "teardrop-flag": {
+      "base": 19.17
+    },
+    "feather-angled-flag": {
+      "base": 19.17
+    },
+    "econo-feather-flag": {
+      "flag-only": 73.65,
+      "full-kit": 156.6,
+      "base": 33.32
+    },
+    "feather-angled-flag-pro": {
+      "small-single-Printed Flag Only (No Hardware)-No": 63.42,
+      "small-single-Printed Flag Only (No Hardware)-Yes": 98.36,
+      "small-single-Printed Flag + Pole + Ground Stake-No": 112.19,
+      "small-single-Printed Flag + Pole + Ground Stake-Yes": 133.97,
+      "small-single-Printed Flag + Pole + Cross Base-No": 125.55,
+      "small-single-Printed Flag + Pole + Cross Base-Yes": 146.82,
+      "small-single-Printed Flag + Pole + Cross Base + Water Bag-No": 134.46,
+      "small-single-Printed Flag + Pole + Cross Base + Water Bag-Yes": 155.99,
+      "small-single-Printed Flag + Pole + Square Base-No": 138.29,
+      "small-single-Printed Flag + Pole + Square Base-Yes": 159.29,
+      "small-single-Printed Flag + Pole + Ground Stake + Cross Base-No": 141.35,
+      "small-single-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 163.13,
+      "small-double-Printed Flag Only (No Hardware)-No": 112.92,
+      "small-double-Printed Flag Only (No Hardware)-Yes": 147.86,
+      "small-double-Printed Flag + Pole + Ground Stake-No": 161.69,
+      "small-double-Printed Flag + Pole + Ground Stake-Yes": 183.47,
+      "small-double-Printed Flag + Pole + Cross Base-No": 175.05,
+      "small-double-Printed Flag + Pole + Cross Base-Yes": 196.32,
+      "small-double-Printed Flag + Pole + Cross Base + Water Bag-No": 183.96,
+      "small-double-Printed Flag + Pole + Cross Base + Water Bag-Yes": 205.49,
+      "small-double-Printed Flag + Pole + Square Base-No": 187.79,
+      "small-double-Printed Flag + Pole + Square Base-Yes": 208.79,
+      "small-double-Printed Flag + Pole + Ground Stake + Cross Base-No": 190.85,
+      "small-double-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 212.63,
+      "medium-single-Printed Flag Only (No Hardware)-No": 66.59,
+      "medium-single-Printed Flag Only (No Hardware)-Yes": 103.27,
+      "medium-single-Printed Flag + Pole + Ground Stake-No": 117.79,
+      "medium-single-Printed Flag + Pole + Ground Stake-Yes": 140.66,
+      "medium-single-Printed Flag + Pole + Cross Base-No": 131.83,
+      "medium-single-Printed Flag + Pole + Cross Base-Yes": 154.16,
+      "medium-single-Printed Flag + Pole + Cross Base + Water Bag-No": 141.18,
+      "medium-single-Printed Flag + Pole + Cross Base + Water Bag-Yes": 163.78,
+      "medium-single-Printed Flag + Pole + Square Base-No": 145.2,
+      "medium-single-Printed Flag + Pole + Square Base-Yes": 167.25,
+      "medium-single-Printed Flag + Pole + Ground Stake + Cross Base-No": 148.41,
+      "medium-single-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 171.28,
+      "medium-double-Printed Flag Only (No Hardware)-No": 118.57,
+      "medium-double-Printed Flag Only (No Hardware)-Yes": 155.25,
+      "medium-double-Printed Flag + Pole + Ground Stake-No": 169.77,
+      "medium-double-Printed Flag + Pole + Ground Stake-Yes": 192.64,
+      "medium-double-Printed Flag + Pole + Cross Base-No": 183.8,
+      "medium-double-Printed Flag + Pole + Cross Base-Yes": 206.14,
+      "medium-double-Printed Flag + Pole + Cross Base + Water Bag-No": 193.16,
+      "medium-double-Printed Flag + Pole + Cross Base + Water Bag-Yes": 215.76,
+      "medium-double-Printed Flag + Pole + Square Base-No": 197.17,
+      "medium-double-Printed Flag + Pole + Square Base-Yes": 219.22,
+      "medium-double-Printed Flag + Pole + Ground Stake + Cross Base-No": 200.39,
+      "medium-double-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 223.26,
+      "large-single-Printed Flag Only (No Hardware)-No": 75.25,
+      "large-single-Printed Flag Only (No Hardware)-Yes": 115.6,
+      "large-single-Printed Flag + Pole + Ground Stake-No": 131.57,
+      "large-single-Printed Flag + Pole + Ground Stake-Yes": 156.73,
+      "large-single-Printed Flag + Pole + Cross Base-No": 147.01,
+      "large-single-Printed Flag + Pole + Cross Base-Yes": 171.58,
+      "large-single-Printed Flag + Pole + Cross Base + Water Bag-No": 157.3,
+      "large-single-Printed Flag + Pole + Cross Base + Water Bag-Yes": 182.16,
+      "large-single-Printed Flag + Pole + Square Base-No": 161.72,
+      "large-single-Printed Flag + Pole + Square Base-Yes": 185.97,
+      "large-single-Printed Flag + Pole + Ground Stake + Cross Base-No": 165.25,
+      "large-single-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 190.41,
+      "large-double-Printed Flag Only (No Hardware)-No": 132.42,
+      "large-double-Printed Flag Only (No Hardware)-Yes": 172.77,
+      "large-double-Printed Flag + Pole + Ground Stake-No": 188.75,
+      "large-double-Printed Flag + Pole + Ground Stake-Yes": 213.9,
+      "large-double-Printed Flag + Pole + Cross Base-No": 204.18,
+      "large-double-Printed Flag + Pole + Cross Base-Yes": 228.75,
+      "large-double-Printed Flag + Pole + Cross Base + Water Bag-No": 214.47,
+      "large-double-Printed Flag + Pole + Cross Base + Water Bag-Yes": 239.34,
+      "large-double-Printed Flag + Pole + Square Base-No": 218.89,
+      "large-double-Printed Flag + Pole + Square Base-Yes": 243.15,
+      "large-double-Printed Flag + Pole + Ground Stake + Cross Base-No": 190.85,
+      "large-double-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 247.58,
+      "xlarge-single-Printed Flag Only (No Hardware)-No": 154.26,
+      "xlarge-single-Printed Flag Only (No Hardware)-Yes": 236.98,
+      "xlarge-single-Printed Flag + Pole + Ground Stake-No": 269.73,
+      "xlarge-single-Printed Flag + Pole + Ground Stake-Yes": 390.34,
+      "xlarge-single-Printed Flag + Pole + Cross Base-No": 301.37,
+      "xlarge-single-Printed Flag + Pole + Cross Base-Yes": 351.73,
+      "xlarge-single-Printed Flag + Pole + Cross Base + Water Bag-No": 322.47,
+      "xlarge-single-Printed Flag + Pole + Cross Base + Water Bag-Yes": 373.43,
+      "xlarge-single-Printed Flag + Pole + Square Base-No": 331.52,
+      "xlarge-single-Printed Flag + Pole + Square Base-Yes": 381.25,
+      "xlarge-single-Printed Flag + Pole + Ground Stake + Cross Base-No": 338.77,
+      "xlarge-single-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 390.34,
+      "xlarge-double-Printed Flag Only (No Hardware)-No": 271.47,
+      "xlarge-double-Printed Flag Only (No Hardware)-Yes": 354.18,
+      "xlarge-double-Printed Flag + Pole + Ground Stake-No": 386.93,
+      "xlarge-double-Printed Flag + Pole + Ground Stake-Yes": 438.5,
+      "xlarge-double-Printed Flag + Pole + Cross Base-No": 418.57,
+      "xlarge-double-Printed Flag + Pole + Cross Base-Yes": 468.94,
+      "xlarge-double-Printed Flag + Pole + Cross Base + Water Bag-No": 439.67,
+      "xlarge-double-Printed Flag + Pole + Cross Base + Water Bag-Yes": 490.64,
+      "xlarge-double-Printed Flag + Pole + Square Base-No": 448.73,
+      "xlarge-double-Printed Flag + Pole + Square Base-Yes": 498.45,
+      "xlarge-double-Printed Flag + Pole + Ground Stake + Cross Base-No": 455.97,
+      "xlarge-double-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 507.54
+    },
+    "teardrop-flag-pro": {
+      "small-single-Printed Flag Only (No Hardware)-No": 63.42,
+      "small-single-Printed Flag Only (No Hardware)-Yes": 98.36,
+      "small-single-Printed Flag + Pole + Ground Stake-No": 112.19,
+      "small-single-Printed Flag + Pole + Ground Stake-Yes": 133.97,
+      "small-single-Printed Flag + Pole + Cross Base-No": 125.55,
+      "small-single-Printed Flag + Pole + Cross Base-Yes": 146.82,
+      "small-single-Printed Flag + Pole + Cross Base + Water Bag-No": 134.46,
+      "small-single-Printed Flag + Pole + Cross Base + Water Bag-Yes": 155.99,
+      "small-single-Printed Flag + Pole + Square Base-No": 138.29,
+      "small-single-Printed Flag + Pole + Square Base-Yes": 159.29,
+      "small-single-Printed Flag + Pole + Ground Stake + Cross Base-No": 141.35,
+      "small-single-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 163.13,
+      "small-double-Printed Flag Only (No Hardware)-No": 112.92,
+      "small-double-Printed Flag Only (No Hardware)-Yes": 147.86,
+      "small-double-Printed Flag + Pole + Ground Stake-No": 161.69,
+      "small-double-Printed Flag + Pole + Ground Stake-Yes": 183.47,
+      "small-double-Printed Flag + Pole + Cross Base-No": 175.05,
+      "small-double-Printed Flag + Pole + Cross Base-Yes": 196.32,
+      "small-double-Printed Flag + Pole + Cross Base + Water Bag-No": 183.96,
+      "small-double-Printed Flag + Pole + Cross Base + Water Bag-Yes": 205.49,
+      "small-double-Printed Flag + Pole + Square Base-No": 187.79,
+      "small-double-Printed Flag + Pole + Square Base-Yes": 208.79,
+      "small-double-Printed Flag + Pole + Ground Stake + Cross Base-No": 190.85,
+      "small-double-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 212.63,
+      "medium-single-Printed Flag Only (No Hardware)-No": 66.59,
+      "medium-single-Printed Flag Only (No Hardware)-Yes": 103.27,
+      "medium-single-Printed Flag + Pole + Ground Stake-No": 117.79,
+      "medium-single-Printed Flag + Pole + Ground Stake-Yes": 140.66,
+      "medium-single-Printed Flag + Pole + Cross Base-No": 131.83,
+      "medium-single-Printed Flag + Pole + Cross Base-Yes": 154.16,
+      "medium-single-Printed Flag + Pole + Cross Base + Water Bag-No": 141.18,
+      "medium-single-Printed Flag + Pole + Cross Base + Water Bag-Yes": 163.78,
+      "medium-single-Printed Flag + Pole + Square Base-No": 145.2,
+      "medium-single-Printed Flag + Pole + Square Base-Yes": 167.25,
+      "medium-single-Printed Flag + Pole + Ground Stake + Cross Base-No": 148.41,
+      "medium-single-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 171.28,
+      "medium-double-Printed Flag Only (No Hardware)-No": 118.57,
+      "medium-double-Printed Flag Only (No Hardware)-Yes": 155.25,
+      "medium-double-Printed Flag + Pole + Ground Stake-No": 169.77,
+      "medium-double-Printed Flag + Pole + Ground Stake-Yes": 192.64,
+      "medium-double-Printed Flag + Pole + Cross Base-No": 183.8,
+      "medium-double-Printed Flag + Pole + Cross Base-Yes": 206.14,
+      "medium-double-Printed Flag + Pole + Cross Base + Water Bag-No": 193.16,
+      "medium-double-Printed Flag + Pole + Cross Base + Water Bag-Yes": 215.76,
+      "medium-double-Printed Flag + Pole + Square Base-No": 197.17,
+      "medium-double-Printed Flag + Pole + Square Base-Yes": 219.22,
+      "medium-double-Printed Flag + Pole + Ground Stake + Cross Base-No": 200.39,
+      "medium-double-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 223.26,
+      "large-single-Printed Flag Only (No Hardware)-No": 75.25,
+      "large-single-Printed Flag Only (No Hardware)-Yes": 115.6,
+      "large-single-Printed Flag + Pole + Ground Stake-No": 131.57,
+      "large-single-Printed Flag + Pole + Ground Stake-Yes": 156.73,
+      "large-single-Printed Flag + Pole + Cross Base-No": 147.01,
+      "large-single-Printed Flag + Pole + Cross Base-Yes": 171.58,
+      "large-single-Printed Flag + Pole + Cross Base + Water Bag-No": 157.3,
+      "large-single-Printed Flag + Pole + Cross Base + Water Bag-Yes": 182.16,
+      "large-single-Printed Flag + Pole + Square Base-No": 161.72,
+      "large-single-Printed Flag + Pole + Square Base-Yes": 185.97,
+      "large-single-Printed Flag + Pole + Ground Stake + Cross Base-No": 165.25,
+      "large-single-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 190.41,
+      "large-double-Printed Flag Only (No Hardware)-No": 132.42,
+      "large-double-Printed Flag Only (No Hardware)-Yes": 172.77,
+      "large-double-Printed Flag + Pole + Ground Stake-No": 188.75,
+      "large-double-Printed Flag + Pole + Ground Stake-Yes": 213.9,
+      "large-double-Printed Flag + Pole + Cross Base-No": 204.18,
+      "large-double-Printed Flag + Pole + Cross Base-Yes": 228.75,
+      "large-double-Printed Flag + Pole + Cross Base + Water Bag-No": 214.47,
+      "large-double-Printed Flag + Pole + Cross Base + Water Bag-Yes": 239.34,
+      "large-double-Printed Flag + Pole + Square Base-No": 218.89,
+      "large-double-Printed Flag + Pole + Square Base-Yes": 243.15,
+      "large-double-Printed Flag + Pole + Ground Stake + Cross Base-No": 190.85,
+      "large-double-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 247.58,
+      "xlarge-single-Printed Flag Only (No Hardware)-No": 154.26,
+      "xlarge-single-Printed Flag Only (No Hardware)-Yes": 236.98,
+      "xlarge-single-Printed Flag + Pole + Ground Stake-No": 269.73,
+      "xlarge-single-Printed Flag + Pole + Ground Stake-Yes": 390.34,
+      "xlarge-single-Printed Flag + Pole + Cross Base-No": 301.37,
+      "xlarge-single-Printed Flag + Pole + Cross Base-Yes": 351.73,
+      "xlarge-single-Printed Flag + Pole + Cross Base + Water Bag-No": 322.47,
+      "xlarge-single-Printed Flag + Pole + Cross Base + Water Bag-Yes": 373.43,
+      "xlarge-single-Printed Flag + Pole + Square Base-No": 331.52,
+      "xlarge-single-Printed Flag + Pole + Square Base-Yes": 381.25,
+      "xlarge-single-Printed Flag + Pole + Ground Stake + Cross Base-No": 338.77,
+      "xlarge-single-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 390.34,
+      "xlarge-double-Printed Flag Only (No Hardware)-No": 271.47,
+      "xlarge-double-Printed Flag Only (No Hardware)-Yes": 354.18,
+      "xlarge-double-Printed Flag + Pole + Ground Stake-No": 386.93,
+      "xlarge-double-Printed Flag + Pole + Ground Stake-Yes": 438.5,
+      "xlarge-double-Printed Flag + Pole + Cross Base-No": 418.57,
+      "xlarge-double-Printed Flag + Pole + Cross Base-Yes": 468.94,
+      "xlarge-double-Printed Flag + Pole + Cross Base + Water Bag-No": 439.67,
+      "xlarge-double-Printed Flag + Pole + Cross Base + Water Bag-Yes": 490.64,
+      "xlarge-double-Printed Flag + Pole + Square Base-No": 448.73,
+      "xlarge-double-Printed Flag + Pole + Square Base-Yes": 498.45,
+      "xlarge-double-Printed Flag + Pole + Ground Stake + Cross Base-No": 455.97,
+      "xlarge-double-Printed Flag + Pole + Ground Stake + Cross Base-Yes": 507.54
+    }
+  },
+  "largeFormatPricing": {
+    "calendar-vinyl": {
+      "material": 1.25,
+      "lamination": {
+        "0": 0,
+        "1.00": 1
+      },
+      "finishing": {
+        "0": 0,
+        "1.00": 1,
+        "1.50": 1.5
+      }
+    },
+    "bubble-free": {
+      "material": 2.5,
+      "lamination": {
+        "0": 0,
+        ".75": 0.75
+      },
+      "finishing": {
+        "0": 0,
+        ".75": 0.75,
+        "SPECIAL": 5.75
+      }
+    },
+    "window-cling": {
+      "materials": {
+        "matte": 2.5,
+        "clear": 4.5,
+        "double-matte": 12
+      }
+    },
+    "wrap-adhesive": {
+      "cast": {
+        "material": 4,
+        "THRU": 4.75,
+        "CONTOUR": 35,
+        "TRIM": 4
+      },
+      "calendar": {
+        "material": 3,
+        "THRU": 3.75,
+        "CONTOUR": 27.75,
+        "TRIM": 3
+      }
+    },
+    "rough-wall": {
+      "material": 2.5
+    },
+    "posters": {
+      "material": 2,
+      "types": {
+        "paper": 2,
+        "popup": 3.75
+      }
+    },
+    "gallery-canvas": {
+      "sizes": {
+        "8x10": 29.34,
+        "11x14": 31.56,
+        "12x12": 31.43,
+        "12x16": 33.05,
+        "12x18": 33.69,
+        "16x16": 34.82,
+        "16x20": 36.17,
+        "16x24": 39.27,
+        "24x24": 42.38,
+        "24x36": 52.32,
+        "32x48": 81.59
+      }
+    },
+    "phototex": {
+      "material": 2.5
+    },
+    "table-cover": {
+      "sizes": {
+        "4-3": 105.75,
+        "6-3": 125.75,
+        "8-3": 146.66,
+        "4-4": 141.75,
+        "6-4": 161.75,
+        "8-4": 191.75
+      }
+    },
+    "glass-adhere": {
+      "material": 2.5
+    },
+    "magnet": {
+      "material": 5.5,
+      "lamination": {
+        "0": 0,
+        "0.75": 0.75
+      },
+      "special_finishing": {
+        "cut-to-shape": 10
+      }
+    },
+    "adhesive-vinyl": {
+      "material": 3
+    },
+    "floor-graphics": {
+      "material": 4,
+      "lamination": {
+        "included": 0
+      },
+      "finishing": {
+        "0": 0,
+        "0.75": 0.75
+      }
+    },
+    "reflective-vinyl": {
+      "material": 6,
+      "lamination": {
+        "gloss": 0.75,
+        "matte": 0.75
+      },
+      "finishing": {
+        "0": 0,
+        "0.75": 0.75
+      }
+    },
+    "heat-press-vinyl": {
+      "material": 25
+    },
+    "backlit-film": {
+      "material": 3.5,
+      "finishing": {
+        "0": 0,
+        "2.25": 0
+      }
+    },
+    "aframe": {
+      "material": 95.67
+    },
+    "window-perf": {
+      "material": 2.5,
+      "lamination": {
+        "0": 0,
+        "3.25": 3.25
+      }
+    }
+  },
+  "rigidsigns": {
+    "PVC": {
+      "material": 3,
+      "type": "sqft",
+      "variants": {
+        "1mm": 0,
+        "3mm": 1.25,
+        "6mm": 3.25
+      },
+      "options": {
+        "uv_gloss": 1,
+        "uv_matte": 1
+      },
+      "doubleSidedMultiplier": 1.75
+    },
+    "Foamboard": {
+      "material": 3.5,
+      "type": "sqft",
+      "variants": {
+        "3/16": 0,
+        "1/2": 2.5
+      },
+      "options": {
+        "uv": 0.75,
+        "dry-erase": 3
+      },
+      "doubleSidedMultiplier": 1.75
+    },
+    "Coroplast": {
+      "material": 3.5,
+      "type": "sqft",
+      "variants": {
+        "4mm": 0,
+        "10mm": 2.5
+      }
+    },
+    "Aluminum Signs": {
+      "material": 4.5,
+      "type": "sqft",
+      "variants": {
+        "white_alum": 3,
+        "die_bond": 0,
+        "1/8\" (3mm) Composite": 0,
+        "1/4\" (6mm) Composite": 4.5,
+        "0.040\" Solid": 3,
+        "0.063\" Solid": 5,
+        "0.080\" Solid": 7
+      },
+      "options": {
+        "uv_gloss": 1.5,
+        "uv_matte": 1.5
+      },
+      "doubleSidedMultiplier": 1.75
+    },
+    "Aframe": {
+      "material": 95.67,
+      "type": "unit",
+      "options": {
+        "deluxe_frame": 25.22,
+        "reflective_vinyl": 95.81,
+        "reflective_coro": 73,
+        "lam_vinyl": 5.91,
+        "lam_coro": 4.5
+      }
+    },
+    "Acrylic": {
+      "material": 10,
+      "type": "sqft",
+      "variants": {
+        "white_1/8": 12,
+        "white_3/16": 14,
+        "clear_1/8": 15,
+        "clear_3/16": 17,
+        "blackout_3/16": 23,
+        "backlit_white_1/8": 18,
+        "backlit_white_3/16": 21,
+        "backlit_clear_3/16": 28
+      },
+      "options": {
+        "router": 2.5,
+        "trim": 0
+      },
+      "doubleSidedMultiplier": 1.5
+    },
+    "Styrene": {
+      "material": 3.5,
+      "type": "sqft",
+      "variants": {
+        "0.020": 0,
+        "0.040": 1.25,
+        "0.060": 2.5
+      },
+      "options": {
+        "uv_gloss": 1,
+        "uv_matte": 1
+      },
+      "doubleSidedMultiplier": 1.5
+    },
+    "Ultraboard": {
+      "material": 5,
+      "type": "sqft",
+      "variants": {
+        "ultra": 0,
+        "gator": 1.5,
+        "3/16": 0,
+        "1/2": 2.5
+      },
+      "options": {
+        "uv": 1.25
+      },
+      "doubleSidedMultiplier": 1.75
+    },
+    "Lexan": {
+      "material": 12,
+      "type": "sqft",
+      "variants": {
+        "white_1/8": 12,
+        "white_3/16": 14,
+        "clear_1/8": 15,
+        "clear_3/16": 17,
+        "blackout_1/8": 18,
+        "blackout_3/16": 20,
+        "backlit_white_0.060": 16,
+        "backlit_white_1/8": 18,
+        "backlit_white_3/16": 21,
+        "backlit_clear_0.060": 22,
+        "backlit_clear_1/8": 24,
+        "backlit_clear_3/16": 28
+      }
+    },
+    "Acrylic-art": {
+      "material": 25,
+      "type": "sqft",
+      "options": {
+        "black": 10
+      }
+    }
+  },
+  "stickerPricing": {
+    "custom-sticker": {
+      "suffix": "sq/ft",
+      "minOrder": 50,
+      "material": {
+        "matte": 2,
+        "gloss": 2.75,
+        "clear": 3.5
+      }
+    }
+  }
+}

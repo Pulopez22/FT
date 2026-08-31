@@ -205,6 +205,18 @@ const PricingOverride = mongoose.model(
 );
 
 
+// Full pricing catalog. MongoDB is the primary pricing source for the storefront.
+// pricing-v2.js remains only as a fallback when the API is unavailable.
+const PricingCatalog = mongoose.model(
+    'PricingCatalog',
+    new mongoose.Schema({
+        key: { type: String, required: true, unique: true, default: 'storefront' },
+        pricing: { type: mongoose.Schema.Types.Mixed, required: true, default: {} },
+        updatedAt: { type: Date, default: Date.now }
+    }, { minimize: false })
+);
+
+
 
 // -----------------------------------------------------
 // STRIPE WEBHOOK
@@ -1014,6 +1026,23 @@ app.post(
 // -----------------------------------------------------
 // PRICING OVERRIDES
 // -----------------------------------------------------
+
+// Public full-pricing endpoint. This is now the storefront's primary source.
+app.get('/api/pricing', async (req, res) => {
+    try {
+        const catalog = await PricingCatalog.findOne({ key: 'storefront' }).lean();
+        if (!catalog || !catalog.pricing) {
+            return res.status(404).json({
+                error: 'Pricing catalog has not been migrated yet.',
+                fallback: true
+            });
+        }
+        res.set('Cache-Control', 'no-store');
+        res.json({ pricing: catalog.pricing, updatedAt: catalog.updatedAt });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // Public read endpoint. The storefront will use this in the next step.
 app.get('/api/pricing-overrides', async (req, res) => {

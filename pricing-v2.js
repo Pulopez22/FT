@@ -1032,82 +1032,90 @@ function getSelectedSize() {
 // Loads admin overrides on every storefront page before consumers
 // that await SFP_PRICING_READY perform their initial calculation.
 // ============================================================
-window.SFP_PRICING_OVERRIDES_ENDPOINT =
-    'https://ft-f34l.onrender.com/api/pricing-overrides';
+window.SFP_PRICING_ENDPOINT = 'https://ft-f34l.onrender.com/api/pricing';
+window.SFP_PRICING_OVERRIDES_ENDPOINT = 'https://ft-f34l.onrender.com/api/pricing-overrides';
 
 window.SFP_PRICING_SOURCES = new Set([
-    'SFP_PRICING_CONFIG',
-    'bannerPricing',
-    'displaysPricing',
-    'masterPricing',
-    'largeFormatPricing',
-    'rigidsigns',
-    'stickerPricing'
+    'SFP_PRICING_CONFIG', 'bannerPricing', 'displaysPricing', 'masterPricing',
+    'largeFormatPricing', 'rigidsigns', 'stickerPricing'
 ]);
 
+// Replace the in-memory fallback objects with the complete MongoDB catalog.
+window.SFP_applyPricingCatalog = function(catalog) {
+    if (!catalog || typeof catalog !== 'object') return 0;
+    let loaded = 0;
+    window.SFP_PRICING_SOURCES.forEach(sourceName => {
+        const incoming = catalog[sourceName];
+        if (!incoming || typeof incoming !== 'object') return;
+        // Keep object identity so existing calculator references remain valid.
+        const target = window[sourceName];
+        if (target && typeof target === 'object') {
+            Object.keys(target).forEach(key => delete target[key]);
+            Object.assign(target, incoming);
+        } else {
+            window[sourceName] = incoming;
+        }
+        loaded++;
+    });
+    return loaded;
+};
+
+// Legacy override support is retained only as a fallback while the migration settles.
 window.SFP_applyPricingOverride = function(path, value) {
     if (typeof path !== 'string' || !path.trim()) return false;
-
     const parts = path.split('.');
     const sourceName = parts.shift();
     if (!window.SFP_PRICING_SOURCES.has(sourceName)) return false;
-
     const blocked = new Set(['__proto__', 'prototype', 'constructor']);
     const numericValue = Number(value);
     if (!Number.isFinite(numericValue) || numericValue < 0) return false;
-
     function resolveExistingPath(target, remaining) {
         if (!target || typeof target !== 'object' || !remaining.length) return null;
-
-        // Longest existing key first. This supports keys such as 3.00,
-        // 0.040" Solid, 1/8" (3mm) Composite, etc.
         for (let take = remaining.length; take >= 1; take--) {
             const key = remaining.slice(0, take).join('.');
             if (blocked.has(key)) continue;
             if (!Object.prototype.hasOwnProperty.call(target, key)) continue;
-
             if (take === remaining.length) return { target, key };
-
             const resolved = resolveExistingPath(target[key], remaining.slice(take));
             if (resolved) return resolved;
         }
         return null;
     }
-
     const resolved = resolveExistingPath(window[sourceName], parts);
     if (!resolved || blocked.has(resolved.key)) return false;
-
     resolved.target[resolved.key] = numericValue;
     return true;
 };
 
 window.SFP_PRICING_READY = (async function() {
     try {
-        const response = await fetch(window.SFP_PRICING_OVERRIDES_ENDPOINT, {
-            method: 'GET',
-            headers: { 'Accept': 'application/json' },
-            cache: 'no-store'
+        const response = await fetch(window.SFP_PRICING_ENDPOINT, {
+            headers: { 'Accept': 'application/json' }, cache: 'no-store'
         });
-
-        if (!response.ok) {
-            throw new Error(`Pricing API returned ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Full pricing API returned ${response.status}`);
         const data = await response.json();
-        const overrides = Array.isArray(data)
-            ? data
-            : (Array.isArray(data.overrides) ? data.overrides : []);
-
-        let applied = 0;
-        overrides.forEach(entry => {
-            if (entry && window.SFP_applyPricingOverride(entry.path, entry.value)) {
-                applied++;
-            }
-        });
-
-        console.info(`SFP pricing ready: ${applied} MongoDB override(s) applied.`);
-
-        // Recalculate product pages after live prices arrive.
+        const loaded = window.SFP_applyPricingCatalog(data.pricing || data);
+        console.info(`SFP pricing ready from MongoDB: ${loaded} source(s) loaded.`);
+        return { ok: true, source: 'mongodb', loaded };
+    } catch (catalogError) {
+        console.warn('Full MongoDB pricing unavailable; trying legacy overrides.', catalogError);
+        try {
+            const response = await fetch(window.SFP_PRICING_OVERRIDES_ENDPOINT, {
+                headers: { 'Accept': 'application/json' }, cache: 'no-store'
+            });
+            if (!response.ok) throw new Error(`Override API returned ${response.status}`);
+            const data = await response.json();
+            const overrides = Array.isArray(data) ? data : (Array.isArray(data.overrides) ? data.overrides : []);
+            let applied = 0;
+            overrides.forEach(entry => {
+                if (entry && window.SFP_applyPricingOverride(entry.path, entry.value)) applied++;
+            });
+            return { ok: true, source: 'legacy-overrides', applied };
+        } catch (overrideError) {
+            console.warn('MongoDB pricing unavailable; using pricing-v2.js fallback defaults.', overrideError);
+            return { ok: false, source: 'fallback', error: overrideError };
+        }
+    } finally {
         setTimeout(() => {
             if (typeof window.calculatePrice === 'function') {
                 try { window.calculatePrice(); } catch (error) {
@@ -1115,12 +1123,6 @@ window.SFP_PRICING_READY = (async function() {
                 }
             }
         }, 0);
-
-        return { ok: true, applied };
-    } catch (error) {
-        // Storefront remains usable with pricing.js defaults if Render is down.
-        console.warn('SFP pricing overrides unavailable; using pricing.js defaults.', error);
-        return { ok: false, applied: 0, error };
     }
 })();
 
