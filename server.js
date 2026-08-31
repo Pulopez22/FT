@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const fs = require('fs');
+const path = require('path');
 const net = require('net');
 
 const mongoTestHost =
@@ -1026,6 +1027,82 @@ app.post(
 // -----------------------------------------------------
 // PRICING OVERRIDES
 // -----------------------------------------------------
+
+// One-time protected migration for Render Free plans (no Shell access).
+// Creates the MongoDB storefront catalog from pricing-seed.json and preserves
+// any legacy PricingOverride values. It refuses to overwrite an existing catalog.
+app.post('/api/admin/migrate-pricing', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ msg: 'Forbidden' });
+        }
+
+        const existing = await PricingCatalog.findOne({ key: 'storefront' }).lean();
+        if (existing) {
+            return res.status(409).json({
+                msg: 'Pricing catalog already exists. Migration was not run again.',
+                migrated: false,
+                updatedAt: existing.updatedAt
+            });
+        }
+
+        const seedPath = path.join(__dirname, 'pricing-seed.json');
+        const pricing = JSON.parse(fs.readFileSync(seedPath, 'utf8'));
+        const sourceNames = new Set(Object.keys(pricing));
+        const blocked = new Set(['__proto__', 'prototype', 'constructor']);
+
+        function applyOverride(root, overridePath, value) {
+            const parts = String(overridePath || '').split('.');
+            const source = parts.shift();
+            if (!sourceNames.has(source) || !root[source]) return false;
+            const numeric = Number(value);
+            if (!Number.isFinite(numeric) || numeric < 0) return false;
+
+            function resolve(target, remaining) {
+                if (!target || typeof target !== 'object' || !remaining.length) return null;
+                for (let take = remaining.length; take >= 1; take--) {
+                    const key = remaining.slice(0, take).join('.');
+                    if (blocked.has(key) || !Object.prototype.hasOwnProperty.call(target, key)) continue;
+                    if (take === remaining.length) return { target, key };
+                    const found = resolve(target[key], remaining.slice(take));
+                    if (found) return found;
+                }
+                return null;
+            }
+
+            const found = resolve(root[source], parts);
+            if (!found) return false;
+            found.target[found.key] = numeric;
+            return true;
+        }
+
+        const overrides = await PricingOverride.find({}).lean();
+        let applied = 0;
+        for (const item of overrides) {
+            if (applyOverride(pricing, item.path, item.value)) applied++;
+        }
+
+        const catalog = await PricingCatalog.create({
+            key: 'storefront',
+            pricing,
+            updatedAt: new Date()
+        });
+
+        console.log(`✅ Pricing catalog migrated by admin: ${Object.keys(pricing).length} sources, ${applied}/${overrides.length} overrides applied.`);
+        return res.status(201).json({
+            success: true,
+            migrated: true,
+            key: catalog.key,
+            sources: Object.keys(pricing).length,
+            overridesApplied: applied,
+            overridesFound: overrides.length,
+            updatedAt: catalog.updatedAt
+        });
+    } catch (error) {
+        console.error('❌ Admin pricing migration failed:', error);
+        return res.status(500).json({ error: error.message });
+    }
+});
 
 // Public full-pricing endpoint. This is now the storefront's primary source.
 app.get('/api/pricing', async (req, res) => {

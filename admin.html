@@ -124,7 +124,8 @@
                                 Changes are saved as MongoDB overrides. The original values in pricing-v2.js remain your defaults.
                             </p>
                         </div>
-                        <div class="flex gap-3">
+                        <div class="flex gap-3 flex-wrap">
+                            <button onclick="migratePricingToMongoDB()" class="px-5 py-3 rounded-xl border border-gray-900 text-[10px] font-black uppercase hover:bg-black hover:text-white">Initialize MongoDB Pricing</button>
                             <button onclick="resetAllPricing()" class="px-5 py-3 rounded-xl border border-gray-200 text-[10px] font-black uppercase hover:border-black">Reset All</button>
                             <button onclick="savePricing()" class="px-6 py-3 rounded-xl bg-red-600 text-white text-[10px] font-black uppercase hover:bg-black">Save Changes</button>
                         </div>
@@ -792,6 +793,24 @@
                     </div>
                 `;
             }).join('');
+        }
+
+
+        async function migratePricingToMongoDB() {
+            if (!confirm('Initialize the full MongoDB pricing catalog now? This is a one-time migration and will preserve your existing pricing overrides.')) return;
+            const token = localStorage.getItem('token');
+            pricingStatus('Migrating pricing to MongoDB...');
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/migrate-pricing`, {
+                    method: 'POST',
+                    headers: { 'x-auth-token': token }
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.msg || data.error || 'Pricing migration failed');
+                pricingStatus(`MongoDB pricing initialized: ${data.sources} source(s), ${data.overridesApplied}/${data.overridesFound} override(s) applied.`);
+            } catch (error) {
+                pricingStatus(error.message, false);
+            }
         }
 
         async function savePricing() {
