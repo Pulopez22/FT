@@ -547,5 +547,6 @@
         function logout() { localStorage.clear(); window.location.reload(); }
         window.addEventListener('load', () => { checkAuth(); renderCart(); updateOrderedLabels(); if (typeof calculatePrice === 'function') calculatePrice(); });
     </script>
+    <script src="../admin-storefront.js"></script>
 </body>
 </html>

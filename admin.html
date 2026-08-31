@@ -19,9 +19,16 @@
         .order-row td:first-child { border-left: 1px solid #f3f4f6; border-top-left-radius: 1.5rem; border-bottom-left-radius: 1.5rem; }
         .order-row td:last-child { border-right: 1px solid #f3f4f6; border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem; }
         .status-badge { padding: 4px 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; border-radius: 20px; }
-        .status-pending { background: #fef3c7; color: #d90606; }
+        .status-pending { background: #fef3c7; color: #b45309; }
+        .status-paid { background: #ecfdf5; color: #047857; }
+        .status-preflight { background: #eff6ff; color: #2563eb; }
+        .status-printing { background: #f5f3ff; color: #7c3aed; }
+        .status-finishing { background: #fdf4ff; color: #a21caf; }
         .status-ready { background: #e0f2fe; color: #0284c7; }
+        .status-shipped { background: #eef2ff; color: #4338ca; }
         .status-completed { background: #dcfce7; color: #16a34a; }
+        .metric-card { border: 1px solid #f3f4f6; border-radius: 1.5rem; padding: 1.25rem; background: #fff; box-shadow: 0 8px 25px rgba(0,0,0,.04); }
+        .quick-action { display:inline-flex; align-items:center; gap:.35rem; padding:.65rem .85rem; border-radius:.75rem; font-size:9px; font-weight:900; text-transform:uppercase; font-style:italic; transition:.2s; }
         #mobile-menu { position: fixed; inset: 0; background: white; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
         #mobile-menu.open { transform: translateX(0); }
     </style>
@@ -30,7 +37,7 @@
 
     <nav class="border-b py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-50 shadow-sm">
         <div class="flex items-center gap-8">
-            <button onclick="toggleMobileMenu()" class="xl:hidden p-1 text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
+            <span class="xl:hidden text-[9px] font-black uppercase italic text-red-600">Admin</span>
             <a href="index.html" class="flex items-center group">
                 <div class="bg-black p-2 rounded-lg shadow-xl transition-transform group-hover:scale-105">
                     <img src="images/SquareFootPrinting-Logo-White-Text-Lrg-01-e1525129997491.jpg" alt="Logo" class="h-8 md:h-10 w-auto object-contain">
@@ -47,12 +54,17 @@
             <button onclick="logout()" class="text-red-600 underline">LOGOUT</button>
         </div>
     </nav>
+    <div class="lg:hidden sticky top-[73px] z-40 bg-white border-b px-4 py-3 flex gap-2 overflow-x-auto shadow-sm">
+        <button onclick="showOrders()" class="shrink-0 bg-black text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase italic">Dashboard / Orders</button>
+        <button onclick="showPricing()" class="shrink-0 border border-black px-4 py-2 rounded-xl text-[9px] font-black uppercase italic">Edit Pricing</button>
+        <a href="index.html" class="shrink-0 border border-gray-200 px-4 py-2 rounded-xl text-[9px] font-black uppercase italic">View Store</a>
+    </div>
 
     <div class="flex">
         <aside class="w-72 border-r h-[calc(100vh-73px)] sticky top-[73px] p-8 hidden lg:block bg-white overflow-y-auto">
             <h3 class="text-[10px] font-black uppercase mb-8 text-gray-300 tracking-widest border-b pb-2">Management</h3>
             <ul class="space-y-5 text-[11px] font-bold text-gray-500 uppercase">
-                <li id="orders-menu" onclick="showOrders()" class="sidebar-item cursor-pointer text-black font-black"><i data-lucide="layout-dashboard" class="w-4 h-4 inline mr-2"></i> Orders History</li>
+                <li id="orders-menu" onclick="showOrders()" class="sidebar-item cursor-pointer text-black font-black"><i data-lucide="layout-dashboard" class="w-4 h-4 inline mr-2"></i> Dashboard / Orders</li>
                 <li id="pricing-menu" onclick="showPricing()" class="sidebar-item cursor-pointer hover:text-black transition-colors"><i data-lucide="tags" class="w-4 h-4 inline mr-2"></i> Edit Pricing</li>
                   <li class="sidebar-item cursor-pointer text-black"><a href="AdvertisingFlags/advertising-flags.html" class="block w-full">Advertising Flags</a></li>
                 <li class="sidebar-item cursor-pointer text-black"><a href="Banners/banners.html" class="block w-full">Banners</a></li>
@@ -71,6 +83,14 @@
                 <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter">Orders History</h1>
                 <div class="h-2 w-24 bg-red-600 rounded-full mb-8"></div>
             </header>
+
+            <div class="grid grid-cols-2 xl:grid-cols-5 gap-4 mb-10">
+                <div class="metric-card"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Orders Today</div><div id="metric-today" class="text-3xl font-black italic mt-2">0</div></div>
+                <div class="metric-card"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Pending</div><div id="metric-pending" class="text-3xl font-black italic mt-2">0</div></div>
+                <div class="metric-card"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Paid</div><div id="metric-paid" class="text-3xl font-black italic mt-2">0</div></div>
+                <div class="metric-card"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">In Production</div><div id="metric-production" class="text-3xl font-black italic mt-2">0</div></div>
+                <div class="metric-card col-span-2 xl:col-span-1"><div class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Revenue</div><div id="metric-revenue" class="text-3xl font-black italic mt-2">$0</div></div>
+            </div>
 
             <div class="overflow-x-auto">
                 <table class="admin-table">
@@ -99,7 +119,7 @@
                             <h1 class="text-4xl md:text-5xl heavy-italic text-gray-900 mb-4 tracking-tighter">Edit Pricing</h1>
                             <div class="h-2 w-24 bg-red-600 rounded-full"></div>
                             <p class="mt-5 text-xs text-gray-500 font-semibold max-w-2xl">
-                                Changes are saved as MongoDB overrides. The original values in pricing.js remain your defaults.
+                                Changes are saved as MongoDB overrides. The original values in pricing-v2.js remain your defaults.
                             </p>
                         </div>
                         <div class="flex gap-3">
@@ -140,6 +160,8 @@
                     headers: { 'x-auth-token': token }
                 });
                 const orders = await response.json();
+                window.adminOrdersById = Object.fromEntries((Array.isArray(orders) ? orders : []).map(order => [order._id, order]));
+                updateDashboardMetrics(Array.isArray(orders) ? orders : []);
                 
                 if (orders.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-gray-400">No orders found.</td></tr>`;
@@ -163,8 +185,12 @@
                             <select onchange="event.stopPropagation(); updateStatus('${order._id}', this.value)" 
         class="status-badge ${getStatusClass(order.status)} outline-none cursor-pointer border-none bg-transparent font-black">
     <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>RECEIVED</option>
+    <option value="Paid" ${order.status === 'Paid' ? 'selected' : ''}>PAID</option>
+    <option value="Preflight" ${order.status === 'Preflight' ? 'selected' : ''}>PREFLIGHT</option>
     <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>PRINTING</option>
-    <option value="Ready" ${order.status === 'Ready' ? 'selected' : ''}>READY</option>
+    <option value="Finishing" ${order.status === 'Finishing' ? 'selected' : ''}>FINISHING</option>
+    <option value="Ready" ${order.status === 'Ready' ? 'selected' : ''}>READY FOR PICKUP</option>
+    <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>SHIPPED</option>
     <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>COMPLETED</option>
 </select>
                         </td>
@@ -299,6 +325,11 @@
     </div>
 `).join('') : ''}
                             </div>
+                            <div class="mt-6 pt-5 border-t border-gray-200 flex flex-wrap gap-3">
+                                <a href="mailto:${order.customer_email || ''}" class="quick-action bg-black text-white hover:bg-red-600">Email Customer</a>
+                                ${order.customer_phone ? `<a href="tel:${order.customer_phone}" class="quick-action border border-black text-black hover:bg-black hover:text-white">Call Customer</a>` : ''}
+                                <button onclick="event.stopPropagation(); printOrder('${order._id}')" class="quick-action bg-red-600 text-white hover:bg-black">Print Work Order</button>
+                            </div>
                         </td>
                     </tr>
                 `).join('');
@@ -306,6 +337,40 @@
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-red-500">Error connecting to server.</td></tr>`;
             }
+        }
+
+        function parseMoney(value) {
+            const number = Number(String(value ?? 0).replace(/[$,]/g, ''));
+            return Number.isFinite(number) ? number : 0;
+        }
+
+        function updateDashboardMetrics(orders) {
+            const today = new Date();
+            const isToday = value => {
+                const d = new Date(value);
+                return d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today.getDate();
+            };
+            const paid = orders.filter(o => String(o.payment_status || o.status || '').toLowerCase().includes('paid'));
+            const productionStatuses = new Set(['Preflight', 'Printing', 'Finishing', 'Ready']);
+            document.getElementById('metric-today').innerText = orders.filter(o => isToday(o.createdAt)).length;
+            document.getElementById('metric-pending').innerText = orders.filter(o => ['Pending', 'Awaiting Payment'].includes(o.status) || String(o.payment_status || '').toLowerCase().includes('pending')).length;
+            document.getElementById('metric-paid').innerText = paid.length;
+            document.getElementById('metric-production').innerText = orders.filter(o => productionStatuses.has(o.status)).length;
+            document.getElementById('metric-revenue').innerText = '$' + paid.reduce((sum, o) => sum + parseMoney(o.total_price), 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function escapePrint(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+        }
+
+        function printOrder(orderId) {
+            const order = window.adminOrdersById?.[orderId];
+            if (!order) return alert('Order details are not loaded yet.');
+            const items = (order.order_items || []).map(item => `<tr><td>${escapePrint(item.name || 'Product')}</td><td>${escapePrint(item.details || item.specs || 'Standard Specs')}</td><td>$${parseMoney(item.price).toFixed(2)}</td></tr>`).join('');
+            const popup = window.open('', '_blank', 'width=900,height=700');
+            if (!popup) return alert('Please allow pop-ups to print the work order.');
+            popup.document.write(`<!doctype html><html><head><title>${escapePrint(order.order_id || 'Work Order')}</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{font-size:28px;margin:0 0 8px}small{color:#666}section{margin:24px 0}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #ddd;padding:10px;text-align:left;font-size:12px}.total{font-size:24px;font-weight:900;text-align:right}</style></head><body><h1>SQUARE FOOT PRINTING — WORK ORDER</h1><small>${escapePrint(order.order_id || order._id)}</small><section><b>Customer:</b> ${escapePrint(order.customer_name)}<br><b>Email:</b> ${escapePrint(order.customer_email)}<br><b>Phone:</b> ${escapePrint(order.customer_phone)}<br><b>Delivery:</b> ${escapePrint(order.delivery_method)}<br><b>Status:</b> ${escapePrint(order.status)}</section><table><thead><tr><th>Product</th><th>Specifications</th><th>Price</th></tr></thead><tbody>${items}</tbody></table><p class="total">Total: $${parseMoney(order.total_price).toFixed(2)}</p><script>window.onload=()=>{window.print()}<\/script></body></html>`);
+            popup.document.close();
         }
 
         async function updateStatus(orderId, newStatus) {
@@ -321,15 +386,17 @@
         }
 
         function getStatusClass(status) {
-            if (status === 'Pending') return 'status-pending';
-            if (status === 'Ready') return 'status-ready';
-            if (status === 'Completed') return 'status-completed';
-            return 'text-blue-600 bg-blue-50';
+            const classes = {
+                Pending: 'status-pending', Paid: 'status-paid', Preflight: 'status-preflight',
+                Printing: 'status-printing', Finishing: 'status-finishing', Ready: 'status-ready',
+                Shipped: 'status-shipped', Completed: 'status-completed'
+            };
+            return classes[status] || 'text-blue-600 bg-blue-50';
         }
 
         function toggleDetails(id) { document.getElementById(id).classList.toggle('hidden'); }
         function logout() { localStorage.clear(); window.location.href = 'login.html'; }
-        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
+        function toggleMobileMenu() { const menu = document.getElementById('mobile-menu'); if (menu) menu.classList.toggle('open'); }
 
 
         const API_BASE = 'https://ft-f34l.onrender.com';
